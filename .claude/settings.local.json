@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(run)",
+      "PowerShell(cd C:\\\\Users\\\\getst\\\\ai-job-watch && npx vite --port 5173 2>&1 &)",
+      "PowerShell(Copy-Item *)"
+    ]
+  }
+}
