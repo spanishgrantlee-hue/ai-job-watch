@@ -1,255 +1,322 @@
-import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAnswers } from '../App';
+import { calculateResults } from '../utils/scoring';
 
-const RISK_CONFIG = {
-  LOW: {
-    label: 'LOW RISK',
-    color: 'var(--success)',
-    bg: 'rgba(16, 185, 129, 0.12)',
-    border: 'rgba(16, 185, 129, 0.35)',
-    headline: 'Your job is well-protected',
-    summary:
-      'Strong structural barriers make your role difficult to automate. Human judgment, physical presence, and professional licensing all work in your favour. Keep investing in the skills that make you irreplaceable.',
+// ─── Resources ────────────────────────────────────────────────────────────────
+const RESOURCES = {
+  HIGH: {
+    headline: 'You still have time to get ahead of this.',
+    intro: 'A lot of people are in the same spot right now. The ones who take one small step today will be okay.',
+    startHere: 'Pick one free resource below. Spend 30 minutes on it this week. You do not need to learn everything at once — just start somewhere.',
+    links: [
+      { name: 'AFL-CIO: Workers & AI',  url: 'https://aflcio.org/reports/workers-first-ai', desc: 'Written for workers, not bosses. Explains what AI means for your job and what your rights are.' },
+      { name: 'Google AI Essentials',   url: 'https://ai.google/learn-ai-skills',            desc: 'Free courses from Google. Teaches you how to use AI tools at work. No experience needed to start.' },
+      { name: 'IBM SkillsBuild',        url: 'https://skillsbuild.org',                       desc: 'Free job training. A few hours can get you started on a skill employers actually want right now.' },
+      { name: 'OpenAI Academy',         url: 'https://academy.openai.com',                    desc: 'Short lessons on how to use AI tools like ChatGPT to help you get more done at work.' },
+    ],
+    tips: [
+      "Ask your boss or union rep what AI tools are coming to your workplace. Knowing early gives you time to prepare — most people wait until it's too late.",
+      "Look at jobs in your company that need more judgment, people skills, or leadership. Those roles are harder to automate, and moving into one is worth thinking about.",
+    ],
   },
   MEDIUM: {
-    label: 'MEDIUM RISK',
-    color: 'var(--warning)',
-    bg: 'rgba(245, 158, 11, 0.12)',
-    border: 'rgba(245, 158, 11, 0.35)',
-    headline: 'Some areas need attention',
-    summary:
-      'Parts of your role show meaningful automation exposure. The good news: your human-intensive tasks still provide protection. Proactively building new skills and deepening your expertise will help you stay ahead.',
+    headline: "You're in decent shape. Keep building on it.",
+    intro: 'Your job has real strengths. A little effort now keeps you ahead of the curve.',
+    startHere: "Look at your lowest category scores above. That's your best starting point — a small improvement there makes the biggest difference.",
+    links: [
+      { name: 'Google AI Essentials', url: 'https://ai.google/learn-ai-skills',            desc: 'Free from Google. Learn to use AI tools to do your current job better and faster.' },
+      { name: 'OpenAI Academy',       url: 'https://academy.openai.com',                    desc: 'Short, practical lessons on using AI at work. Useful no matter what kind of job you have.' },
+      { name: 'IBM SkillsBuild',      url: 'https://skillsbuild.org',                       desc: 'Free training to help you add skills and move into roles with more job protection.' },
+      { name: 'AFL-CIO: Workers & AI',url: 'https://aflcio.org/reports/workers-first-ai',   desc: 'Good reading if you want to understand your rights as AI comes into your workplace.' },
+    ],
+    tips: [
+      "Try using one AI tool at work this week — even just to help you write an email or plan a task. Workers who use AI tend to be seen as more valuable, not less.",
+      "Think about getting a certification or taking on more responsibility at work. Both make you harder to replace — and they show up directly in your score.",
+    ],
   },
-  HIGH: {
-    label: 'HIGH RISK',
-    color: 'var(--danger)',
-    bg: 'rgba(239, 68, 68, 0.12)',
-    border: 'rgba(239, 68, 68, 0.35)',
-    headline: 'Significant automation exposure',
-    summary:
-      'Your role has structural characteristics that make it vulnerable to AI displacement. This is the time to take action — explore adjacent roles, pursue new certifications, or consider a career pivot toward areas with stronger human protection.',
+  LOW: {
+    headline: "Your job is in great shape. Here's how to make it even stronger.",
+    intro: 'Workers who have natural job protection AND know how to use AI tools are very hard to replace. That\'s where you want to be.',
+    startHere: "Pick one AI tool and try it this week to make part of your job easier. You're adding a new skill on top of strong ones you already have.",
+    links: [
+      { name: 'Google AI Essentials', url: 'https://ai.google/learn-ai-skills',            desc: 'Free from Google. Learn how to use AI as a tool to save time and do your job even better.' },
+      { name: 'OpenAI Academy',       url: 'https://academy.openai.com',                    desc: 'Short lessons on using AI tools like ChatGPT to get more done without more effort.' },
+      { name: 'IBM SkillsBuild',      url: 'https://skillsbuild.org',                       desc: 'Free courses to add more skills on top of the strong foundation you already have.' },
+      { name: 'AFL-CIO: Workers & AI',url: 'https://aflcio.org/reports/workers-first-ai',   desc: 'Know your rights as AI comes into your workplace — even when your job feels safe.' },
+    ],
+    tips: [
+      "People in low-risk jobs who also know how to use AI tools become very hard to replace. It puts you in the best possible spot.",
+      "Teaching coworkers how to do parts of your job does not make you replaceable — it shows you are a leader. That adds even more protection.",
+    ],
   },
 };
 
-const CATEGORY_DESCRIPTIONS = {
-  Accountability:
-    'How much others depend on your personal judgment and professional accountability.',
-  Trust: 'How central relationship-building and interpersonal trust are to your role.',
-  Judgment: 'How often you make nuanced decisions that rules alone cannot cover.',
-  'Problem Solving': 'How frequently you tackle novel problems without a predefined answer.',
-  'Physical Presence': 'How much your role requires physical location or manual action.',
-  Licensing: 'How much formal credentials or regulations protect your position.',
-};
-
-function ScoreGauge({ score, max = 30 }) {
-  const pct = Math.min(1, score / max);
-  const radius = 90;
-  const circumference = Math.PI * radius;
-  const dashOffset = circumference * (1 - pct);
-
-  let color;
-  if (score >= 24) color = 'var(--success)';
-  else if (score >= 16) color = 'var(--warning)';
-  else color = 'var(--danger)';
-
+function ExternalIcon() {
   return (
-    <div className="gauge-wrap">
-      <svg viewBox="0 0 200 110" className="gauge-svg">
-        <path
-          d="M 10 100 A 90 90 0 0 1 190 100"
-          fill="none"
-          stroke="#e2e8f0"
-          strokeWidth="14"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 10 100 A 90 90 0 0 1 190 100"
-          fill="none"
-          stroke={color}
-          strokeWidth="14"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={dashOffset}
-          style={{ transition: 'stroke-dashoffset 1s ease, stroke 0.5s ease' }}
-        />
-      </svg>
-      <div className="gauge-center">
-        <div className="gauge-score" style={{ color }}>{score}</div>
-        <div className="gauge-max">out of 30</div>
-      </div>
-    </div>
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style={{ display: 'inline', marginLeft: 4, verticalAlign: 'middle', flexShrink: 0 }}>
+      <path d="M2 10L10 2M10 2H5M10 2v5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
   );
 }
 
-function CategoryBar({ name, score, max = 5 }) {
-  const pct = (score / max) * 100;
-  return (
-    <div className="cat-bar-row">
-      <div className="cat-bar-header">
-        <span className="cat-name">{name}</span>
-        <span className="cat-score">{score}<span className="cat-max">/{max}</span></span>
-      </div>
-      <div className="cat-track">
-        <div
-          className="cat-fill"
-          style={{
-            width: `${pct}%`,
-            background:
-              score >= 4
-                ? 'var(--success)'
-                : score >= 3
-                ? 'var(--accent)'
-                : score >= 2
-                ? 'var(--warning)'
-                : 'var(--danger)',
-          }}
-        />
-      </div>
-      <p className="cat-desc">{CATEGORY_DESCRIPTIONS[name]}</p>
-    </div>
-  );
-}
-
-export default function Results() {
-  const { state } = useLocation();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!state?.scores) navigate('/assessment');
-  }, [state, navigate]);
-
-  if (!state?.scores) return null;
-
-  const { scores, answers } = state;
-  const { categories, aiExposure, total, riskLevel } = scores;
-  const cfg = RISK_CONFIG[riskLevel];
-  const jobTitle = answers?.Q1 || 'Your Role';
+function ResourcesSection({ riskKey }) {
+  const data = RESOURCES[riskKey];
+  if (!data) return null;
 
   return (
-    <div className="page-wrap">
-    <div className="results-page">
-      <div className="results-header">
-        <div className="results-title-block">
-          <p className="results-subtitle">Assessment results for</p>
-          <h1 className="results-title">{jobTitle}</h1>
+    <section className="resources-section">
+      <div className="container results-container">
+        <div className="resources-hdr">
+          <div className="section-label">What You Can Do Next</div>
+          <h2 className="resources-title">{data.headline}</h2>
+          <p className="resources-intro">{data.intro}</p>
         </div>
-      </div>
 
-      {/* Score Hero */}
-      <div className="score-hero">
-        <div className="score-gauge-col">
-          <ScoreGauge score={total} />
+        <div className="resources-start-here">
+          <span className="resources-start-label">Start Here</span>
+          <p className="resources-start-text">{data.startHere}</p>
         </div>
-        <div className="score-info-col">
-          <div
-            className="risk-badge"
-            style={{ color: cfg.color, background: cfg.bg, borderColor: cfg.border }}
-          >
-            {cfg.label}
-          </div>
-          <h2 className="score-headline">{cfg.headline}</h2>
-          <p className="score-summary">{cfg.summary}</p>
-          <div className="score-formula">
-            <div className="formula-label">Score breakdown</div>
-            <div className="formula-parts">
-              {Object.entries(categories).map(([name, val]) => (
-                <div key={name} className="formula-part">
-                  <span className="formula-val">{val}</span>
-                  <span className="formula-name">{name}</span>
-                </div>
-              ))}
-              <div className="formula-minus">−</div>
-              <div className="formula-part penalty">
-                <span className="formula-val">{aiExposure}</span>
-                <span className="formula-name">AI Exposure</span>
-              </div>
-              <div className="formula-equals">=</div>
-              <div className="formula-part total">
-                <span className="formula-val">{total}</span>
-                <span className="formula-name">Final Score</span>
-              </div>
+
+        <h3 className="resources-subheading">Free learning resources</h3>
+        <div className="resources-links-grid">
+          {data.links.map(link => (
+            <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="resource-card">
+              <span className="resource-card-name">{link.name}<ExternalIcon /></span>
+              <p className="resource-card-desc">{link.desc}</p>
+            </a>
+          ))}
+        </div>
+
+        <h3 className="resources-subheading">Two practical steps</h3>
+        <div className="resources-tips">
+          {data.tips.map((tip, i) => (
+            <div className="resources-tip-card" key={i}>
+              <span className="resources-tip-num" aria-hidden="true">{i + 1}</span>
+              <p className="resources-tip-text">{tip}</p>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Category Breakdown */}
-      <div className="results-section">
-        <h2 className="results-section-title">Category Breakdown</h2>
-        <p className="results-section-sub">
-          Each category is scored 1–5. Higher scores mean stronger protection in that area.
-        </p>
-        <div className="category-bars">
-          {Object.entries(categories).map(([name, score]) => (
-            <CategoryBar key={name} name={name} score={score} />
           ))}
         </div>
       </div>
+    </section>
+  );
+}
 
-      {/* AI Exposure Panel */}
-      <div className="results-section">
-        <div className="exposure-panel">
-          <div className="exposure-left">
-            <h3>AI Exposure Penalty</h3>
-            <p>
-              This score captures how much AI has already penetrated your work — measured by
-              repeatability, digital deliverability, and how quickly someone could replace you. A
-              higher penalty means more exposure.
-            </p>
-          </div>
-          <div className="exposure-score">
-            <div
-              className="exposure-number"
-              style={{
-                color:
-                  aiExposure <= 1
-                    ? 'var(--success)'
-                    : aiExposure <= 3
-                    ? 'var(--warning)'
-                    : 'var(--danger)',
-              }}
-            >
-              {aiExposure}
-            </div>
-            <div className="exposure-label">out of 5</div>
-          </div>
-        </div>
+function ScoreRangeBar({ score }) {
+  const MAX = 30;
+  const markerPct = Math.max(1.5, Math.min(98.5, (score / MAX) * 100));
+
+  return (
+    <div className="score-range-bar" aria-hidden="true">
+      <div className="score-range-track">
+        <div className="score-zone score-zone--high"   style={{ width: '50%' }} />
+        <div className="score-zone score-zone--medium" style={{ width: '26.7%' }} />
+        <div className="score-zone score-zone--low"    style={{ width: '23.3%' }} />
+        <div className="score-marker" style={{ left: `${markerPct}%` }} />
       </div>
-
-      {/* Risk Scale Reference */}
-      <div className="results-section">
-        <h2 className="results-section-title">Where You Fall on the Scale</h2>
-        <div className="scale-bar-wrap">
-          <div className="scale-bar">
-            <div className="scale-zone zone-high">≤15<br/>HIGH</div>
-            <div className="scale-zone zone-medium">16–23<br/>MEDIUM</div>
-            <div className="scale-zone zone-low">24+<br/>LOW</div>
-            <div
-              className="scale-marker"
-              style={{ left: `${Math.min(98, Math.max(2, (total / 30) * 100))}%` }}
-            >
-              <div className="scale-marker-dot" />
-              <div className="scale-marker-label">{total}</div>
-            </div>
-          </div>
-        </div>
+      <div className="score-range-legend">
+        <span>High Risk<br /><em>0–15</em></span>
+        <span>Medium Risk<br /><em>16–23</em></span>
+        <span>Low Risk<br /><em>24–30</em></span>
       </div>
-
-      {/* Actions */}
-      <div className="results-actions">
-        <Link to="/assessment" className="btn-primary">
-          Retake Assessment
-        </Link>
-        <Link to="/" className="btn-ghost">
-          Back to Home
-        </Link>
-      </div>
-
-      <p className="results-disclaimer">
-        This tool provides a structural analysis based on your answers. It is not a guarantee of
-        employment outcomes. Use it as one input among many when thinking about your career.
-      </p>
     </div>
+  );
+}
+
+// IDs of scored questions — used to check if assessment was completed
+const SCORED_IDS = ['Q6','Q7','Q8','Q9','Q10','Q11','Q12','Q13','Q14','Q15','Q16','Q17','Q18','Q19','Q20','Q21','Q22','Q23','Q24','Q25','Q28'];
+
+export default function Results() {
+  const { answers, setAnswers } = useAnswers();
+  const navigate = useNavigate();
+
+  const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
+
+  if (!hasAnswers) {
+    return (
+      <div className="results-page">
+        <div className="results-empty-page">
+          <div className="container">
+            <div className="results-empty-icon" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                <rect x="6"  y="28" width="8" height="14" rx="2" fill="#DDE3EE"/>
+                <rect x="20" y="18" width="8" height="24" rx="2" fill="#DDE3EE"/>
+                <rect x="34" y="8"  width="8" height="34" rx="2" fill="#DDE3EE"/>
+              </svg>
+            </div>
+            <h1>No Results Yet</h1>
+            <p>Complete the assessment first to get your AI Resistance Score.</p>
+            <Link to="/assessment" className="btn-primary">Take the Assessment</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const { rankedCategories, aiExposurePenalty, finalScore, riskKey, riskLabel, summary, automationRisks, topProtectors } = calculateResults(answers);
+  const riskClass = riskKey.toLowerCase();
+
+  function handleRetake() {
+    setAnswers({});
+    navigate('/assessment');
+  }
+
+  return (
+    <div className="results-page">
+
+      {/* Score Hero */}
+      <section className="results-hero">
+        <div className="container">
+          <p className="results-eyebrow">Your AI Resistance Score</p>
+          <div className="results-score-display">
+            <span className="results-score-number">{finalScore}</span>
+            <span className="results-score-denom">/ 30</span>
+          </div>
+          <div className={`results-risk-badge results-risk-badge--${riskClass}`}>
+            {riskLabel}
+          </div>
+          <ScoreRangeBar score={finalScore} />
+        </div>
+      </section>
+
+      {/* Personalized Summary */}
+      <section className="results-section results-section--white">
+        <div className="container results-container">
+          <div className={`summary-card summary-card--${riskClass}`}>
+            <div className={`summary-card-bar summary-card-bar--${riskClass}`} aria-hidden="true" />
+            <div className="summary-card-body">
+              <p className="section-label">Personalized Summary</p>
+              <h2 className="summary-headline">{summary.headline}</h2>
+              <p className="summary-body">{summary.body}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Category Breakdown */}
+      <section className="results-section">
+        <div className="container results-container">
+          <div className="results-section-hdr">
+            <div className="section-label">Score Breakdown</div>
+            <h2 className="results-section-title">How your job scores across 6 factors</h2>
+            <p className="results-section-desc">Each factor is scored 1–5. Higher means stronger protection. The AI Exposure Penalty is subtracted from your total.</p>
+          </div>
+
+          <div className="category-breakdown">
+            {rankedCategories.map(cat => {
+              const fillClass = cat.score >= 4 ? 'fill--strong' : cat.score >= 3 ? 'fill--mid' : 'fill--weak';
+              return (
+                <div className="category-row" key={cat.key}>
+                  <div className="category-row-top">
+                    <span className="category-row-label">{cat.label}</span>
+                    <span className="category-row-score">{cat.score}<span className="category-row-max">/5</span></span>
+                  </div>
+                  <div className="category-bar-track">
+                    <div className={`category-bar-fill ${fillClass}`} style={{ width: `${(cat.score / 5) * 100}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+
+            <div className="category-row category-row--penalty">
+              <div className="category-row-top">
+                <span className="category-row-label">
+                  AI Exposure Penalty
+                  <span className="penalty-note"> (subtracted)</span>
+                </span>
+                <span className="category-row-score category-row-score--penalty">
+                  &minus;{aiExposurePenalty}
+                </span>
+              </div>
+              <div className="category-bar-track">
+                <div className="category-bar-fill fill--penalty" style={{ width: `${(aiExposurePenalty / 3) * 100}%` }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What Protects Your Job */}
+      <section className="results-section results-section--white">
+        <div className="container results-container">
+          <div className="results-section-hdr">
+            <div className="section-label">What Protects Your Job</div>
+            <h2 className="results-section-title">Your strongest defenses against automation</h2>
+            <p className="results-section-desc">These are the parts of your role that AI struggles to replicate — your natural moat.</p>
+          </div>
+
+          {topProtectors.length > 0 ? (
+            <div className="protectors-grid">
+              {topProtectors.map(cat => (
+                <div className="protector-card" key={cat.key}>
+                  <div className="protector-card-top">
+                    <h3 className="protector-card-label">{cat.label}</h3>
+                    <span className="protector-score-badge">{cat.score}/5</span>
+                  </div>
+                  <p className="protector-card-why">{cat.protectsJobWhy}</p>
+                  <div className="protector-tags">
+                    {cat.exampleTasks.map(task => (
+                      <span className="protector-tag" key={task}>{task}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="results-callout results-callout--warning">
+              <p>None of your categories scored high enough to serve as a strong protective factor right now. Building skills in judgment, trust-based work, or earning credentials in your field are the most direct ways to improve your position.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* What Could Be Automated */}
+      <section className="results-section">
+        <div className="container results-container">
+          <div className="results-section-hdr">
+            <div className="section-label">What Could Be Automated</div>
+            <h2 className="results-section-title">Areas worth watching</h2>
+            <p className="results-section-desc">Based on your answers, these are the tasks in your role most exposed to automation pressure.</p>
+          </div>
+
+          {automationRisks.length > 0 ? (
+            <div className="automation-grid">
+              {automationRisks.map(risk => (
+                <div className="automation-card" key={risk.key}>
+                  <div className="automation-card-dot" aria-hidden="true" />
+                  <div>
+                    <h3 className="automation-card-title">{risk.label}</h3>
+                    <p className="automation-card-desc">{risk.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="results-callout results-callout--positive">
+              <p>Based on your answers, no major automation signals were detected in your role. Your work appears to rely heavily on human judgment, physical presence, or relationship-driven tasks — all of which are difficult to automate.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* What You Can Do Next */}
+      <ResourcesSection riskKey={riskKey} />
+
+      {/* Retake CTA */}
+      <section className="results-cta-band">
+        <div className="container">
+          <h2>Want to explore a different role?</h2>
+          <p>Retake the assessment with different answers, or share the link with a coworker so they can check their own score.</p>
+          <div className="results-cta-actions">
+            <button className="btn-primary" onClick={handleRetake} type="button">
+              Retake Assessment
+            </button>
+            <Link to="/about" className="btn-ghost-dark">
+              About this project
+            </Link>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

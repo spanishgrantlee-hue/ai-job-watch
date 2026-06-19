@@ -1,169 +1,196 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sections } from '../utils/questions';
-import { calculateScores } from '../utils/scoring';
+import { useAnswers } from '../App';
+import { sections, getQuestionsForSection } from '../utils/questions';
 
 const TOTAL_SECTIONS = sections.length;
 
 export default function Assessment() {
-  const navigate = useNavigate();
-  const [currentSection, setCurrentSection] = useState(0);
-  const [answers, setAnswers] = useState({});
+  const [currentSection, setCurrentSection] = useState(1);
   const [errors, setErrors] = useState({});
+  const { answers, setAnswers } = useAnswers();
+  const navigate = useNavigate();
 
-  const section = sections[currentSection];
-  const progress = Math.round(((currentSection) / TOTAL_SECTIONS) * 100);
+  const sectionData = sections.find(s => s.id === currentSection);
+  const sectionQuestions = getQuestionsForSection(currentSection);
+  const isLastSection = currentSection === TOTAL_SECTIONS;
+  const progressPct = Math.round((currentSection / TOTAL_SECTIONS) * 100);
 
-  function handleAnswer(qid, value) {
-    setAnswers((prev) => ({ ...prev, [qid]: value }));
-    setErrors((prev) => ({ ...prev, [qid]: false }));
+  function handleAnswer(questionId, value) {
+    setAnswers(prev => ({ ...prev, [questionId]: value }));
+    setErrors(prev => {
+      const next = { ...prev };
+      delete next[questionId];
+      return next;
+    });
   }
 
-  function validateSection() {
+  function validate() {
     const newErrors = {};
-    let valid = true;
-    section.questions.forEach((q) => {
-      if (q.type !== 'textarea' && !answers[q.id]) {
+    sectionQuestions.forEach(q => {
+      if (q.type === 'choice' && answers[q.id] === undefined) {
         newErrors[q.id] = true;
-        valid = false;
       }
     });
     setErrors(newErrors);
-    return valid;
+    return Object.keys(newErrors).length === 0;
   }
 
   function handleNext() {
-    if (!validateSection()) return;
-    if (currentSection < TOTAL_SECTIONS - 1) {
-      setCurrentSection((s) => s + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!validate()) {
+      const firstErrorId = sectionQuestions.find(
+        q => q.type === 'choice' && answers[q.id] === undefined
+      )?.id;
+      if (firstErrorId) {
+        document.getElementById(firstErrorId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+    if (isLastSection) {
+      navigate('/results');
     } else {
-      const scores = calculateScores(answers);
-      navigate('/results', { state: { scores, answers } });
+      setCurrentSection(s => s + 1);
+      setErrors({});
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
   function handleBack() {
-    setCurrentSection((s) => s - 1);
+    setCurrentSection(s => s - 1);
+    setErrors({});
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return (
-    <div className="page-wrap">
     <div className="assessment-page">
+
+      {/* Sticky progress bar */}
+      <div className="assessment-progress-bar">
+        <div className="container">
+          <div className="progress-meta">
+            <span className="progress-section-label">
+              Section {currentSection} of {TOTAL_SECTIONS} &mdash; <strong>{sectionData.title}</strong>
+            </span>
+            <span className="progress-pct">{progressPct}% complete</span>
+          </div>
+          <div className="progress-track">
+            <div className="progress-fill" style={{ width: `${progressPct}%` }} />
+          </div>
+        </div>
+      </div>
+
+      {/* Dark section header */}
       <div className="assessment-header">
-        <div className="progress-info">
-          <span className="progress-label">
-            Section {currentSection + 1} of {TOTAL_SECTIONS}
-          </span>
-          <span className="progress-pct">{progress}%</span>
+        <div className="container">
+          <p className="assessment-section-tag">Section {currentSection} of {TOTAL_SECTIONS}</p>
+          <h1 className="assessment-title">{sectionData.title}</h1>
+          <p className="assessment-desc">{sectionData.description}</p>
         </div>
-        <div className="progress-track">
-          <div className="progress-fill" style={{ width: `${progress}%` }} />
-        </div>
-        <div className="section-steps">
-          {sections.map((s, i) => (
-            <div
-              key={s.id}
-              className={`step ${i < currentSection ? 'done' : ''} ${i === currentSection ? 'active' : ''}`}
-              title={s.title}
+      </div>
+
+      {/* Questions */}
+      <div className="assessment-body">
+        <div className="container">
+          {sectionQuestions.map((q, idx) => (
+            <QuestionBlock
+              key={q.id}
+              question={q}
+              number={idx + 1}
+              answer={answers[q.id]}
+              hasError={!!errors[q.id]}
+              onChange={val => handleAnswer(q.id, val)}
             />
           ))}
-        </div>
-      </div>
 
-      <div className="assessment-body">
-        <div className="section-intro">
-          <span className="section-tag">Section {section.id}</span>
-          <h2 className="section-heading">{section.title}</h2>
-          <p className="section-desc">{section.description}</p>
-        </div>
-
-        <div className="questions-list">
-          {section.questions.map((q, qi) => (
-            <div key={q.id} className={`question-card ${errors[q.id] ? 'question-error' : ''}`}>
-              <div className="question-label">
-                <span className="q-number">Q{q.id.replace('Q', '')}</span>
-                <span className="q-text">{q.label}</span>
-              </div>
-
-              {q.type === 'text' && (
-                <input
-                  type="text"
-                  className="text-input"
-                  placeholder={q.placeholder}
-                  value={answers[q.id] || ''}
-                  onChange={(e) => handleAnswer(q.id, e.target.value)}
-                />
-              )}
-
-              {q.type === 'textarea' && (
-                <textarea
-                  className="textarea-input"
-                  placeholder={q.placeholder}
-                  rows={6}
-                  value={answers[q.id] || ''}
-                  onChange={(e) => handleAnswer(q.id, e.target.value)}
-                />
-              )}
-
-              {q.type === 'select' && (
-                <select
-                  className="select-input"
-                  value={answers[q.id] || ''}
-                  onChange={(e) => handleAnswer(q.id, e.target.value)}
-                >
-                  <option value="" disabled>
-                    Select an option…
-                  </option>
-                  {q.options.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
-              )}
-
-              {q.type === 'radio' && (
-                <div className="radio-group">
-                  {q.options.map((opt) => (
-                    <label
-                      key={opt}
-                      className={`radio-option ${answers[q.id] === opt ? 'selected' : ''}`}
-                    >
-                      <input
-                        type="radio"
-                        name={q.id}
-                        value={opt}
-                        checked={answers[q.id] === opt}
-                        onChange={() => handleAnswer(q.id, opt)}
-                      />
-                      <span className="radio-check" />
-                      <span className="radio-label">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {errors[q.id] && (
-                <p className="error-msg">Please select an answer to continue.</p>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="assessment-nav">
-          {currentSection > 0 && (
-            <button className="btn-ghost" onClick={handleBack}>
-              ← Back
+          <div className="assessment-nav">
+            {currentSection > 1 && (
+              <button className="btn-secondary" onClick={handleBack} type="button">
+                &larr; Back
+              </button>
+            )}
+            <button className="btn-primary" onClick={handleNext} type="button">
+              {isLastSection ? 'See My Results →' : 'Next →'}
             </button>
-          )}
-          <button className="btn-primary" onClick={handleNext}>
-            {currentSection < TOTAL_SECTIONS - 1 ? 'Next Section →' : 'See My Results →'}
-          </button>
+          </div>
         </div>
       </div>
+
     </div>
+  );
+}
+
+function QuestionBlock({ question, number, answer, hasError, onChange }) {
+  const isOptional = question.type === 'freeText';
+
+  return (
+    <div
+      id={question.id}
+      className={`question-block${hasError ? ' question-block--error' : ''}`}
+    >
+      <div className="question-label-row">
+        <span className="question-label">
+          {number}. {question.text}
+        </span>
+        {isOptional && <span className="question-optional">Optional</span>}
+      </div>
+
+      {hasError && (
+        <p className="question-error-msg">Please select an answer to continue.</p>
+      )}
+
+      {question.type === 'freeText' && !question.multiLine && (
+        <input
+          type="text"
+          className="question-input"
+          placeholder={question.placeholder}
+          value={answer || ''}
+          onChange={e => onChange(e.target.value)}
+          aria-label={question.text}
+        />
+      )}
+
+      {question.type === 'freeText' && question.multiLine && (
+        <textarea
+          className="question-textarea"
+          placeholder={question.placeholder}
+          value={answer || ''}
+          onChange={e => onChange(e.target.value)}
+          rows={6}
+          aria-label={question.text}
+        />
+      )}
+
+      {question.type === 'choice' && (
+        <div className="choice-list" role="radiogroup" aria-label={question.text}>
+          {question.choices.map((choice, i) => {
+            const selected = answer === i;
+            return (
+              <button
+                key={i}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                className={`choice-btn${selected ? ' choice-btn--selected' : ''}`}
+                onClick={() => onChange(i)}
+              >
+                <span className="choice-indicator" aria-hidden="true">
+                  {selected ? (
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <circle cx="9" cy="9" r="8" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="2"/>
+                      <circle cx="9" cy="9" r="4" fill="currentColor"/>
+                    </svg>
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <circle cx="9" cy="9" r="8" stroke="#C8D4E3" strokeWidth="2"/>
+                    </svg>
+                  )}
+                </span>
+                <span className="choice-label">{choice.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
