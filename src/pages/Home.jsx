@@ -35,7 +35,7 @@ export default function Home() {
           <span className="gradient-text">from AI?</span>
         </h1>
         <p className="hero-sub">
-          Answer 30 questions about your role. Get a personalised AI Resistance Score and a clear
+          Answer 30 questions about your role. Get a personalized AI Resistance Score and a clear
           breakdown of how exposed — or protected — your job really is.
         </p>
         <div className="hero-actions">
