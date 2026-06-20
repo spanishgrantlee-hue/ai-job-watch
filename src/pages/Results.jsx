@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAnswers } from '../App';
 import { calculateResults } from '../utils/scoring';
@@ -130,6 +131,19 @@ export default function Results() {
   const navigate = useNavigate();
 
   const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
+
+  // Fire-and-forget: save anonymous result once per completed assessment
+  const hasFiredRef = useRef(false);
+  useEffect(() => {
+    if (!hasAnswers || hasFiredRef.current) return;
+    hasFiredRef.current = true;
+    const { finalScore, riskKey } = calculateResults(answers);
+    fetch('/api/save-result', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answers, finalScore, riskKey }),
+    }).catch(() => {});
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!hasAnswers) {
     return (
