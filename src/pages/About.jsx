@@ -90,10 +90,11 @@ export default function About() {
       <div className="about-section">
         <h2>Privacy</h2>
         <p>
-          AI Job Watch currently does not collect or store any of your answers — everything is
-          processed in your browser and discarded when you close the tab. A future version of the
-          site may introduce optional data collection to improve the tool, but you will always be
-          informed before any data is stored.
+          AI Job Watch automatically saves your assessment answers and final score to help us
+          understand which jobs and industries are most affected by AI — and to improve this tool
+          over time. We do not collect your name, email, location, or any other personal
+          information. Your responses are anonymous, but your input helps us learn and build a
+          better site to help more people.
         </p>
       </div>
 
