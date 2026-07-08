@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 const features = [
   {
@@ -26,6 +27,10 @@ const features = [
 export default function Home() {
   return (
     <div className="home">
+      <Helmet>
+        <title>Is Your Job Safe from AI? | AI Job Watch</title>
+        <meta name="description" content="Free AI job risk assessment. Answer 30 questions about your role and get a personalized AI Resistance Score — find out exactly how exposed or protected your job is from automation." />
+      </Helmet>
       {/* Dark navy hero */}
       <section className="hero">
         <div className="hero-badge">AI Disruption Analysis Tool</div>
