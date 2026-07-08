@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# TODO (Task A2): Replace with production domain once confirmed
+Sitemap: https://www.aijobwatch.com/sitemap.xml
