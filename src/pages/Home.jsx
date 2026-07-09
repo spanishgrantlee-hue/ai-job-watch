@@ -1,6 +1,22 @@
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'AI Job Watch',
+  url: 'https://aijobwatch.org',
+  description: 'Free AI job risk assessment. Answer 30 questions and get a personalized AI Resistance Score showing how exposed or protected your job is from automation.',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web Browser',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  featureList: 'AI Resistance Score, Category Breakdown, Automation Risk Assessment, Anonymous with no account required',
+};
+
 const features = [
   {
     icon: '🧠',
@@ -30,6 +46,7 @@ export default function Home() {
       <Helmet>
         <title>Is Your Job Safe from AI? | AI Job Watch</title>
         <meta name="description" content="Free AI job risk assessment. Answer 30 questions about your role and get a personalized AI Resistance Score — find out exactly how exposed or protected your job is from automation." />
+        <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
       </Helmet>
       {/* Dark navy hero */}
       <section className="hero">
