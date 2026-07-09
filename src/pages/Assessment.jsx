@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useAnswers } from '../App';
 import { sections, getQuestionsForSection } from '../utils/questions';
 
@@ -63,6 +64,10 @@ export default function Assessment() {
 
   return (
     <div className="assessment-page">
+      <Helmet>
+        <title>AI Job Risk Assessment | AI Job Watch</title>
+        <meta name="description" content="Take the free AI Job Watch assessment. Answer 30 questions about your role and get an instant AI Resistance Score across six categories — no account required." />
+      </Helmet>
 
       {/* Sticky progress bar */}
       <div className="assessment-progress-bar">
