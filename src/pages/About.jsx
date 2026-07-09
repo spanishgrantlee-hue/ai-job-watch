@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import heroPhoto from '../assets/hero.jpg';
 
 const categories = [
@@ -14,6 +15,10 @@ const categories = [
 export default function About() {
   return (
     <div className="page-wrap">
+      <Helmet>
+        <title>About AI Job Watch | Methodology &amp; Scoring</title>
+        <meta name="description" content="Learn how AI Job Watch scores your job's automation risk across six factors: Accountability, Trust, Judgment, Problem Solving, Physical Presence, and Licensing. No data stored, fully anonymous." />
+      </Helmet>
     <div className="about-page">
       <div className="about-hero">
         <h1>About AI Job Watch</h1>
