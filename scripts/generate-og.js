@@ -150,6 +150,51 @@ const svgHigh = wrap(`
         font-size="16" font-weight="600" fill="#ffffff" text-anchor="middle">See Your Full Breakdown</text>
 `);
 
+// ─── B3: Medium Risk ─────────────────────────────────────────────────────────
+
+const svgMedium = wrap(`
+  <!-- Left accent bar — amber -->
+  <rect x="0" y="0" width="6" height="630" fill="#9A5700"/>
+
+  <!-- Badge -->
+  <rect x="72" y="142" width="178" height="32" rx="6"
+        fill="#9A5700" fill-opacity="0.18"/>
+  <text x="86" y="163" font-family="system-ui,-apple-system,Segoe UI,sans-serif"
+        font-size="13" font-weight="700" fill="#d4930a" letter-spacing="1.2">MEDIUM RISK</text>
+
+  <!-- Title -->
+  <text x="72" y="258" font-family="system-ui,-apple-system,Segoe UI,sans-serif"
+        font-size="74" font-weight="800" fill="#f8fafc" letter-spacing="-1">AI Job Watch</text>
+
+  <!-- Tagline -->
+  <text x="72" y="318" font-family="system-ui,-apple-system,Segoe UI,sans-serif"
+        font-size="32" font-weight="400" fill="#94a3b8">Medium Automation Risk Detected</text>
+
+  <!-- Sub-description -->
+  <text x="72" y="370" font-family="system-ui,-apple-system,Segoe UI,sans-serif"
+        font-size="20" fill="#52647a">Some parts of your role are vulnerable. See where to focus.</text>
+
+  ${riskBar()}
+
+  <!-- Marker triangle over MEDIUM zone — center x≈361 -->
+  <polygon points="361,428 371,416 351,416" fill="#9A5700"/>
+
+  <!-- Right: risk circle — amber -->
+  <circle cx="968" cy="272" r="148" fill="#9A5700" fill-opacity="0.08"/>
+  <circle cx="968" cy="272" r="148" fill="none" stroke="#9A5700" stroke-opacity="0.3" stroke-width="1.5"/>
+  <text x="968" y="224" font-family="system-ui,-apple-system,Segoe UI,sans-serif"
+        font-size="58" font-weight="800" fill="#9A5700" fill-opacity="0.7" text-anchor="middle">MEDIUM</text>
+  <text x="968" y="298" font-family="system-ui,-apple-system,Segoe UI,sans-serif"
+        font-size="32" font-weight="700" fill="#9A5700" fill-opacity="0.5" text-anchor="middle">RISK</text>
+  <text x="968" y="348" font-family="system-ui,-apple-system,Segoe UI,sans-serif"
+        font-size="15" fill="#52647a" text-anchor="middle">Score range: 16 – 23</text>
+
+  <!-- CTA button — amber -->
+  <rect x="820" y="548" width="308" height="48" rx="24" fill="#9A5700"/>
+  <text x="974" y="579" font-family="system-ui,-apple-system,Segoe UI,sans-serif"
+        font-size="16" font-weight="600" fill="#ffffff" text-anchor="middle">See Your Full Breakdown</text>
+`);
+
 // ─── Render helper ────────────────────────────────────────────────────────────
 
 function render(svg, filename) {
@@ -162,3 +207,4 @@ function render(svg, filename) {
 
 render(svgDefault, 'og-default.png');
 render(svgHigh,    'og-high.png');
+render(svgMedium,  'og-medium.png');
