@@ -1,8 +1,8 @@
 import { useRef, useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAnswers } from '../App';
 import { calculateResults } from '../utils/scoring';
-import { encodeShareState } from '../utils/share';
+import { encodeShareState, decodeShareState } from '../utils/share';
 
 // ─── Resources ────────────────────────────────────────────────────────────────
 const RESOURCES = {
@@ -130,14 +130,19 @@ const SCORED_IDS = ['Q6','Q7','Q8','Q9','Q10','Q11','Q12','Q13','Q14','Q15','Q16
 export default function Results() {
   const { answers, setAnswers } = useAnswers();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [copied, setCopied] = useState(false);
+
+  const shareParam = searchParams.get('share');
+  const sharedData = shareParam ? decodeShareState(shareParam) : null;
+  const isSharedView = sharedData !== null;
 
   const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
 
-  // Fire-and-forget: save anonymous result once per completed assessment
+  // Fire-and-forget: save anonymous result once per completed assessment (skip shared views)
   const hasFiredRef = useRef(false);
   useEffect(() => {
-    if (!hasAnswers || hasFiredRef.current) return;
+    if (!hasAnswers || isSharedView || hasFiredRef.current) return;
     hasFiredRef.current = true;
     const { finalScore, riskKey } = calculateResults(answers);
     fetch('/api/save-result', {
@@ -147,7 +152,7 @@ export default function Results() {
     }).catch(() => {});
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!hasAnswers) {
+  if (!isSharedView && !hasAnswers) {
     return (
       <div className="results-page">
         <div className="results-empty-page">
@@ -168,9 +173,12 @@ export default function Results() {
     );
   }
 
-  const { categories, rankedCategories, aiExposurePenalty, finalScore, riskKey, riskLabel, summary, automationRisks, topProtectors } = calculateResults(answers);
+  const { categories, rankedCategories, aiExposurePenalty, finalScore, riskKey, riskLabel, summary, automationRisks, topProtectors } =
+    isSharedView ? sharedData : calculateResults(answers);
   const riskClass = riskKey.toLowerCase();
-  const shareUrl  = `${window.location.origin}/results?share=${encodeShareState({ finalScore, riskKey, categories, aiExposurePenalty, automationRisks })}`;
+  const shareUrl  = isSharedView
+    ? window.location.href
+    : `${window.location.origin}/results?share=${encodeShareState({ finalScore, riskKey, categories, aiExposurePenalty, automationRisks })}`;
 
   function handleCopyLink() {
     navigator.clipboard.writeText(shareUrl)
@@ -191,6 +199,16 @@ export default function Results() {
 
   return (
     <div className="results-page">
+
+      {/* Shared-view notice */}
+      {isSharedView && (
+        <div className="results-shared-banner">
+          <div className="container">
+            <span>You&rsquo;re viewing a shared result.</span>
+            <Link to="/assessment" className="results-shared-banner-cta">Take your own assessment &rarr;</Link>
+          </div>
+        </div>
+      )}
 
       {/* Score Hero */}
       <section className="results-hero">
@@ -348,18 +366,20 @@ export default function Results() {
       {/* What You Can Do Next */}
       <ResourcesSection riskKey={riskKey} />
 
-      {/* Retake CTA */}
+      {/* Retake / Take assessment CTA */}
       <section className="results-cta-band">
         <div className="container">
-          <h2>Want to explore a different role?</h2>
-          <p>Retake the assessment with different answers, or share the link with a coworker so they can check their own score.</p>
+          <h2>{isSharedView ? 'Want to check your own score?' : 'Want to explore a different role?'}</h2>
+          <p>{isSharedView ? 'Take the free assessment and get your personalized AI Resistance Score.' : 'Retake the assessment with different answers, or share the link with a coworker so they can check their own score.'}</p>
           <div className="results-cta-actions">
             <button className="btn-primary" onClick={handleRetake} type="button">
-              Retake Assessment
+              {isSharedView ? 'Take the Assessment' : 'Retake Assessment'}
             </button>
-            <Link to="/about" className="btn-ghost-dark">
-              About this project
-            </Link>
+            {!isSharedView && (
+              <Link to="/about" className="btn-ghost-dark">
+                About this project
+              </Link>
+            )}
           </div>
         </div>
       </section>
