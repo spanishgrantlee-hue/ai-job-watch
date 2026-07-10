@@ -170,13 +170,18 @@ export default function Results() {
 
   const { categories, rankedCategories, aiExposurePenalty, finalScore, riskKey, riskLabel, summary, automationRisks, topProtectors } = calculateResults(answers);
   const riskClass = riskKey.toLowerCase();
+  const shareUrl  = `${window.location.origin}/results?share=${encodeShareState({ finalScore, riskKey, categories, aiExposurePenalty, automationRisks })}`;
 
   function handleCopyLink() {
-    const encoded = encodeShareState({ finalScore, riskKey, categories, aiExposurePenalty, automationRisks });
-    const url = `${window.location.origin}/results?share=${encoded}`;
-    navigator.clipboard.writeText(url)
+    navigator.clipboard.writeText(shareUrl)
       .then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); })
       .catch(() => {});
+  }
+
+  function handleShareX() {
+    const text = `I just checked my AI risk score — got ${finalScore}/30 (${riskKey} Risk). Check yours free:`;
+    const tweet = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
+    window.open(tweet, '_blank', 'noopener,noreferrer');
   }
 
   function handleRetake() {
@@ -207,6 +212,14 @@ export default function Results() {
               aria-label="Copy share link to clipboard"
             >
               {copied ? '✓ Copied!' : 'Copy Link'}
+            </button>
+            <button
+              type="button"
+              className="btn-share-x"
+              onClick={handleShareX}
+              aria-label="Share on X (Twitter)"
+            >
+              Share on X
             </button>
           </div>
         </div>
