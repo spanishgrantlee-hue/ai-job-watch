@@ -890,6 +890,39 @@ input, select, textarea, button { font-family: inherit; }
   z-index: 2;
 }
 
+/* Share row — sits below the score range bar inside the dark hero */
+.results-share-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.btn-copy-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 22px;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255,255,255,0.75);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+.btn-copy-link:hover {
+  border-color: rgba(255,255,255,0.5);
+  color: #fff;
+  background: rgba(255,255,255,0.07);
+}
+.btn-copy-link--copied {
+  border-color: var(--clr-low);
+  color: var(--clr-low-bg);
+  background: rgba(10,122,75,0.15);
+}
+
 .score-range-legend {
   display: flex;
   justify-content: space-between;

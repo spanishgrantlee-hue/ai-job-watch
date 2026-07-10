@@ -1,7 +1,8 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAnswers } from '../App';
 import { calculateResults } from '../utils/scoring';
+import { encodeShareState } from '../utils/share';
 
 // ─── Resources ────────────────────────────────────────────────────────────────
 const RESOURCES = {
@@ -129,6 +130,7 @@ const SCORED_IDS = ['Q6','Q7','Q8','Q9','Q10','Q11','Q12','Q13','Q14','Q15','Q16
 export default function Results() {
   const { answers, setAnswers } = useAnswers();
   const navigate = useNavigate();
+  const [copied, setCopied] = useState(false);
 
   const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
 
@@ -166,8 +168,16 @@ export default function Results() {
     );
   }
 
-  const { rankedCategories, aiExposurePenalty, finalScore, riskKey, riskLabel, summary, automationRisks, topProtectors } = calculateResults(answers);
+  const { categories, rankedCategories, aiExposurePenalty, finalScore, riskKey, riskLabel, summary, automationRisks, topProtectors } = calculateResults(answers);
   const riskClass = riskKey.toLowerCase();
+
+  function handleCopyLink() {
+    const encoded = encodeShareState({ finalScore, riskKey, categories, aiExposurePenalty, automationRisks });
+    const url = `${window.location.origin}/results?share=${encoded}`;
+    navigator.clipboard.writeText(url)
+      .then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); })
+      .catch(() => {});
+  }
 
   function handleRetake() {
     setAnswers({});
@@ -189,6 +199,16 @@ export default function Results() {
             {riskLabel}
           </div>
           <ScoreRangeBar score={finalScore} />
+          <div className="results-share-row">
+            <button
+              type="button"
+              className={`btn-copy-link${copied ? ' btn-copy-link--copied' : ''}`}
+              onClick={handleCopyLink}
+              aria-label="Copy share link to clipboard"
+            >
+              {copied ? '✓ Copied!' : 'Copy Link'}
+            </button>
+          </div>
         </div>
       </section>
 
