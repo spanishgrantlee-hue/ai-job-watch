@@ -4,6 +4,7 @@ import { useAnswers } from '../App';
 import { calculateResults } from '../utils/scoring';
 import { encodeShareState, decodeShareState, generateTextSummary } from '../utils/share';
 import { Helmet } from 'react-helmet-async';
+import WhatIfPanel from '../components/WhatIfPanel';
 
 // ─── Resources ────────────────────────────────────────────────────────────────
 const RESOURCES = {
@@ -134,6 +135,7 @@ export default function Results() {
   const [searchParams] = useSearchParams();
   const [copied, setCopied]         = useState(false);
   const [copiedText, setCopiedText] = useState(false);
+  const [showWhatIf, setShowWhatIf] = useState(false);
 
   const shareParam = searchParams.get('share');
   const sharedData = shareParam ? decodeShareState(shareParam) : null;
@@ -333,6 +335,32 @@ export default function Results() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* What-If Explorer */}
+      <section className="results-section whatif-section">
+        <div className="container results-container">
+          <div className="whatif-section-hdr">
+            <div>
+              <div className="section-label">Explore Scenarios</div>
+              <h2 className="results-section-title">What-If Explorer</h2>
+              <p className="results-section-desc">
+                Adjust your category scores to see how small changes would affect your AI Resistance Score.
+              </p>
+            </div>
+            <button
+              type="button"
+              className={`whatif-toggle-btn${showWhatIf ? ' whatif-toggle-btn--open' : ''}`}
+              onClick={() => setShowWhatIf(v => !v)}
+              aria-expanded={showWhatIf}
+            >
+              {showWhatIf ? 'Hide Explorer' : 'Open Explorer'}
+            </button>
+          </div>
+          {showWhatIf && (
+            <WhatIfPanel categories={categories} aiExposurePenalty={aiExposurePenalty} />
+          )}
         </div>
       </section>
 
