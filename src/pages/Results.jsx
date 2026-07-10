@@ -3,6 +3,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAnswers } from '../App';
 import { calculateResults } from '../utils/scoring';
 import { encodeShareState, decodeShareState } from '../utils/share';
+import { Helmet } from 'react-helmet-async';
 
 // ─── Resources ────────────────────────────────────────────────────────────────
 const RESOURCES = {
@@ -180,6 +181,10 @@ export default function Results() {
     ? window.location.href
     : `${window.location.origin}/results?share=${encodeShareState({ finalScore, riskKey, categories, aiExposurePenalty, automationRisks })}`;
 
+  const ogImage   = `https://aijobwatch.org/og-${riskClass}.png`;
+  const pageTitle = `AI Resistance Score: ${finalScore}/30 (${riskLabel}) | AI Job Watch`;
+  const pageDesc  = `Scored ${finalScore}/30 on the AI Job Watch assessment — ${riskLabel}. Take the free quiz to see how AI-proof your job is.`;
+
   function handleCopyLink() {
     navigator.clipboard.writeText(shareUrl)
       .then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); })
@@ -199,6 +204,19 @@ export default function Results() {
 
   return (
     <div className="results-page">
+
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDesc} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDesc} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:url" content={shareUrl} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDesc} />
+        <meta name="twitter:image" content={ogImage} />
+      </Helmet>
 
       {/* Shared-view notice */}
       {isSharedView && (
