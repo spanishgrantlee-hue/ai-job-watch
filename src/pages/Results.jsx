@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAnswers } from '../App';
 import { calculateResults } from '../utils/scoring';
-import { encodeShareState, decodeShareState } from '../utils/share';
+import { encodeShareState, decodeShareState, generateTextSummary } from '../utils/share';
 import { Helmet } from 'react-helmet-async';
 
 // ─── Resources ────────────────────────────────────────────────────────────────
@@ -132,7 +132,8 @@ export default function Results() {
   const { answers, setAnswers } = useAnswers();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied]         = useState(false);
+  const [copiedText, setCopiedText] = useState(false);
 
   const shareParam = searchParams.get('share');
   const sharedData = shareParam ? decodeShareState(shareParam) : null;
@@ -193,6 +194,13 @@ export default function Results() {
       .catch(() => {});
   }
 
+  function handleCopyText() {
+    const text = generateTextSummary({ finalScore, riskLabel, rankedCategories, aiExposurePenalty, automationRisks, topProtectors });
+    navigator.clipboard.writeText(text)
+      .then(() => { setCopiedText(true); setTimeout(() => setCopiedText(false), 2000); })
+      .catch(() => {});
+  }
+
   function handleShareX() {
     const text = `I just checked my AI risk score — got ${finalScore}/30 (${riskKey} Risk). Check yours free:`;
     const tweet = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
@@ -250,6 +258,14 @@ export default function Results() {
               aria-label="Copy share link to clipboard"
             >
               {copied ? '✓ Copied!' : 'Copy Link'}
+            </button>
+            <button
+              type="button"
+              className={`btn-copy-text${copiedText ? ' btn-copy-text--copied' : ''}`}
+              onClick={handleCopyText}
+              aria-label="Copy plain-text summary to clipboard"
+            >
+              {copiedText ? '✓ Copied!' : 'Copy as Text'}
             </button>
             <button
               type="button"
