@@ -145,11 +145,13 @@ export default function Results() {
   useEffect(() => {
     if (!hasAnswers || isSharedView || hasFiredRef.current) return;
     hasFiredRef.current = true;
-    const { finalScore, riskKey } = calculateResults(answers);
+    const { finalScore, riskKey, categories, aiExposurePenalty, automationRisks } = calculateResults(answers);
+    const encoded  = encodeShareState({ finalScore, riskKey, categories, aiExposurePenalty, automationRisks });
+    const shareUrl = `${window.location.origin}/results?share=${encoded}`;
     fetch('/api/save-result', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ answers, finalScore, riskKey }),
+      body: JSON.stringify({ answers, finalScore, riskKey, shareUrl }),
     }).catch(() => {});
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

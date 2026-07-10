@@ -14,7 +14,7 @@ export default async (req) => {
     return new Response('Bad Request', { status: 400 });
   }
 
-  const { answers, finalScore, riskKey } = body;
+  const { answers, finalScore, riskKey, shareUrl } = body;
 
   if (
     answers === null ||
@@ -30,6 +30,8 @@ export default async (req) => {
     Object.entries(answers).filter(([k]) => VALID_Q.test(k))
   );
 
+  const safeShareUrl = typeof shareUrl === 'string' && shareUrl.length < 1000 ? shareUrl : null;
+
   const id = crypto.randomUUID();
   const store = getStore('assessment-results');
   await store.setJSON(id, {
@@ -38,6 +40,7 @@ export default async (req) => {
     answers: sanitized,
     finalScore,
     riskKey,
+    shareUrl: safeShareUrl,
   });
 
   return new Response(JSON.stringify({ ok: true }), {
