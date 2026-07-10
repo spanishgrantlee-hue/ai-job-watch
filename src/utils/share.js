@@ -104,3 +104,44 @@ export function decodeShareState(encoded) {
     return null;
   }
 }
+
+/**
+ * Generates a plain-text summary of assessment results suitable for
+ * copying into emails, messages, or social media posts.
+ *
+ * @param {object} results - return value of calculateResults() or decodeShareState()
+ * @returns {string} multi-line plain text
+ */
+export function generateTextSummary({ finalScore, riskLabel, rankedCategories, aiExposurePenalty, automationRisks, topProtectors }) {
+  const lines = [];
+
+  lines.push(`AI Resistance Score: ${finalScore}/30 (${riskLabel})`);
+  lines.push('');
+
+  lines.push('Category Breakdown:');
+  for (const cat of rankedCategories) {
+    lines.push(`  ${cat.label}: ${cat.score}/5`);
+  }
+  lines.push(`  AI Exposure Penalty: −${aiExposurePenalty}`);
+
+  if (topProtectors.length > 0) {
+    lines.push('');
+    lines.push('Strongest protections:');
+    for (const cat of topProtectors) {
+      lines.push(`  • ${cat.label} (${cat.score}/5)`);
+    }
+  }
+
+  if (automationRisks.length > 0) {
+    lines.push('');
+    lines.push('Automation exposure:');
+    for (const risk of automationRisks) {
+      lines.push(`  • ${risk.label}`);
+    }
+  }
+
+  lines.push('');
+  lines.push('Find out yours → https://aijobwatch.org');
+
+  return lines.join('\n');
+}
