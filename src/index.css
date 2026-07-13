@@ -751,6 +751,29 @@ input, select, textarea, button { font-family: inherit; }
   font-size: 1rem;
 }
 
+/* F3: sticky bottom nav on mobile — fixed bar so Next is always reachable */
+@media (max-width: 479px) {
+  .assessment-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 90;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0;
+    padding: 10px 16px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    background: var(--clr-white);
+    box-shadow: 0 -3px 16px rgba(0,0,0,0.09);
+  }
+  .assessment-nav .btn-primary   { flex: 1; width: auto; padding: 14px 20px; }
+  .assessment-nav .btn-secondary { width: auto; flex-shrink: 0; padding: 14px 18px; }
+  /* Keep last question from hiding under the fixed bar */
+  .assessment-body { padding-bottom: 96px; }
+}
+
 @media (min-width: 480px) {
   .assessment-nav { flex-direction: row; justify-content: flex-end; }
   .assessment-nav .btn-primary,
