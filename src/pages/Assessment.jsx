@@ -14,8 +14,9 @@ export default function Assessment() {
 
   const sectionData = sections.find(s => s.id === currentSection);
   const sectionQuestions = getQuestionsForSection(currentSection);
-  const isLastSection = currentSection === TOTAL_SECTIONS;
-  const progressPct = Math.round((currentSection / TOTAL_SECTIONS) * 100);
+  const isLastSection   = currentSection === TOTAL_SECTIONS;
+  const answeredCount   = sectionQuestions.filter(q => q.type === 'choice' && answers[q.id] !== undefined).length;
+  const requiredCount   = sectionQuestions.filter(q => q.type === 'choice').length;
 
   function handleAnswer(questionId, value) {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
@@ -76,10 +77,19 @@ export default function Assessment() {
             <span className="progress-section-label">
               Section {currentSection} of {TOTAL_SECTIONS} &mdash; <strong>{sectionData.title}</strong>
             </span>
-            <span className="progress-pct">{progressPct}% complete</span>
+            <span className="progress-pct">{answeredCount}/{requiredCount} answered</span>
           </div>
-          <div className="progress-track">
-            <div className="progress-fill" style={{ width: `${progressPct}%` }} />
+          <div className="progress-track" role="progressbar" aria-valuenow={currentSection} aria-valuemin={1} aria-valuemax={TOTAL_SECTIONS} aria-label="Assessment progress">
+            {sections.map(s => (
+              <div
+                key={s.id}
+                className={
+                  s.id < currentSection  ? 'progress-segment progress-segment--done'   :
+                  s.id === currentSection ? 'progress-segment progress-segment--active' :
+                                            'progress-segment'
+                }
+              />
+            ))}
           </div>
         </div>
       </div>

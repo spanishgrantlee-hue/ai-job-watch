@@ -556,17 +556,19 @@ input, select, textarea, button { font-family: inherit; }
 
 .progress-track {
   height: 5px;
-  background: var(--clr-border);
-  border-radius: 3px;
-  overflow: hidden;
+  display: flex;
+  gap: 3px;
 }
 
-.progress-fill {
+.progress-segment {
+  flex: 1;
   height: 100%;
-  background: var(--clr-primary);
   border-radius: 3px;
-  transition: width 0.35s ease;
+  background: var(--clr-border);
+  transition: background 0.3s ease, opacity 0.3s ease;
 }
+.progress-segment--done   { background: var(--clr-primary); }
+.progress-segment--active { background: var(--clr-primary); opacity: 0.45; }
 
 /* Dark section header */
 .assessment-header {
