@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useAnswers } from '../App';
@@ -135,7 +135,26 @@ export default function Assessment() {
 }
 
 function QuestionBlock({ question, number, answer, hasError, onChange }) {
-  const isOptional = question.type === 'freeText';
+  const isOptional  = question.type === 'freeText';
+  const choiceRefs  = useRef([]);
+
+  // WAI-ARIA radio group: only the selected (or first) option is in the tab sequence.
+  // Arrow keys move focus + selection; clicking always selects.
+  const focusableIdx = answer !== undefined ? answer : 0;
+
+  function handleChoiceKeyDown(e, i) {
+    const last = question.choices.length - 1;
+    let next = null;
+    if      (e.key === 'ArrowDown'  || e.key === 'ArrowRight') next = i === last ? 0 : i + 1;
+    else if (e.key === 'ArrowUp'    || e.key === 'ArrowLeft')  next = i === 0 ? last : i - 1;
+    else if (e.key === 'Home')                                  next = 0;
+    else if (e.key === 'End')                                   next = last;
+    if (next !== null) {
+      e.preventDefault();
+      onChange(next);
+      choiceRefs.current[next]?.focus();
+    }
+  }
 
   return (
     <div
@@ -185,8 +204,11 @@ function QuestionBlock({ question, number, answer, hasError, onChange }) {
                 type="button"
                 role="radio"
                 aria-checked={selected}
+                tabIndex={i === focusableIdx ? 0 : -1}
                 className={`choice-btn${selected ? ' choice-btn--selected' : ''}`}
                 onClick={() => onChange(i)}
+                onKeyDown={e => handleChoiceKeyDown(e, i)}
+                ref={el => { choiceRefs.current[i] = el; }}
               >
                 <span className="choice-indicator" aria-hidden="true">
                   {selected ? (
