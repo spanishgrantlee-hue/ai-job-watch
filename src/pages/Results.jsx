@@ -136,12 +136,31 @@ export default function Results() {
   const [copied, setCopied]         = useState(false);
   const [copiedText, setCopiedText] = useState(false);
   const [showWhatIf, setShowWhatIf] = useState(false);
+  const [displayScore, setDisplayScore] = useState(0);
 
   const shareParam = searchParams.get('share');
   const sharedData = shareParam ? decodeShareState(shareParam) : null;
   const isSharedView = sharedData !== null;
 
   const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
+
+  // Count-up animation for the hero score number
+  useEffect(() => {
+    const target = isSharedView
+      ? (sharedData?.finalScore ?? 0)
+      : (hasAnswers ? calculateResults(answers).finalScore : 0);
+    if (!target) return;
+    const duration = 900;
+    const start = performance.now();
+    let frameId;
+    function tick(now) {
+      const t = Math.min((now - start) / duration, 1);
+      setDisplayScore(Math.round((1 - Math.pow(1 - t, 3)) * target));
+      if (t < 1) frameId = requestAnimationFrame(tick);
+    }
+    frameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameId);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fire-and-forget: save anonymous result once per completed assessment (skip shared views)
   const hasFiredRef = useRef(false);
@@ -245,7 +264,7 @@ export default function Results() {
         <div className="container">
           <p className="results-eyebrow">Your AI Resistance Score</p>
           <div className="results-score-display">
-            <span className="results-score-number">{finalScore}</span>
+            <span className="results-score-number">{displayScore}</span>
             <span className="results-score-denom">/ 30</span>
           </div>
           <div className={`results-risk-badge results-risk-badge--${riskClass}`}>
