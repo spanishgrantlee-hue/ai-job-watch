@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useAnswers } from '../App';
@@ -135,12 +135,37 @@ export default function Assessment() {
 }
 
 function QuestionBlock({ question, number, answer, hasError, onChange }) {
-  const isOptional  = question.type === 'freeText';
-  const choiceRefs  = useRef([]);
+  const isOptional    = question.type === 'freeText';
+  const choiceRefs    = useRef([]);
+  const prevAnswerRef = useRef(answer); // initialized from current answer at mount
 
   // WAI-ARIA radio group: only the selected (or first) option is in the tab sequence.
   // Arrow keys move focus + selection; clicking always selects.
   const focusableIdx = answer !== undefined ? answer : 0;
+
+  // On mobile only: smooth-scroll to the next question 300ms after the user
+  // answers a choice question for the first time. Re-selecting/changing an
+  // existing answer does not trigger a scroll (prev !== undefined guard).
+  useEffect(() => {
+    const prev = prevAnswerRef.current;
+    prevAnswerRef.current = answer;
+
+    if (
+      answer === undefined ||   // question is unanswered
+      prev !== undefined ||     // user is changing an existing answer
+      window.innerWidth >= 768  // desktop: no auto-scroll
+    ) return;
+
+    const timer = setTimeout(() => {
+      const el = document.getElementById(question.id);
+      const nextEl = el?.nextElementSibling;
+      if (nextEl?.classList.contains('question-block')) {
+        nextEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [answer, question.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleChoiceKeyDown(e, i) {
     const last = question.choices.length - 1;
