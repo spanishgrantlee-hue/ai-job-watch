@@ -6,9 +6,19 @@ import { sections, getQuestionsForSection } from '../utils/questions';
 
 const TOTAL_SECTIONS = sections.length;
 
+// Lightweight snapshot of the values that matter for the mobile scroll debug overlay.
+function captureScrollState() {
+  return {
+    winY:      Math.round(window.scrollY),
+    docElTop:  Math.round(document.documentElement.scrollTop),
+    bodyTop:   Math.round(document.body.scrollTop),
+  };
+}
+
 export default function Assessment() {
   const [currentSection, setCurrentSection] = useState(1);
   const [errors, setErrors] = useState({});
+  const [scrollDebug, setScrollDebug] = useState(null);
   const { answers, setAnswers } = useAnswers();
   const navigate = useNavigate();
 
@@ -46,25 +56,47 @@ export default function Assessment() {
     return () => { history.scrollRestoration = prev; };
   }, []);
 
-  // Reset every scroll container before the browser paints the new section.
-  // useLayoutEffect fires after React commits DOM changes but before paint —
-  // the user never sees the new section at the previous scroll position.
-  // Resets all candidates because the actual scroll container varies by browser.
+  // Reset every scroll container on section change.
+  // iOS Safari can restore scroll position AFTER useLayoutEffect runs, so we
+  // repeat the reset inside requestAnimationFrame (before next paint) and again
+  // inside a short setTimeout (after layout settles). The desktop path is
+  // unaffected — extra no-op resets on an already-zero scroll position are harmless.
   useLayoutEffect(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+    function resetScroll() {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      window.scrollTo(0, 0);
+      if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
 
-    // Also zero out any ancestor of .assessment-page with a non-zero scrollTop.
-    const pageEl = document.querySelector('.assessment-page');
-    let node = pageEl?.parentElement;
-    while (node) {
-      if (node.scrollTop > 0) node.scrollTop = 0;
-      if (node === document.documentElement) break;
-      node = node.parentElement;
+      // Also zero out any ancestor of .assessment-page with a non-zero scrollTop.
+      const pageEl = document.querySelector('.assessment-page');
+      let node = pageEl?.parentElement;
+      while (node) {
+        if (node.scrollTop > 0) node.scrollTop = 0;
+        if (node === document.documentElement) break;
+        node = node.parentElement;
+      }
+
+      setScrollDebug(captureScrollState());
     }
+
+    resetScroll();
+    const raf   = requestAnimationFrame(resetScroll);
+    const timer = setTimeout(resetScroll, 80);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+    };
   }, [currentSection]);
+
+  // Keep overlay live as the user scrolls manually within a section.
+  useEffect(() => {
+    const update = () => setScrollDebug(captureScrollState());
+    update();
+    document.addEventListener('scroll', update, { passive: true, capture: true });
+    return () => document.removeEventListener('scroll', update, { capture: true });
+  }, []);
 
   function handleNext() {
     if (!validate()) {
@@ -91,6 +123,21 @@ export default function Assessment() {
 
   return (
     <div className="assessment-page">
+
+      {/* ── TEMPORARY MOBILE DEBUG OVERLAY — remove before ship ── */}
+      <div style={{
+        position: 'fixed', top: '72px', right: '8px', zIndex: 9999,
+        background: 'rgba(0,0,0,0.88)', color: '#00ff88', fontFamily: 'monospace',
+        fontSize: '12px', padding: '7px 10px', borderRadius: '6px', lineHeight: '1.7',
+        border: '1px solid #00ff88', pointerEvents: 'none',
+      }}>
+        <div style={{ color: '#ffcc00', fontWeight: 'bold' }}>⚠ SCROLL DEBUG</div>
+        <div>section: {currentSection}</div>
+        <div>window.scrollY: {scrollDebug?.winY ?? '…'}</div>
+        <div>docEl.scrollTop: {scrollDebug?.docElTop ?? '…'}</div>
+        <div>body.scrollTop: {scrollDebug?.bodyTop ?? '…'}</div>
+      </div>
+      {/* ── END DEBUG OVERLAY ── */}
 
       <Helmet>
         <title>AI Job Risk Assessment | AI Job Watch</title>
