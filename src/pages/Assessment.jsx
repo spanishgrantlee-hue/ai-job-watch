@@ -19,8 +19,10 @@ export default function Assessment() {
   const [currentSection, setCurrentSection] = useState(1);
   const [errors, setErrors] = useState({});
   const [scrollDebug, setScrollDebug] = useState(null);
+  const [scrollTimeline, setScrollTimeline] = useState([]);
   const { answers, setAnswers } = useAnswers();
   const navigate = useNavigate();
+  const headerRef = useRef(null); // receives programmatic focus on section change
 
   const sectionData = sections.find(s => s.id === currentSection);
   const sectionQuestions = getQuestionsForSection(currentSection);
@@ -77,6 +79,10 @@ export default function Assessment() {
         node = node.parentElement;
       }
 
+      // Move focus to the section heading so the Next/Back button loses its
+      // focus context. preventScroll ensures this focus call doesn't scroll.
+      headerRef.current?.focus({ preventScroll: true });
+
       setScrollDebug(captureScrollState());
     }
 
@@ -98,6 +104,33 @@ export default function Assessment() {
     return () => document.removeEventListener('scroll', update, { capture: true });
   }, []);
 
+  // INSTRUMENTATION: sample window.scrollY every frame for 600ms after each
+  // section change. Any non-zero reading is logged with its timestamp and the
+  // currently focused element so we can trace what is scrolling the page.
+  useEffect(() => {
+    setScrollTimeline([]);
+    const t0 = performance.now();
+    let prevY = Math.round(window.scrollY);
+    let log = [];
+    let rafId;
+
+    function sample() {
+      const t = Math.round(performance.now() - t0);
+      const y = Math.round(window.scrollY);
+      if (y !== prevY) {
+        const ae = document.activeElement;
+        const aeStr = ae ? `${ae.tagName}${ae.id ? '#' + ae.id : ''}` : '-';
+        log = [...log, `+${t}ms ${prevY}→${y} [${aeStr}]`];
+        setScrollTimeline(log);
+        prevY = y;
+      }
+      if (t < 600) rafId = requestAnimationFrame(sample);
+    }
+
+    rafId = requestAnimationFrame(sample);
+    return () => cancelAnimationFrame(rafId);
+  }, [currentSection]);
+
   function handleNext() {
     if (!validate()) {
       const firstErrorId = sectionQuestions.find(
@@ -111,12 +144,14 @@ export default function Assessment() {
     if (isLastSection) {
       navigate('/results');
     } else {
-      setCurrentSection(s => s + 1);
+      document.activeElement?.blur(); // drop focus before section change so iOS Safari
+      setCurrentSection(s => s + 1); // doesn't scroll to keep the Next button in view
       setErrors({});
     }
   }
 
   function handleBack() {
+    document.activeElement?.blur();
     setCurrentSection(s => s - 1);
     setErrors({});
   }
@@ -128,14 +163,21 @@ export default function Assessment() {
       <div style={{
         position: 'fixed', top: '72px', right: '8px', zIndex: 9999,
         background: 'rgba(0,0,0,0.88)', color: '#00ff88', fontFamily: 'monospace',
-        fontSize: '12px', padding: '7px 10px', borderRadius: '6px', lineHeight: '1.7',
-        border: '1px solid #00ff88', pointerEvents: 'none',
+        fontSize: '11px', padding: '7px 10px', borderRadius: '6px', lineHeight: '1.6',
+        border: '1px solid #00ff88', pointerEvents: 'none', maxWidth: '220px',
       }}>
         <div style={{ color: '#ffcc00', fontWeight: 'bold' }}>⚠ SCROLL DEBUG</div>
         <div>section: {currentSection}</div>
-        <div>window.scrollY: {scrollDebug?.winY ?? '…'}</div>
-        <div>docEl.scrollTop: {scrollDebug?.docElTop ?? '…'}</div>
-        <div>body.scrollTop: {scrollDebug?.bodyTop ?? '…'}</div>
+        <div>scrollY: {scrollDebug?.winY ?? '…'}</div>
+        <div>docEl: {scrollDebug?.docElTop ?? '…'}</div>
+        <div>body: {scrollDebug?.bodyTop ?? '…'}</div>
+        <div style={{ marginTop: '4px', borderTop: '1px solid #444', paddingTop: '4px',
+          color: '#ffcc00', fontWeight: 'bold' }}>
+          {scrollTimeline.length === 0 ? 'timeline: clean ✓' : 'SCROLL TRACE:'}
+        </div>
+        {scrollTimeline.map((entry, i) => (
+          <div key={i} style={{ color: '#ff6b6b', wordBreak: 'break-all' }}>{entry}</div>
+        ))}
       </div>
       {/* ── END DEBUG OVERLAY ── */}
 
@@ -168,8 +210,9 @@ export default function Assessment() {
         </div>
       </div>
 
-      {/* Dark section header */}
-      <div className="assessment-header">
+      {/* Dark section header — tabIndex="-1" lets us focus it programmatically
+          to clear the Next button's focus context without entering the tab order */}
+      <div className="assessment-header" ref={headerRef} tabIndex="-1" style={{ outline: 'none' }}>
         <div className="container">
           <p className="assessment-section-tag">Section {currentSection} of {TOTAL_SECTIONS}</p>
           <h1 className="assessment-title">{sectionData.title}</h1>
