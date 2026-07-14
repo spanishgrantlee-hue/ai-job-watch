@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useAnswers } from '../App';
@@ -38,6 +38,34 @@ export default function Assessment() {
     return Object.keys(newErrors).length === 0;
   }
 
+  // Disable browser scroll restoration while the assessment is mounted so
+  // the browser doesn't fight our explicit resets on section transitions.
+  useEffect(() => {
+    const prev = history.scrollRestoration;
+    history.scrollRestoration = 'manual';
+    return () => { history.scrollRestoration = prev; };
+  }, []);
+
+  // Reset every scroll container before the browser paints the new section.
+  // useLayoutEffect fires after React commits DOM changes but before paint —
+  // the user never sees the new section at the previous scroll position.
+  // Resets all candidates because the actual scroll container varies by browser.
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+
+    // Also zero out any ancestor of .assessment-page with a non-zero scrollTop.
+    const pageEl = document.querySelector('.assessment-page');
+    let node = pageEl?.parentElement;
+    while (node) {
+      if (node.scrollTop > 0) node.scrollTop = 0;
+      if (node === document.documentElement) break;
+      node = node.parentElement;
+    }
+  }, [currentSection]);
+
   function handleNext() {
     if (!validate()) {
       const firstErrorId = sectionQuestions.find(
@@ -53,18 +81,17 @@ export default function Assessment() {
     } else {
       setCurrentSection(s => s + 1);
       setErrors({});
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
   function handleBack() {
     setCurrentSection(s => s - 1);
     setErrors({});
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return (
     <div className="assessment-page">
+
       <Helmet>
         <title>AI Job Risk Assessment | AI Job Watch</title>
         <meta name="description" content="Take the free AI Job Watch assessment. Answer 30 questions about your role and get an instant AI Resistance Score across six categories — no account required." />
