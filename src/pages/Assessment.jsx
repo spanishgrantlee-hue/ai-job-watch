@@ -211,7 +211,8 @@ export default function Assessment() {
 function QuestionBlock({ question, number, answer, hasError, onChange }) {
   const isOptional    = question.type === 'freeText';
   const choiceRefs    = useRef([]);
-  const prevAnswerRef = useRef(answer); // initialized from current answer at mount
+  const prevAnswerRef = useRef(answer); // tracks previous answer value
+  const hasMountedRef = useRef(false);  // skips auto-scroll on initial mount
 
   // WAI-ARIA radio group: only the selected (or first) option is in the tab sequence.
   // Arrow keys move focus + selection; clicking always selects.
@@ -220,7 +221,15 @@ function QuestionBlock({ question, number, answer, hasError, onChange }) {
   // On mobile only: smooth-scroll to the next question 300ms after the user
   // answers a choice question for the first time. Re-selecting/changing an
   // existing answer does not trigger a scroll (prev !== undefined guard).
+  // hasMountedRef ensures this never fires during section mount/unmount —
+  // only genuine user interactions (answer changing after mount) trigger it.
   useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      prevAnswerRef.current = answer;
+      return;
+    }
+
     const prev = prevAnswerRef.current;
     prevAnswerRef.current = answer;
 
