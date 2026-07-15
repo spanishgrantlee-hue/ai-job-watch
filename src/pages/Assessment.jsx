@@ -194,6 +194,16 @@ export default function Assessment() {
   return (
     <div className="assessment-page">
 
+      {/* ── TEMPORARY VERSION BANNER — remove before ship ── */}
+      <div style={{
+        background: '#cc0000', color: '#ffffff', fontFamily: 'monospace',
+        fontSize: '22px', fontWeight: 'bold', textAlign: 'center',
+        padding: '18px 12px', letterSpacing: '2px', zIndex: 100000,
+      }}>
+        DEBUG BUILD 34d9574
+      </div>
+      {/* ── END VERSION BANNER ── */}
+
       {/* ── TEMPORARY MOBILE DEBUG PANEL — remove before ship ── */}
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, height: '50vh',
