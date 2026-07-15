@@ -6,6 +6,9 @@ import { encodeShareState, decodeShareState, generateTextSummary } from '../util
 import { Helmet } from 'react-helmet-async';
 import WhatIfPanel from '../components/WhatIfPanel';
 
+// ─── Score label (one word, shown in the hero beneath the number) ─────────────
+const SCORE_LABELS = { LOW: 'Resilient', MEDIUM: 'Developing', HIGH: 'Under Pressure' };
+
 // ─── Resources ────────────────────────────────────────────────────────────────
 const RESOURCES = {
   HIGH: {
@@ -223,7 +226,7 @@ export default function Results() {
   }
 
   function handleShareX() {
-    const text = `I just checked my AI risk score — got ${finalScore}/30 (${riskKey} Risk). Check yours free:`;
+    const text = `I just got my AI Resistance Score: ${finalScore}/30 — ${SCORE_LABELS[riskKey]}. See how AI-proof your job is:`;
     const tweet = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(tweet, '_blank', 'noopener,noreferrer');
   }
@@ -267,6 +270,7 @@ export default function Results() {
             <span className="results-score-number">{displayScore}</span>
             <span className="results-score-denom">/ 30</span>
           </div>
+          <p className="results-score-label">{SCORE_LABELS[riskKey]}</p>
           <div className={`results-risk-badge results-risk-badge--${riskClass}`}>
             {riskLabel}
           </div>

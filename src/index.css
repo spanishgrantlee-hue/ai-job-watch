@@ -879,6 +879,16 @@ input, select, textarea, button { font-family: inherit; }
 .results-risk-badge--medium { background: var(--clr-medium-bg); color: var(--clr-medium); }
 .results-risk-badge--high   { background: var(--clr-high-bg);   color: var(--clr-high); }
 
+/* Score label (one-word summary beneath the number: Resilient / Developing / Exposed) */
+.results-score-label {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 4px 0 14px;
+  line-height: 1;
+}
+
 /* Score range bar */
 .score-range-bar { max-width: 480px; margin: 0 auto; }
 
@@ -1292,6 +1302,7 @@ input, select, textarea, button { font-family: inherit; }
 @media (min-width: 640px) {
   .results-hero          { padding: 52px 0 60px; }
   .results-score-number  { font-size: 6rem; }
+  .results-score-label   { font-size: 2.5rem; }
   .results-section-title { font-size: 1.55rem; }
   .protectors-grid       { grid-template-columns: 1fr 1fr; }
   .summary-card-body     { padding: 28px 28px; }
