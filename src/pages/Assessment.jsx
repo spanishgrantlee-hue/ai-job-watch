@@ -22,7 +22,22 @@ export default function Assessment() {
   const [scrollTimeline, setScrollTimeline] = useState([]);
   const { answers, setAnswers } = useAnswers();
   const navigate = useNavigate();
-  const headerRef = useRef(null); // receives programmatic focus on section change
+  const headerRef = useRef(null);
+  const scrollLogRef = useRef([]);
+  const sectionT0Ref = useRef(performance.now());
+  const logRef = useRef(null);
+
+  // Updated every render so prototype patches always call the latest closure.
+  logRef.current = (msg, isRed = false) => {
+    const t = `+${Math.round(performance.now() - sectionT0Ref.current)}ms`;
+    const ae = document.activeElement;
+    const aeStr = ae
+      ? `${ae.tagName}${ae.className ? '.' + String(ae.className).split(' ')[0] : ''}${ae.id ? '#' + ae.id : ''}`
+      : 'none';
+    const entry = { t, y: Math.round(window.scrollY), ae: aeStr, msg, isRed };
+    scrollLogRef.current = [...scrollLogRef.current, entry].slice(-10);
+    setScrollTimeline([...scrollLogRef.current]);
+  };
 
   const sectionData = sections.find(s => s.id === currentSection);
   const sectionQuestions = getQuestionsForSection(currentSection);
@@ -104,27 +119,45 @@ export default function Assessment() {
     return () => document.removeEventListener('scroll', update, { capture: true });
   }, []);
 
-  // INSTRUMENTATION: sample window.scrollY every frame for 600ms after each
-  // section change. Any non-zero reading is logged with its timestamp and the
-  // currently focused element so we can trace what is scrolling the page.
+  // Patch scrollIntoView and focus once so every call is captured in the trace.
   useEffect(() => {
+    const origSIV = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function(opts) {
+      const cls = String(this.className || '').split(' ')[0] || this.tagName;
+      logRef.current?.(`scrollIntoView .${cls}`, true);
+      return origSIV.call(this, opts);
+    };
+
+    const origFocus = HTMLElement.prototype.focus;
+    HTMLElement.prototype.focus = function(opts) {
+      const id = this.id || String(this.className || '').split(' ')[0] || this.tagName;
+      const label = opts?.preventScroll ? `focus(pS) .${id}` : `FOCUS .${id}`;
+      logRef.current?.(label, !opts?.preventScroll);
+      return origFocus.call(this, opts);
+    };
+
+    return () => {
+      Element.prototype.scrollIntoView = origSIV;
+      HTMLElement.prototype.focus = origFocus;
+    };
+  }, []);
+
+  // Sample scrollY every animation frame for 700ms after each section change.
+  useEffect(() => {
+    scrollLogRef.current = [];
     setScrollTimeline([]);
-    const t0 = performance.now();
     let prevY = Math.round(window.scrollY);
-    let log = [];
     let rafId;
 
     function sample() {
-      const t = Math.round(performance.now() - t0);
       const y = Math.round(window.scrollY);
       if (y !== prevY) {
-        const ae = document.activeElement;
-        const aeStr = ae ? `${ae.tagName}${ae.id ? '#' + ae.id : ''}` : '-';
-        log = [...log, `+${t}ms ${prevY}→${y} [${aeStr}]`];
-        setScrollTimeline(log);
+        logRef.current?.(`SCROLL ${prevY}→${y}`, true);
         prevY = y;
       }
-      if (t < 600) rafId = requestAnimationFrame(sample);
+      if (Math.round(performance.now() - sectionT0Ref.current) < 700) {
+        rafId = requestAnimationFrame(sample);
+      }
     }
 
     rafId = requestAnimationFrame(sample);
@@ -144,14 +177,16 @@ export default function Assessment() {
     if (isLastSection) {
       navigate('/results');
     } else {
-      document.activeElement?.blur(); // drop focus before section change so iOS Safari
-      setCurrentSection(s => s + 1); // doesn't scroll to keep the Next button in view
+      document.activeElement?.blur();
+      sectionT0Ref.current = performance.now();
+      setCurrentSection(s => s + 1);
       setErrors({});
     }
   }
 
   function handleBack() {
     document.activeElement?.blur();
+    sectionT0Ref.current = performance.now();
     setCurrentSection(s => s - 1);
     setErrors({});
   }
@@ -159,27 +194,56 @@ export default function Assessment() {
   return (
     <div className="assessment-page">
 
-      {/* ── TEMPORARY MOBILE DEBUG OVERLAY — remove before ship ── */}
+      {/* ── TEMPORARY MOBILE DEBUG PANEL — remove before ship ── */}
       <div style={{
-        position: 'fixed', top: '72px', right: '8px', zIndex: 9999,
-        background: 'rgba(0,0,0,0.88)', color: '#00ff88', fontFamily: 'monospace',
-        fontSize: '11px', padding: '7px 10px', borderRadius: '6px', lineHeight: '1.6',
-        border: '1px solid #00ff88', pointerEvents: 'none', maxWidth: '220px',
+        position: 'fixed', top: 0, left: 0, right: 0, height: '50vh',
+        zIndex: 99999, background: 'rgba(0,0,0,0.95)', color: '#00ff88',
+        fontFamily: 'monospace', fontSize: '15px', lineHeight: '1.55',
+        padding: '10px 12px', boxSizing: 'border-box',
+        display: 'flex', flexDirection: 'column', gap: '4px',
+        pointerEvents: 'none',
       }}>
-        <div style={{ color: '#ffcc00', fontWeight: 'bold' }}>⚠ SCROLL DEBUG</div>
-        <div>section: {currentSection}</div>
-        <div>scrollY: {scrollDebug?.winY ?? '…'}</div>
-        <div>docEl: {scrollDebug?.docElTop ?? '…'}</div>
-        <div>body: {scrollDebug?.bodyTop ?? '…'}</div>
-        <div style={{ marginTop: '4px', borderTop: '1px solid #444', paddingTop: '4px',
-          color: '#ffcc00', fontWeight: 'bold' }}>
-          {scrollTimeline.length === 0 ? 'timeline: clean ✓' : 'SCROLL TRACE:'}
+        {/* Header row */}
+        <div style={{ color: '#ffcc00', fontWeight: 'bold', fontSize: '17px', flexShrink: 0 }}>
+          SCROLL DEBUG — §{currentSection} — Y:{scrollDebug?.winY ?? '…'} docEl:{scrollDebug?.docElTop ?? '…'}
         </div>
-        {scrollTimeline.map((entry, i) => (
-          <div key={i} style={{ color: '#ff6b6b', wordBreak: 'break-all' }}>{entry}</div>
-        ))}
+
+        {/* Event log */}
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          {scrollTimeline.length === 0
+            ? <div style={{ color: '#555' }}>no events yet (last 10 shown)</div>
+            : scrollTimeline.map((e, i) => (
+              <div key={i} style={{
+                color: e.isRed ? '#ff5555' : '#888888',
+                wordBreak: 'break-all',
+              }}>
+                {e.t} Y:{e.y} [{e.ae}] {e.msg}
+              </div>
+            ))
+          }
+        </div>
+
+        {/* Copy button — needs pointer events */}
+        <button
+          onClick={() => {
+            const lines = [
+              `Section:${currentSection} scrollY:${scrollDebug?.winY ?? '?'} docEl:${scrollDebug?.docElTop ?? '?'}`,
+              '---',
+              ...scrollTimeline.map(e => `${e.t} Y:${e.y} [${e.ae}] ${e.msg}`),
+            ];
+            navigator.clipboard?.writeText(lines.join('\n')).catch(() => {});
+          }}
+          style={{
+            pointerEvents: 'auto', flexShrink: 0, alignSelf: 'flex-start',
+            padding: '10px 22px', background: '#ffcc00', color: '#000',
+            border: 'none', borderRadius: '6px', fontSize: '16px',
+            fontWeight: 'bold', cursor: 'pointer',
+          }}
+        >
+          Copy Trace
+        </button>
       </div>
-      {/* ── END DEBUG OVERLAY ── */}
+      {/* ── END DEBUG PANEL ── */}
 
       <Helmet>
         <title>AI Job Risk Assessment | AI Job Watch</title>
