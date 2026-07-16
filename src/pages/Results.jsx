@@ -9,6 +9,21 @@ import WhatIfPanel from '../components/WhatIfPanel';
 // ─── Score label (one word, shown in the hero beneath the number) ─────────────
 const SCORE_LABELS = { LOW: 'Resilient', MEDIUM: 'Developing', HIGH: 'Under Pressure' };
 
+// ─── Score context (plain-English "why" shown below the range bar) ────────────
+function getScoreContextWhy(riskKey, topProtectors, aiExposurePenalty) {
+  if (riskKey === 'LOW') {
+    return topProtectors.length > 0
+      ? `Your strongest protection is ${topProtectors[0].label} — one of the factors that AI has the hardest time replacing.`
+      : "Your role's structure gives it strong natural protection against automation.";
+  }
+  if (riskKey === 'MEDIUM') {
+    return aiExposurePenalty >= 2
+      ? `Your strengths in ${topProtectors[0]?.label ?? 'key areas'} are real, but an AI exposure penalty of −${aiExposurePenalty} is pulling your total down.`
+      : `Your role has genuine strengths in ${topProtectors[0]?.label ?? 'several areas'}, balanced against tasks that carry some automation exposure.`;
+  }
+  return "Your role’s current structure — not your ability — is what’s creating exposure. The breakdown below explains what’s driving this and what’s worth changing.";
+}
+
 // ─── Resources ────────────────────────────────────────────────────────────────
 const RESOURCES = {
   HIGH: {
@@ -207,6 +222,7 @@ export default function Results() {
   const shareUrl  = isSharedView
     ? window.location.href
     : `${window.location.origin}/results?share=${encodeShareState({ finalScore, riskKey, categories, aiExposurePenalty, automationRisks })}`;
+  const scoreContextWhy = getScoreContextWhy(riskKey, topProtectors, aiExposurePenalty);
 
   const ogImage   = `https://aijobwatch.org/og-${riskClass}.png`;
   const pageTitle = `AI Resistance Score: ${finalScore}/30 (${riskLabel}) | AI Job Watch`;
@@ -275,6 +291,10 @@ export default function Results() {
             {riskLabel}
           </div>
           <ScoreRangeBar score={finalScore} />
+          <div className="results-score-context">
+            <p>You scored {finalScore} out of 30 possible points.</p>
+            <p>{scoreContextWhy}</p>
+          </div>
           <div className="results-share-row">
             <button
               type="button"
