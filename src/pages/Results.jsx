@@ -166,15 +166,15 @@ function PlaybookCard({ category, rank }) {
       <p className="playbook-card-context">{data.context[level]}</p>
       <div className="playbook-timeline">
         <div className="playbook-item">
-          <span className="playbook-item-label">30 days</span>
+          <span className="playbook-item-label">This Week</span>
           <p className="playbook-item-text">{data.days30[level]}</p>
         </div>
         <div className="playbook-item">
-          <span className="playbook-item-label">90 days</span>
+          <span className="playbook-item-label">Next Few Months</span>
           <p className="playbook-item-text">{data.days90[level]}</p>
         </div>
         <div className="playbook-item">
-          <span className="playbook-item-label">1 year</span>
+          <span className="playbook-item-label">Long-Term</span>
           <p className="playbook-item-text">{data.year1[level]}</p>
         </div>
       </div>

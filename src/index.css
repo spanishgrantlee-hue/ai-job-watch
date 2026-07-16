@@ -1108,19 +1108,20 @@ input, select, textarea, button { font-family: inherit; }
 .playbook-timeline {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
   border-top: 1px solid var(--clr-border);
   padding-top: 16px;
 }
 
 .playbook-item {
-  display: grid;
-  grid-template-columns: 64px 1fr;
-  gap: 12px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .playbook-item-label {
+  display: inline-block;
+  align-self: flex-start;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -1128,10 +1129,8 @@ input, select, textarea, button { font-family: inherit; }
   color: var(--clr-primary);
   background: var(--clr-primary-light);
   border-radius: 4px;
-  padding: 3px 0;
-  text-align: center;
+  padding: 3px 8px;
   line-height: 1.5;
-  white-space: nowrap;
 }
 
 .playbook-item-text {
