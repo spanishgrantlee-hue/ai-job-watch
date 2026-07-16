@@ -386,10 +386,10 @@ export default function Results() {
         <div className="container results-container">
           <div className="whatif-section-hdr">
             <div>
-              <div className="section-label">Explore Scenarios</div>
-              <h2 className="results-section-title">What-If Explorer</h2>
+              <div className="section-label">Your Path Forward</div>
+              <h2 className="results-section-title">How to Improve Your Score</h2>
               <p className="results-section-desc">
-                Adjust your category scores to see how small changes would affect your AI Resistance Score.
+                See how your score would change if you strengthened a weaker area. Your lowest scores are the fastest path to moving up.
               </p>
             </div>
             <button
@@ -398,11 +398,16 @@ export default function Results() {
               onClick={() => setShowWhatIf(v => !v)}
               aria-expanded={showWhatIf}
             >
-              {showWhatIf ? 'Hide Explorer' : 'Open Explorer'}
+              {showWhatIf ? 'Hide' : 'Try adjusting my scores'}
             </button>
           </div>
           {showWhatIf && (
-            <WhatIfPanel categories={categories} aiExposurePenalty={aiExposurePenalty} />
+            <WhatIfPanel
+              categories={categories}
+              aiExposurePenalty={aiExposurePenalty}
+              baseScore={finalScore}
+              baseRisk={riskKey}
+            />
           )}
         </div>
       </section>

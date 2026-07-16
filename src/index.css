@@ -1537,6 +1537,13 @@ input, select, textarea, button { font-family: inherit; }
   font-weight: 500;
   color: var(--clr-text-light);
 }
+.whatif-projection-why {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.55);
+}
+
 .whatif-projection-label {
   font-size: 0.95rem;
   font-weight: 700;

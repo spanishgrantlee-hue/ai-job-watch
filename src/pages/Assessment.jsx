@@ -216,7 +216,14 @@ function QuestionBlock({ question, number, answer, hasError, onChange }) {
       const el = document.getElementById(question.id);
       const nextEl = el?.nextElementSibling;
       if (nextEl?.classList.contains('question-block')) {
-        nextEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const progressBar = document.querySelector('.assessment-progress-bar');
+        const stickyBottom = progressBar
+          ? progressBar.getBoundingClientRect().bottom
+          : 125;
+        window.scrollTo({
+          top: nextEl.getBoundingClientRect().top + window.scrollY - stickyBottom - 24,
+          behavior: 'smooth',
+        });
       }
     }, 300);
 
