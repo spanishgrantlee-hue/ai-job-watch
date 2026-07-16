@@ -10,6 +10,18 @@ import { PLAYBOOK, playbookLevel } from '../utils/playbook';
 // ─── Score label (one word, shown in the hero beneath the number) ─────────────
 const SCORE_LABELS = { LOW: 'Resilient', MEDIUM: 'Developing', HIGH: 'Under Pressure' };
 
+// ─── What Protects Your Job — plain-English card descriptions ────────────────
+// Display-layer overrides so protectsJobWhy reads like a coach, not a report.
+// scoring.js is not modified.
+const PROTECTOR_WHY_PLAIN = {
+  accountability: "When your job requires you to make real decisions — and someone has to be responsible for the outcome — AI can't step in. Employers need a human being in that seat.",
+  trust: "Clients, patients, and coworkers build real trust with a person, not a tool. Those relationships are some of the hardest things to hand off to software.",
+  judgment: "Some calls require real-world experience, not just a rule or a formula. Reading a situation, weighing the options, and making the right call is still something AI struggles with.",
+  problemSolving: "When a situation is brand-new and nobody has the answer written down, a human has to work through it. AI handles patterns well. It doesn't handle genuine surprises.",
+  physicalPresence: "Work that requires real hands, real movement, and showing up in person is difficult to automate — and often expensive to even try.",
+  licensing: "A license or certification that employers are legally required to have on staff creates a real barrier. Even when automation is technically possible, regulations slow it down.",
+};
+
 // ─── Score context (plain-English "why" shown below the range bar) ────────────
 function getScoreContextWhy(riskKey, topProtectors, aiExposurePenalty) {
   if (riskKey === 'LOW') {
@@ -481,31 +493,45 @@ export default function Results() {
       <section className="results-section results-section--white">
         <div className="container results-container">
           <div className="results-section-hdr">
-            <div className="section-label">What Protects Your Job</div>
-            <h2 className="results-section-title">Your strongest defenses against automation</h2>
-            <p className="results-section-desc">These are the parts of your role that AI struggles to replicate — your natural moat.</p>
+            <div className="section-label">What's Working In Your Favor</div>
+            <h2 className="results-section-title">The parts of your job that AI has a hard time replacing</h2>
+            <p className="results-section-desc">Based on your answers, these are the areas where your work is naturally hard to automate. They're your strongest assets right now.</p>
           </div>
 
           {topProtectors.length > 0 ? (
-            <div className="protectors-grid">
-              {topProtectors.map(cat => (
-                <div className="protector-card" key={cat.key}>
-                  <div className="protector-card-top">
-                    <h3 className="protector-card-label">{cat.label}</h3>
-                    <span className="protector-score-badge">{cat.score}/5</span>
+            <>
+              <div className="protectors-grid">
+                {topProtectors.map(cat => (
+                  <div className="protector-card" key={cat.key}>
+                    <div className="protector-card-top">
+                      <h3 className="protector-card-label">{cat.label}</h3>
+                      <span className="protector-score-badge">{cat.score}/5</span>
+                    </div>
+                    <p className="protector-card-why">
+                      {PROTECTOR_WHY_PLAIN[cat.key] ?? cat.protectsJobWhy}
+                    </p>
+                    <div className="protector-tags">
+                      {cat.exampleTasks.map(task => (
+                        <span className="protector-tag" key={task}>{task}</span>
+                      ))}
+                    </div>
                   </div>
-                  <p className="protector-card-why">{cat.protectsJobWhy}</p>
-                  <div className="protector-tags">
-                    {cat.exampleTasks.map(task => (
-                      <span className="protector-tag" key={task}>{task}</span>
-                    ))}
-                  </div>
+                ))}
+              </div>
+              {topProtectors.length < 3 && (
+                <div className="protectors-partial-note">
+                  <p>
+                    {topProtectors.length === 1
+                      ? "You have one area working strongly in your favor right now — that's a real foundation to build on. Most workers who improve their position do it by adding a second protection area. Your Career Playbook above shows exactly where to focus first."
+                      : "You have two areas working in your favor. That's a solid starting point. Adding a third — even a small improvement in one of your lower-scoring categories — would make a real difference to your overall score and your position."
+                    }
+                  </p>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           ) : (
             <div className="results-callout results-callout--warning">
-              <p>None of your categories scored high enough to serve as a strong protective factor right now. Building skills in judgment, trust-based work, or earning credentials in your field are the most direct ways to improve your position.</p>
+              <p>Right now, none of your categories scored high enough to count as a strong protection. That's not a permanent situation — it's a starting point. Look at your Career Playbook above. It was built specifically for where you are right now, and it gives you a concrete first step you can take this week.</p>
             </div>
           )}
         </div>
