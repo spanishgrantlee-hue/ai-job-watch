@@ -5,6 +5,7 @@ import { calculateResults } from '../utils/scoring';
 import { encodeShareState, decodeShareState, generateTextSummary } from '../utils/share';
 import { Helmet } from 'react-helmet-async';
 import WhatIfPanel from '../components/WhatIfPanel';
+import { PLAYBOOK, playbookLevel } from '../utils/playbook';
 
 // ─── Score label (one word, shown in the hero beneath the number) ─────────────
 const SCORE_LABELS = { LOW: 'Resilient', MEDIUM: 'Developing', HIGH: 'Under Pressure' };
@@ -141,6 +142,67 @@ function ScoreRangeBar({ score }) {
         <span>Low Risk<br /><em>24–30</em></span>
       </div>
     </div>
+  );
+}
+
+// ─── Career Playbook card ─────────────────────────────────────────────────────
+function PlaybookCard({ category, rank }) {
+  const level = playbookLevel(category.score);
+  const data  = PLAYBOOK[category.key];
+  if (!data) return null;
+
+  const badgeClass =
+    category.score <= 2 ? 'playbook-score-badge--low'
+    : category.score === 3 ? 'playbook-score-badge--mid'
+    : 'playbook-score-badge--high';
+
+  return (
+    <div className="playbook-card">
+      <div className="playbook-card-top">
+        <span className="playbook-card-rank">{rank === 1 ? 'Start here' : 'Then this'}</span>
+        <span className={`playbook-score-badge ${badgeClass}`}>{category.score}<span className="playbook-score-denom">/5</span></span>
+      </div>
+      <h3 className="playbook-card-title">{category.label}</h3>
+      <p className="playbook-card-context">{data.context[level]}</p>
+      <div className="playbook-timeline">
+        <div className="playbook-item">
+          <span className="playbook-item-label">30 days</span>
+          <p className="playbook-item-text">{data.days30[level]}</p>
+        </div>
+        <div className="playbook-item">
+          <span className="playbook-item-label">90 days</span>
+          <p className="playbook-item-text">{data.days90[level]}</p>
+        </div>
+        <div className="playbook-item">
+          <span className="playbook-item-label">1 year</span>
+          <p className="playbook-item-text">{data.year1[level]}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Career Playbook section ──────────────────────────────────────────────────
+function PlaybookSection({ rankedCategories }) {
+  // Two weakest categories — last two entries in the descending-sorted array
+  const weakest = [...rankedCategories].reverse().slice(0, 2);
+  return (
+    <section className="results-section">
+      <div className="container results-container">
+        <div className="results-section-hdr">
+          <div className="section-label">Career Playbook</div>
+          <h2 className="results-section-title">Your action plan, based on your scores</h2>
+          <p className="results-section-desc">
+            These are the two areas where a small improvement would make the biggest difference. Start with the first one — the second can wait a month.
+          </p>
+        </div>
+        <div className="playbook-grid">
+          {weakest.map((cat, idx) => (
+            <PlaybookCard key={cat.key} category={cat} rank={idx + 1} />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -380,6 +442,9 @@ export default function Results() {
           </div>
         </div>
       </section>
+
+      {/* Career Playbook */}
+      <PlaybookSection rankedCategories={rankedCategories} />
 
       {/* What-If Explorer */}
       <section className="results-section whatif-section">
