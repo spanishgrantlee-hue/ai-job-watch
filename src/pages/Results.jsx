@@ -22,6 +22,17 @@ const PROTECTOR_WHY_PLAIN = {
   licensing: "A license or certification that employers are legally required to have on staff creates a real barrier. Even when automation is technically possible, regulations slow it down.",
 };
 
+// ─── What Could Be Automated — plain-English card copy, distinguishing what AI
+// can assist with from what it could fully take over. Display-layer overrides
+// so automation risks read like a coach, not a warning label. scoring.js is not modified.
+const AUTOMATION_PLAIN = {
+  routine: "AI is good at speeding up the repeatable part of this — drafting, sorting, or filling in the routine steps so you're not starting from scratch. But when your day is almost entirely that same repeatable process with little judgment involved, AI can often take over the whole task, not just help with it.",
+  dataEntry: "AI is a solid assistant for pulling numbers together and formatting reports so you're not staring at a blank page. Straightforward data entry and standard report generation, though, are exactly the kind of task AI can often complete on its own, start to finish.",
+  aiAlreadyHere: "Right now, the AI tools showing up in your workplace are probably best used as a first draft you check and fix — that's assistance, not replacement. But some of what they're doing, like a first pass at writing or simple lookups, is already happening without a person involved at all.",
+  remoteInfo: "AI is genuinely useful here for researching, summarizing, and organizing information so you can make the final call faster. The catch is that when a task is fully digital and doesn't need judgment, AI can often do the entire thing without a human in the loop.",
+  replaceability: "If a task can be taught to a new coworker in an afternoon, AI can probably help you get through it faster today. The uncomfortable truth is that anything that quick to teach a person is usually just as quick to teach an AI — and easy to hand off completely.",
+};
+
 // ─── Score context (plain-English "why" shown below the range bar) ────────────
 function getScoreContextWhy(riskKey, topProtectors, aiExposurePenalty) {
   if (riskKey === 'LOW') {
@@ -542,8 +553,8 @@ export default function Results() {
         <div className="container results-container">
           <div className="results-section-hdr">
             <div className="section-label">What Could Be Automated</div>
-            <h2 className="results-section-title">Areas worth watching</h2>
-            <p className="results-section-desc">Based on your answers, these are the tasks in your role most exposed to automation pressure.</p>
+            <h2 className="results-section-title">Where AI can help — and where it could take over</h2>
+            <p className="results-section-desc">Not everything below means AI replaces you. Some of it is AI assisting you. Some of it is AI doing the whole task without you. Here's the difference, based on your answers.</p>
           </div>
 
           {automationRisks.length > 0 ? (
@@ -553,7 +564,7 @@ export default function Results() {
                   <div className="automation-card-dot" aria-hidden="true" />
                   <div>
                     <h3 className="automation-card-title">{risk.label}</h3>
-                    <p className="automation-card-desc">{risk.description}</p>
+                    <p className="automation-card-desc">{AUTOMATION_PLAIN[risk.key] ?? risk.description}</p>
                   </div>
                 </div>
               ))}
@@ -563,6 +574,12 @@ export default function Results() {
               <p>Based on your answers, no major automation signals were detected in your role. Your work appears to rely heavily on human judgment, physical presence, or relationship-driven tasks — all of which are difficult to automate.</p>
             </div>
           )}
+
+          <div className="automation-takeaway">
+            <p>
+              The goal isn't to avoid AI — it's to use it. Let AI take the first pass on the repeatable parts of your job. Keep the judgment calls, the exceptions, and the relationships for yourself. That combination is what keeps you valuable, and it's a much better way to spend your energy than worrying about being replaced.
+            </p>
+          </div>
         </div>
       </section>
 

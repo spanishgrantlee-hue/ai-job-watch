@@ -1263,6 +1263,20 @@ input, select, textarea, button { font-family: inherit; }
 .automation-card-title { font-size: 0.93rem; font-weight: 700; color: var(--clr-text); margin-bottom: 5px; }
 .automation-card-desc  { font-size: 0.86rem; color: var(--clr-text-mid); line-height: 1.7; }
 
+.automation-takeaway {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: var(--clr-primary-light);
+  border-radius: var(--radius-lg);
+  border-left: 3px solid var(--clr-primary);
+}
+.automation-takeaway p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--clr-primary-dark);
+  margin: 0;
+}
+
 /* Callout (empty states) */
 .results-callout {
   border-radius: var(--radius-lg);
