@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useAnswers } from '../App';
 import { sections, getQuestionsForSection } from '../utils/questions';
@@ -147,6 +147,18 @@ export default function Assessment() {
           <p className="assessment-section-tag">Section {currentSection} of {TOTAL_SECTIONS}</p>
           <h1 className="assessment-title">{sectionData.title}</h1>
           <p className="assessment-desc">{sectionData.description}</p>
+          {currentSection === 1 && (
+            <>
+              <p className="assessment-section-tag" style={{ marginTop: 20 }}>Privacy First</p>
+              <p className="assessment-desc">
+                Your responses are anonymous and help improve AI Job Watch for workers everywhere. You do
+                not need to provide your name, email address, or create an account to complete this
+                assessment. The information you choose to share helps improve the accuracy of future
+                assessments while protecting your privacy.{' '}
+                <Link to="/about" className="results-shared-banner-cta">Learn more.</Link>
+              </p>
+            </>
+          )}
         </div>
       </div>
 
