@@ -6,12 +6,31 @@ import { sections, getQuestionsForSection } from '../utils/questions';
 
 const TOTAL_SECTIONS = sections.length;
 
+// localStorage key for the in-progress section number — paired with the
+// answers themselves (persisted in App.jsx) so a refresh can resume in place.
+const SECTION_STORAGE_KEY = 'aijobwatch_section';
+
+function getSavedSection() {
+  try {
+    const n = parseInt(localStorage.getItem(SECTION_STORAGE_KEY), 10);
+    return Number.isInteger(n) && n >= 1 && n <= TOTAL_SECTIONS ? n : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function Assessment() {
   const [currentSection, setCurrentSection] = useState(1);
   const [errors, setErrors] = useState({});
   const { answers, setAnswers } = useAnswers();
   const navigate = useNavigate();
   const headerRef = useRef(null);
+
+  // If saved answers exist from a previous session, ask before resuming
+  // rather than silently jumping back in.
+  const [showResumePrompt, setShowResumePrompt] = useState(
+    () => Object.keys(answers).length > 0
+  );
 
   const sectionData = sections.find(s => s.id === currentSection);
   const sectionQuestions = getQuestionsForSection(currentSection);
@@ -83,6 +102,34 @@ export default function Assessment() {
     };
   }, [currentSection]);
 
+  // Persist the current section whenever it changes — skipped while the
+  // resume prompt is undecided so it doesn't overwrite the saved value
+  // before the user has chosen to resume or start over.
+  useEffect(() => {
+    if (showResumePrompt) return;
+    try {
+      localStorage.setItem(SECTION_STORAGE_KEY, String(currentSection));
+    } catch {
+      // localStorage unavailable — safe to ignore
+    }
+  }, [currentSection, showResumePrompt]);
+
+  function handleResume() {
+    setCurrentSection(getSavedSection() ?? 1);
+    setShowResumePrompt(false);
+  }
+
+  function handleStartOver() {
+    try {
+      localStorage.removeItem(SECTION_STORAGE_KEY);
+    } catch {
+      // localStorage unavailable — safe to ignore
+    }
+    setAnswers({});
+    setCurrentSection(1);
+    setShowResumePrompt(false);
+  }
+
   function handleNext() {
     if (!validate()) {
       const firstErrorId = sectionQuestions.find(
@@ -116,78 +163,104 @@ export default function Assessment() {
         <meta name="description" content="Take the free AI Job Watch assessment. Answer 30 questions about your role and get an instant AI Resistance Score across six categories — no account required." />
       </Helmet>
 
-      {/* Sticky progress bar */}
-      <div className="assessment-progress-bar">
-        <div className="container">
-          <div className="progress-meta">
-            <span className="progress-section-label">
-              Section {currentSection} of {TOTAL_SECTIONS} &mdash; <strong>{sectionData.title}</strong>
-            </span>
-            <span className="progress-pct">{answeredCount}/{requiredCount} answered</span>
-          </div>
-          <div className="progress-track" role="progressbar" aria-valuenow={currentSection} aria-valuemin={1} aria-valuemax={TOTAL_SECTIONS} aria-label="Assessment progress">
-            {sections.map(s => (
-              <div
-                key={s.id}
-                className={
-                  s.id < currentSection  ? 'progress-segment progress-segment--done'   :
-                  s.id === currentSection ? 'progress-segment progress-segment--active' :
-                                            'progress-segment'
-                }
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Dark section header — tabIndex="-1" lets us focus it programmatically
-          to clear the Next button's focus context without entering the tab order */}
-      <div className="assessment-header" ref={headerRef} tabIndex="-1" style={{ outline: 'none' }}>
-        <div className="container">
-          <p className="assessment-section-tag">Section {currentSection} of {TOTAL_SECTIONS}</p>
-          <h1 className="assessment-title">{sectionData.title}</h1>
-          <p className="assessment-desc">{sectionData.description}</p>
-          {currentSection === 1 && (
-            <>
-              <p className="assessment-section-tag" style={{ marginTop: 20 }}>Privacy First</p>
-              <p className="assessment-desc">
-                Your responses are anonymous and help improve AI Job Watch for workers everywhere. You do
-                not need to provide your name, email address, or create an account to complete this
-                assessment. The information you choose to share helps improve the accuracy of future
-                assessments while protecting your privacy.{' '}
-                <Link to="/about" className="results-shared-banner-cta">Learn more.</Link>
+      {showResumePrompt ? (
+        /* Saved progress detected — ask before resuming instead of jumping back in silently */
+        <div className="assessment-body">
+          <div className="container">
+            <div className="question-block">
+              <p className="question-label">Resume your previous assessment?</p>
+              <p className="playbook-card-context">
+                We found saved progress from an earlier session
+                {getSavedSection() ? ` — Section ${getSavedSection()} of ${TOTAL_SECTIONS}` : ''}.
+                Pick up where you left off, or start over with a clean slate.
               </p>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Questions */}
-      <div className="assessment-body">
-        <div className="container">
-          {sectionQuestions.map((q, idx) => (
-            <QuestionBlock
-              key={q.id}
-              question={q}
-              number={idx + 1}
-              answer={answers[q.id]}
-              hasError={!!errors[q.id]}
-              onChange={val => handleAnswer(q.id, val)}
-            />
-          ))}
-
-          <div className="assessment-nav">
-            {currentSection > 1 && (
-              <button className="btn-secondary" onClick={handleBack} type="button">
-                &larr; Back
-              </button>
-            )}
-            <button className="btn-primary" onClick={handleNext} type="button">
-              {isLastSection ? 'See My Results →' : 'Next →'}
-            </button>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <button type="button" className="btn-primary" onClick={handleResume}>
+                  Resume Assessment
+                </button>
+                <button type="button" className="btn-secondary" onClick={handleStartOver}>
+                  Start Over
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Sticky progress bar */}
+          <div className="assessment-progress-bar">
+            <div className="container">
+              <div className="progress-meta">
+                <span className="progress-section-label">
+                  Section {currentSection} of {TOTAL_SECTIONS} &mdash; <strong>{sectionData.title}</strong>
+                </span>
+                <span className="progress-pct">{answeredCount}/{requiredCount} answered</span>
+              </div>
+              <div className="progress-track" role="progressbar" aria-valuenow={currentSection} aria-valuemin={1} aria-valuemax={TOTAL_SECTIONS} aria-label="Assessment progress">
+                {sections.map(s => (
+                  <div
+                    key={s.id}
+                    className={
+                      s.id < currentSection  ? 'progress-segment progress-segment--done'   :
+                      s.id === currentSection ? 'progress-segment progress-segment--active' :
+                                                'progress-segment'
+                    }
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Dark section header — tabIndex="-1" lets us focus it programmatically
+              to clear the Next button's focus context without entering the tab order */}
+          <div className="assessment-header" ref={headerRef} tabIndex="-1" style={{ outline: 'none' }}>
+            <div className="container">
+              <p className="assessment-section-tag">Section {currentSection} of {TOTAL_SECTIONS}</p>
+              <h1 className="assessment-title">{sectionData.title}</h1>
+              <p className="assessment-desc">{sectionData.description}</p>
+              {currentSection === 1 && (
+                <>
+                  <p className="assessment-section-tag" style={{ marginTop: 20 }}>Privacy First</p>
+                  <p className="assessment-desc">
+                    Your responses are anonymous and help improve AI Job Watch for workers everywhere. You do
+                    not need to provide your name, email address, or create an account to complete this
+                    assessment. The information you choose to share helps improve the accuracy of future
+                    assessments while protecting your privacy.{' '}
+                    <Link to="/about" className="results-shared-banner-cta">Learn more.</Link>
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Questions */}
+          <div className="assessment-body">
+            <div className="container">
+              {sectionQuestions.map((q, idx) => (
+                <QuestionBlock
+                  key={q.id}
+                  question={q}
+                  number={idx + 1}
+                  answer={answers[q.id]}
+                  hasError={!!errors[q.id]}
+                  onChange={val => handleAnswer(q.id, val)}
+                />
+              ))}
+
+              <div className="assessment-nav">
+                {currentSection > 1 && (
+                  <button className="btn-secondary" onClick={handleBack} type="button">
+                    &larr; Back
+                  </button>
+                )}
+                <button className="btn-primary" onClick={handleNext} type="button">
+                  {isLastSection ? 'See My Results →' : 'Next →'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
     </div>
   );
