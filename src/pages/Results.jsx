@@ -97,6 +97,43 @@ const RESOURCES = {
   },
 };
 
+// ─── What You Can Do Next — personalized "Start Here" and second tip ─────────
+// Display-layer overrides so this section names the user's own weakest
+// category / top protector, matching the personalization already applied in
+// PROTECTOR_WHY_PLAIN and AUTOMATION_PLAIN above. Falls back to the generic
+// per-tier copy in RESOURCES when the needed category data isn't available.
+function getPersonalizedStartHere(riskKey, weakestCategory, topProtector) {
+  if (riskKey === 'HIGH') {
+    return weakestCategory ? (
+      <>Your Career Playbook above flagged <strong>{weakestCategory.label}</strong> as your first priority. Pick a resource below that builds toward that, and spend 30 minutes on it this week. You do not need to learn everything at once — just start somewhere.</>
+    ) : RESOURCES.HIGH.startHere;
+  }
+  if (riskKey === 'MEDIUM') {
+    return weakestCategory ? (
+      <>Your lowest score is <strong>{weakestCategory.label} ({weakestCategory.score}/5)</strong>. That's your best starting point — a small improvement there makes the biggest difference to your total.</>
+    ) : RESOURCES.MEDIUM.startHere;
+  }
+  return topProtector ? (
+    <>You're already strong in <strong>{topProtector.label}</strong>. Pick one AI tool and try it this week to make part of your job easier — you're stacking a new skill on top of a strength you already have.</>
+  ) : RESOURCES.LOW.startHere;
+}
+
+function getPersonalizedSecondTip(riskKey, weakestCategory, topProtector) {
+  if (riskKey === 'HIGH') {
+    return weakestCategory ? (
+      <>Look at jobs in your company that need more judgment, people skills, or leadership — especially roles built around <strong>{weakestCategory.label}</strong>. Those are harder to automate, and moving into one is worth thinking about.</>
+    ) : RESOURCES.HIGH.tips[1];
+  }
+  if (riskKey === 'MEDIUM') {
+    return weakestCategory ? (
+      <>Think about building up <strong>{weakestCategory.label}</strong> specifically — a certification or more responsibility there would raise that score directly and make you harder to replace.</>
+    ) : RESOURCES.MEDIUM.tips[1];
+  }
+  return topProtector ? (
+    <>Teaching coworkers how to do parts of your job — especially where you're strong in <strong>{topProtector.label}</strong> — does not make you replaceable. It shows you are a leader, and that adds even more protection.</>
+  ) : RESOURCES.LOW.tips[1];
+}
+
 function ExternalIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style={{ display: 'inline', marginLeft: 4, verticalAlign: 'middle', flexShrink: 0 }}>
@@ -105,9 +142,12 @@ function ExternalIcon() {
   );
 }
 
-function ResourcesSection({ riskKey }) {
+function ResourcesSection({ riskKey, weakestCategory, topProtector }) {
   const data = RESOURCES[riskKey];
   if (!data) return null;
+
+  const startHereText = getPersonalizedStartHere(riskKey, weakestCategory, topProtector);
+  const tips = [data.tips[0], getPersonalizedSecondTip(riskKey, weakestCategory, topProtector)];
 
   return (
     <section className="resources-section">
@@ -120,7 +160,7 @@ function ResourcesSection({ riskKey }) {
 
         <div className="resources-start-here">
           <span className="resources-start-label">Start Here</span>
-          <p className="resources-start-text">{data.startHere}</p>
+          <p className="resources-start-text">{startHereText}</p>
         </div>
 
         <h3 className="resources-subheading">Free learning resources</h3>
@@ -135,7 +175,7 @@ function ResourcesSection({ riskKey }) {
 
         <h3 className="resources-subheading">Two practical steps</h3>
         <div className="resources-tips">
-          {data.tips.map((tip, i) => (
+          {tips.map((tip, i) => (
             <div className="resources-tip-card" key={i}>
               <span className="resources-tip-num" aria-hidden="true">{i + 1}</span>
               <p className="resources-tip-text">{tip}</p>
@@ -584,7 +624,11 @@ export default function Results() {
       </section>
 
       {/* What You Can Do Next */}
-      <ResourcesSection riskKey={riskKey} />
+      <ResourcesSection
+        riskKey={riskKey}
+        weakestCategory={rankedCategories[rankedCategories.length - 1]}
+        topProtector={topProtectors[0]}
+      />
 
       {/* Retake / Take assessment CTA */}
       <section className="results-cta-band">
