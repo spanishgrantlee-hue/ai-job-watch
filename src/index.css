@@ -666,6 +666,7 @@ input, select, textarea, button { font-family: inherit; }
   color: var(--clr-text);
   background: var(--clr-bg);
   outline: none;
+  scroll-margin-bottom: 88px;
   transition: border-color 0.18s, background 0.18s;
 }
 
@@ -681,6 +682,7 @@ input, select, textarea, button { font-family: inherit; }
   color: var(--clr-text);
   background: var(--clr-bg);
   outline: none;
+  scroll-margin-bottom: 88px;
   resize: vertical;
   min-height: 130px;
   line-height: 1.6;
@@ -711,6 +713,7 @@ input, select, textarea, button { font-family: inherit; }
   font-weight: 500;
   text-align: left;
   cursor: pointer;
+  scroll-margin-bottom: 88px;
   transition: border-color 0.15s, background 0.15s, color 0.15s, box-shadow 0.15s;
   line-height: 1.4;
 }
@@ -779,6 +782,7 @@ input, select, textarea, button { font-family: inherit; }
   .assessment-header { padding: 32px 0 36px; }
   .assessment-body   { padding: 28px 0 96px; }
   .question-block    { padding: 26px 28px; }
+  .choice-btn, .question-input, .question-textarea { scroll-margin-bottom: 96px; }
 }
 
 @media (min-width: 1024px) {

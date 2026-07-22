@@ -262,8 +262,8 @@
 
 ---
 
-### F2 · Add keyboard navigation to choice buttons
-**What:** In the `QuestionBlock` component, add an `onKeyDown` handler to each `.choice-btn` that handles: `ArrowDown` / `ArrowRight` → focus next choice, `ArrowUp` / `ArrowLeft` → focus previous choice, `Enter` / `Space` → select current choice (already handled by browser for `<button>`, but confirm). Use `useRef` on the choice list container and manage focus with `querySelectorAll` + `focus()`.
+### F2 · Keyboard navigation for choice buttons ✓ DONE
+**What:** `QuestionBlock`'s `.choice-btn` list implements a roving-tabindex `role="radiogroup"` pattern: `ArrowDown`/`ArrowRight` moves to the next choice, `ArrowUp`/`ArrowLeft` to the previous, `Home`/`End` jump to first/last, and moving focus also selects (matching native radio behavior). Verified live via keyboard-only browser testing on 2026-07-22.
 **Why:** Power users and accessibility-conscious users navigate forms with a keyboard. Currently, tabbing to a choice group and pressing Enter does nothing useful — you have to mouse-click each answer. This is also required for WCAG 2.1 AA compliance (`role="radiogroup"` implies keyboard navigation).
 **Files:** `src/pages/Assessment.jsx`
 **Time:** 45 minutes
@@ -355,10 +355,10 @@
 
 ---
 
-### I2 · Keyboard navigation test on assessment
-**What:** Tab through the entire assessment using only keyboard. Verify arrow keys move between choices, Enter selects, Tab advances to the next question group, and the Next button is reachable and activatable via keyboard.
-**Why:** Keyboard nav is easy to implement but hard to verify without actually doing it. Bugs here (focus traps, wrong arrow direction) are invisible to sighted mouse users but a complete blocker for screen reader users.
-**Files:** No code changes — test only
+### I2 · Keyboard navigation test on assessment ✓ DONE
+**What:** Tabbed through Sections 1–2 of the assessment using only the keyboard, verified programmatically (`document.activeElement`, `getBoundingClientRect()`) rather than by visual inspection alone. Confirmed: Arrow/Home/End move and select within each radiogroup, Tab/Shift+Tab move correctly in and out of groups, Enter activates Next, and focus moves to the section heading on section transition. Found one real bug in the process — the sticky nav bar could render on top of the currently-focused choice button, hiding it from view (measured via bounding-rect overlap). Fixed with `scroll-margin-bottom` on `.choice-btn`, `.question-input`, and `.question-textarea`, re-verified at both the mobile and desktop breakpoints.
+**Why:** Keyboard nav is easy to implement but hard to verify without actually doing it. Bugs here (focus traps, wrong arrow direction, hidden focus) are invisible to sighted mouse users but a complete blocker for screen reader and keyboard-only users.
+**Files:** `src/index.css` (fix); no other code changes
 **Time:** 15 minutes
 **Dependencies:** F2 complete
 
