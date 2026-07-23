@@ -133,7 +133,7 @@
 
 ---
 
-### C1 · Create `src/utils/share.js` — `encodeShareState()`
+### C1 · Create `src/utils/share.js` — `encodeShareState()` ✓ DONE
 **What:** A utility function that takes the calculated results object (`{ finalScore, riskKey, categories, aiExposurePenalty }`) and encodes it into a compact, URL-safe Base64 string using a short-key JSON format (e.g., `{"s":18,"r":"MEDIUM","c":[3,2,4,2,3,2],"e":2}`).
 **Why:** The share URL must be self-contained — no server lookup, no database. All result data needed to reconstruct the results page travels in the URL itself. This function produces that string.
 **Files:** `src/utils/share.js` *(new file)*
@@ -142,7 +142,7 @@
 
 ---
 
-### C2 · Add `decodeShareState()` to `src/utils/share.js`
+### C2 · Add `decodeShareState()` to `src/utils/share.js` ✓ DONE
 **What:** The inverse of C1. Takes a Base64 string from the URL and returns the structured results object. Must handle malformed/corrupted input gracefully (return `null` on failure).
 **Why:** The Results page needs to reconstruct the full results display from just the URL string. Graceful error handling prevents a broken share link from crashing the page.
 **Files:** `src/utils/share.js`
@@ -151,7 +151,7 @@
 
 ---
 
-### C3 · Add "Copy Link" button to `Results.jsx`
+### C3 · Add "Copy Link" button to `Results.jsx` ✓ DONE
 **What:** A button in the results hero section that calls `encodeShareState()`, builds the full share URL (`https://aijobwatch.com/results?share=<encoded>`), writes it to the clipboard using `navigator.clipboard.writeText()`, and shows a brief "Copied!" confirmation state.
 **Why:** This is the primary sharing action. A direct clipboard copy is the fastest possible share action — no extra dialog, no navigation.
 **Files:** `src/pages/Results.jsx`, `src/index.css`
@@ -160,7 +160,7 @@
 
 ---
 
-### C4 · Add "Share on X" button to `Results.jsx`
+### C4 · Add "Share on X" button to `Results.jsx` ✓ DONE
 **What:** A second share button that opens a new tab to `https://twitter.com/intent/tweet?text=...&url=...` with a pre-written tweet ("I just checked my AI risk score — got [X]/30 [MEDIUM] Risk. Check yours free:"). Opens in a new tab via `window.open`.
 **Why:** Twitter/X is where tech workers share tools like this. A pre-filled tweet removes friction entirely. This is the single most cost-effective viral distribution mechanism available at v1.
 **Files:** `src/pages/Results.jsx`, `src/index.css`
@@ -169,7 +169,7 @@
 
 ---
 
-### C5 · Render shared results from URL in `Results.jsx`
+### C5 · Render shared results from URL in `Results.jsx` ✓ DONE
 **What:** At the top of the `Results` component, check for a `?share=` query parameter using `useSearchParams()`. If present, call `decodeShareState()` and use that data to populate the results display instead of `calculateResults(answers)`. Show a banner ("You're viewing someone else's results — take the assessment yourself") when in shared view mode.
 **Why:** This is what makes the share link actually work. Without this, the share URL routes to the empty-state "No Results Yet" screen.
 **Files:** `src/pages/Results.jsx`
@@ -178,7 +178,7 @@
 
 ---
 
-### C6 · Add dynamic `<Helmet>` to `Results.jsx`
+### C6 · Add dynamic `<Helmet>` to `Results.jsx` ✓ DONE
 **What:** When results are available (either from assessment or from shared URL), inject a `<Helmet>` block with: a dynamic title (`"My AI Risk Score: 18/30 Medium Risk | AI Job Watch"`), a dynamic description summarizing the result, `og:image` pointing to the appropriate risk-tier OG image (B2/B3/B4), and `og:url` pointing to the share URL.
 **Why:** When someone shares the link on Twitter, LinkedIn, or iMessage, the platform fetches the page and reads these tags. A generic title ("AI Job Watch") gets ignored. A personal title ("Score: 18/30 — Medium Risk") generates curiosity and clicks.
 **Files:** `src/pages/Results.jsx`
@@ -187,7 +187,7 @@
 
 ---
 
-### C7 · Extend `save-result.js` to store the share URL
+### C7 · Extend `save-result.js` to store the share URL ✓ DONE
 **What:** After saving to Netlify Blobs, compute the share URL using the same encoding logic (duplicated or imported as a Node-compatible version) and include `shareUrl` in the stored blob record.
 **Why:** Future analytics and the v3 benchmarking feature will benefit from having the share URL stored alongside the result. Also allows generating a leaderboard or "recent results" feed later.
 **Files:** `netlify/functions/save-result.js`, potentially `src/utils/share.js` (may need a CJS-compatible version or inline duplication for the serverless context)
@@ -200,7 +200,7 @@
 
 ---
 
-### D1 · Create `generateTextSummary()` in `src/utils/share.js`
+### D1 · Create `generateTextSummary()` in `src/utils/share.js` ✓ DONE
 **What:** A function that takes the results object and returns a plain-text multi-line string: score, risk level, top 3 categories, and the personalized summary headline. Formatted cleanly for pasting into Slack, email, or a text message.
 **Why:** Not everyone wants to share a link. Many users will want to paste their score into a work chat or send it to a friend. Plain text is the most portable format.
 **Files:** `src/utils/share.js`
@@ -209,7 +209,7 @@
 
 ---
 
-### D2 · Add "Copy as Text" button to `Results.jsx`
+### D2 · Add "Copy as Text" button to `Results.jsx` ✓ DONE
 **What:** A button (near the share buttons from C3/C4) that calls `generateTextSummary()`, copies the result to clipboard, and shows a "Copied!" confirmation.
 **Why:** Gives users a second sharing option for contexts where a link isn't appropriate. Increases total sharing surface area at near-zero implementation cost.
 **Files:** `src/pages/Results.jsx`, `src/index.css`
