@@ -271,9 +271,9 @@
 
 ---
 
-### F3 · Mobile sticky "Next" button
-**What:** On viewports ≤ 768px, fix the `.assessment-nav` button container to the bottom of the viewport using `position: sticky; bottom: 0` with a white/blurred background, so users don't need to scroll to the bottom of a long question list to advance.
-**Why:** On mobile, the Next button can be two or three full screens below the first question on multi-question sections. Users get confused and abandon. A sticky Next button removes the biggest mobile UX friction point.
+### F3 · Sticky navigation on all screen sizes ✓ DONE
+**What:** Fixed `.assessment-nav` to the bottom of the viewport on all screen sizes (not just mobile), with screen-specific button sizing and padding. Body gets bottom padding at all three breakpoints to prevent questions from being hidden behind the bar.
+**Why:** On mobile, the Next button can be two or three full screens below the first question on multi-question sections. Users get confused and abandon. Extended to all screen sizes after testing revealed the same friction on desktop during longer sections.
 **Files:** `src/index.css`
 **Time:** 25 minutes
 **Dependencies:** None
