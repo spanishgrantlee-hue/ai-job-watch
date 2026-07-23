@@ -95,7 +95,7 @@
 
 ---
 
-### B1 · Create default OG image
+### B1 · Create default OG image ✓ DONE
 **What:** A 1200×630px image (`public/og-default.png`) branded with the AI Job Watch name, a one-line description ("Find out how safe your job is from AI automation"), and the site's color scheme.
 **Why:** Every social share, iMessage link preview, and Slack unfurl shows this image. It's the first visual impression of the brand.
 **Files:** `public/og-default.png` *(new file)*
@@ -104,7 +104,7 @@
 
 ---
 
-### B2 · Create HIGH RISK OG image
+### B2 · Create HIGH RISK OG image ✓ DONE
 **What:** A 1200×630px image (`public/og-high.png`) designed around the HIGH risk state — the same branding as B1 but with a distinct visual that indicates "high risk" (e.g., a red accent, a risk indicator graphic).
 **Why:** When a user with a HIGH risk score shares their result link, this image will show in the preview, making the share visually distinct and more likely to generate engagement from worried coworkers.
 **Files:** `public/og-high.png` *(new file)*
@@ -113,7 +113,7 @@
 
 ---
 
-### B3 · Create MEDIUM RISK OG image
+### B3 · Create MEDIUM RISK OG image ✓ DONE
 **What:** Same as B2 but for the MEDIUM risk state (`public/og-medium.png`), with an amber/orange visual treatment.
 **Files:** `public/og-medium.png` *(new file)*
 **Time:** 15 minutes
@@ -121,7 +121,7 @@
 
 ---
 
-### B4 · Create LOW RISK OG image
+### B4 · Create LOW RISK OG image ✓ DONE
 **What:** Same pattern, LOW risk state (`public/og-low.png`), green visual treatment.
 **Files:** `public/og-low.png` *(new file)*
 **Time:** 15 minutes
