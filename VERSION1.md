@@ -10,7 +10,7 @@
 
 ---
 
-### A1 · Create `robots.txt`
+### A1 · Create `robots.txt` ✓ DONE
 **What:** A plain-text file telling search engines which pages to crawl.
 **Why:** Without it, Google may deprioritize or unpredictably crawl the site. Required baseline for any indexing strategy.
 **Files:** `public/robots.txt` *(new file)*
@@ -19,7 +19,7 @@
 
 ---
 
-### A2 · Create `sitemap.xml`
+### A2 · Create `sitemap.xml` ✓ DONE
 **What:** An XML file listing all four public URLs with their priority and change frequency.
 **Why:** Tells Google exactly what pages exist and how often they change. Speeds up indexing of `/about`, `/assessment`, and future `/results/shared` pages.
 **Files:** `public/sitemap.xml` *(new file)*
@@ -28,7 +28,7 @@
 
 ---
 
-### A3 · Install `react-helmet-async`
+### A3 · Install `react-helmet-async` ✓ DONE
 **What:** Add the `react-helmet-async` npm package to the project.
 **Why:** Allows each page component to inject its own `<title>`, `<meta>`, and `<link>` tags into `<head>` at runtime. The "async" variant is required for React 19 (avoids the stale-closure issue in the original `react-helmet`).
 **Files:** `package.json`, `package-lock.json`
@@ -37,7 +37,7 @@
 
 ---
 
-### A4 · Wrap the app with `HelmetProvider`
+### A4 · Wrap the app with `HelmetProvider` ✓ DONE
 **What:** Import `HelmetProvider` from `react-helmet-async` and wrap the return value of `App.jsx` with it.
 **Why:** Every page-level `<Helmet>` component must be a descendant of exactly one `HelmetProvider`. This is the single setup step that makes A5–A9 work.
 **Files:** `src/main.jsx` or `src/App.jsx`
@@ -46,7 +46,7 @@
 
 ---
 
-### A5 · Add default meta tags to `index.html`
+### A5 · Add default meta tags to `index.html` ✓ DONE
 **What:** Add `<meta name="description">`, a default `<title>`, Open Graph tags (`og:title`, `og:description`, `og:type`, `og:url`, `og:image`), and Twitter Card tags to the `<head>` of `index.html`.
 **Why:** These are the fallback tags that crawlers and link-preview bots see before React renders. Every page that doesn't override them inherits these. Also the only tags a bot will ever see without JavaScript execution.
 **Files:** `index.html`
@@ -55,7 +55,7 @@
 
 ---
 
-### A6 · Add `<Helmet>` to `Home.jsx`
+### A6 · Add `<Helmet>` to `Home.jsx` ✓ DONE
 **What:** Import `Helmet` from `react-helmet-async` and add a `<Helmet>` block at the top of the Home component with a page-specific title (`"Is Your Job Safe from AI? | AI Job Watch"`) and description focused on the assessment tool.
 **Why:** Home is the highest-traffic page. A specific, keyword-rich title and description improve click-through rate from search results.
 **Files:** `src/pages/Home.jsx`
@@ -64,7 +64,7 @@
 
 ---
 
-### A7 · Add `<Helmet>` to `About.jsx`
+### A7 · Add `<Helmet>` to `About.jsx` ✓ DONE
 **What:** Page-specific title (`"About AI Job Watch | Methodology & Scoring"`) and a description covering the scoring methodology and privacy stance.
 **Why:** The About page will be linked from other sites covering AI policy and labor — a proper title makes those links count.
 **Files:** `src/pages/About.jsx`
@@ -73,7 +73,7 @@
 
 ---
 
-### A8 · Add `<Helmet>` to `Assessment.jsx`
+### A8 · Add `<Helmet>` to `Assessment.jsx` ✓ DONE
 **What:** Page-specific title (`"AI Job Assessment | AI Job Watch"`) and a description focused on the 30-question format and instant result.
 **Why:** People search for "AI job risk assessment" and similar phrases. This page needs its own title so it can rank independently from the home page.
 **Files:** `src/pages/Assessment.jsx`
@@ -82,7 +82,7 @@
 
 ---
 
-### A9 · Add JSON-LD structured data to `Home.jsx`
+### A9 · Add JSON-LD structured data to `Home.jsx` ✓ DONE
 **What:** Inject a `<script type="application/ld+json">` block using Helmet containing Schema.org `WebApplication` or `Quiz` markup — name, description, url, application category.
 **Why:** Structured data enables Google rich results (e.g., a "Take the Quiz" action button directly in search results). This is a significant click-through rate multiplier at no cost.
 **Files:** `src/pages/Home.jsx`
