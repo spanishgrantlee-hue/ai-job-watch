@@ -921,6 +921,7 @@ input, select, textarea, button { font-family: inherit; }
   border-radius: 50%;
   box-shadow: 0 0 0 3px rgba(255,255,255,0.35), 0 0 16px 4px rgba(255,255,255,0.45), 0 4px 14px rgba(0,0,0,0.5);
   z-index: 2;
+  transition: left 0.8s ease-out;
 }
 
 /* Share row — sits below the score range bar inside the dark hero */

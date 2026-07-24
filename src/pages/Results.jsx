@@ -189,7 +189,15 @@ function ResourcesSection({ riskKey, weakestCategory, topProtector }) {
 
 function ScoreRangeBar({ score }) {
   const MAX = 30;
-  const markerPct = Math.max(1.5, Math.min(98.5, (score / MAX) * 100));
+  const targetPct = Math.max(1.5, Math.min(98.5, (score / MAX) * 100));
+
+  // Marker starts at 0 and slides to its resting position after mount,
+  // so the reveal matches the score count-up rather than snapping in place.
+  const [markerPct, setMarkerPct] = useState(0);
+  useEffect(() => {
+    const frameId = requestAnimationFrame(() => setMarkerPct(targetPct));
+    return () => cancelAnimationFrame(frameId);
+  }, [targetPct]);
 
   return (
     <div className="score-range-bar" aria-hidden="true">
