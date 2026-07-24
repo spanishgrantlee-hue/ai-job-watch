@@ -346,12 +346,12 @@
 
 ---
 
-### I1 · End-to-end share link test
-**What:** Complete a full assessment → click Copy Link → paste URL in a new incognito tab → verify the results page renders correctly from the shared URL → verify the "You're viewing someone else's results" banner appears → click "Take the assessment yourself" and verify it routes to `/assessment`.
+### I1 · End-to-end share link test — NOT YET VERIFIED
+**What:** Complete a full assessment → click Copy Link → paste URL in a new incognito tab → verify the results page renders correctly from the shared URL → verify the shared-view banner appears (actual copy: "You're viewing a shared result." with a "Take your own assessment →" link, not the "You're viewing someone else's results" text originally drafted here) → click through and verify it routes to `/assessment`. No test report or other evidence exists in the repo confirming this round-trip has actually been run.
 **Why:** The share link is the most complex new flow in v1. A manual round-trip test catches encoding edge cases (score = 0, all HIGH categories, etc.) that unit tests might miss.
 **Files:** No code changes — test only
 **Time:** 20 minutes
-**Dependencies:** C1–C6 complete
+**Dependencies:** C1–C6 complete (✓ verified implemented — this manual test itself has not been executed)
 
 ---
 
@@ -364,30 +364,30 @@
 
 ---
 
-### I3 · Mobile layout smoke test
-**What:** Use Chrome DevTools device emulator (iPhone 14 viewport) to walk through Home → Assessment → Results. Verify: sticky Next button doesn't obscure questions, share buttons are tap-friendly (44px minimum touch target), score animations play correctly, OG image dimensions don't cause layout shift.
-**Why:** The assessment form is particularly fragile on mobile due to the sticky progress bar + sticky Next button + scrollable question list all competing for viewport space.
+### I3 · Mobile layout smoke test — NOT YET VERIFIED
+**What:** Use Chrome DevTools device emulator (iPhone 14 viewport) to walk through Home → Assessment → Results. Verify: sticky nav bar doesn't obscure questions or the currently-focused choice button, share buttons are tap-friendly (44px minimum touch target), the score count-up animation plays correctly, OG image dimensions don't cause layout shift. No test report exists in the repo confirming this has been run.
+**Why:** The assessment form is particularly fragile on mobile due to the sticky progress bar + sticky nav bar + scrollable question list all competing for viewport space.
 **Files:** Likely minor fixes to `src/index.css`
 **Time:** 25 minutes
-**Dependencies:** F3 complete, G1–G3 complete
+**Dependencies:** F3 complete (✓). Originally listed "G1–G3 complete" — corrected: only G1 (count-up) is implemented; G2 (marker slide-in) and G3 (stagger-reveal) are not, so there is no marker or card-reveal animation for this test to check yet.
 
 ---
 
-### I4 · Verify clean production build
-**What:** Run `npm run build` and confirm zero errors, zero warnings that indicate missing assets or broken imports, and that `dist/index.html` contains the GA4 snippet and default meta tags.
+### I4 · Verify clean production build ✓ DONE
+**What:** Ran `npm run build` — completed cleanly with zero errors and zero warnings (39 modules transformed, built in 923ms). Confirmed `dist/index.html` contains the GA4 script (`googletagmanager.com/gtag/js`) and the full default meta tag set (title, description, canonical, Open Graph, Twitter Card). Note: this verifies the build compiles cleanly as of today, with Groups G2, G3, and H1–H3 still unimplemented — not a full v1-scope-complete build, since that scope isn't finished yet.
 **Why:** Vite's build can succeed even with warnings that indicate real issues (e.g., missing dynamic imports, unresolved assets). A clean build with eyes on the output is required before deploy.
 **Files:** No code changes
 **Time:** 10 minutes
-**Dependencies:** All groups complete
+**Dependencies:** All groups complete — not yet true (G2, G3, H1–H3 remain open); re-run this check once those land, since a warning could theoretically surface later work they introduce.
 
 ---
 
-### I5 · Commit and push Version 1
-**What:** Stage all changed files, write a descriptive commit message summarizing v1 scope, push to `origin/main`.
+### I5 · Commit and push Version 1 — NOT YET DONE
+**What:** No single consolidated "Version 1 release" commit has been made. Work has instead been committed and pushed incrementally — one commit per checklist group or fix — throughout this audit, rather than as one final release checkpoint.
 **Why:** Creates a clean git checkpoint for v1. If v2 work introduces regressions, we have a known-good v1 state to diff against.
 **Files:** All modified files
 **Time:** 10 minutes
-**Dependencies:** I1–I4 passing
+**Dependencies:** I1–I4 passing — not yet met: I1 and I3 are unverified, I4 is verified, I2 is verified.
 
 ---
 
