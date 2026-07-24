@@ -222,27 +222,27 @@
 
 ---
 
-### E1 · Create `src/components/WhatIfPanel.jsx`
-**What:** A new component that renders 5–6 of the highest-impact scored questions (Q6, Q7, Q8, Q16, Q22, Q25) as interactive sliders or segmented button groups. Each control maps to a question's choice index (0–N). The component accepts `baseAnswers` and an `onChange(questionId, value)` callback.
-**Why:** The most common reaction after seeing a score is "what if I changed jobs?" or "what if I got a certification?" This mode lets users explore hypotheticals without retaking the whole assessment. It turns the results page from a static report into an interactive tool.
-**Files:** `src/components/WhatIfPanel.jsx` *(new file)*
+### E1 · `WhatIfPanel.jsx` — category-level score explorer ✓ DONE
+**What:** `src/components/WhatIfPanel.jsx` lets users adjust the 6 category scores (Accountability, Trust, Judgment, Problem Solving, Physical Presence, Licensing) and the AI Exposure Penalty directly via +/− stepper controls, rather than the 6 raw questions originally scoped (Q6, Q7, Q8, Q16, Q22, Q25). Live-recalculates a projected score/risk band and surfaces a per-category "why" coaching sentence explaining what's driving the change.
+**Why:** Adjusting category scores — the same units used throughout the rest of the results page — is a more direct, meaningful lever than 6 arbitrary raw questions, and pairs naturally with the coaching content elsewhere on the page. Redesigned from the original slider/question-based spec during the "refactor What-If Explorer as coaching tool" pass.
+**Files:** `src/components/WhatIfPanel.jsx`
 **Time:** 60 minutes
-**Dependencies:** Familiarity with `scoring.js` and `questions.js`
+**Dependencies:** Familiarity with `scoring.js` and `share.js` (`CAT_ORDER`, `CATEGORY_META`)
 
 ---
 
-### E2 · Wire What-If mode into `Results.jsx`
-**What:** Add a `whatIfAnswers` state initialized from `answers`. Add a "Explore What-If" toggle button to the score hero section. When active: render `WhatIfPanel`, override `calculateResults` with `whatIfAnswers` instead of `answers` for the entire page display, show a "What-If Mode" banner, and show side-by-side comparison ("Your score: 18 → What-If score: 22"). Add an "Exit What-If" button that resets to original results.
-**Why:** The panel alone does nothing without state management. This task makes the feature end-to-end functional.
+### E2 · Wire What-If mode into `Results.jsx` ✓ DONE
+**What:** A `showWhatIf` boolean toggles a "Try adjusting my scores" / "Hide" button in the "How to Improve Your Score" section. When open, `WhatIfPanel` renders inline with the user's real `categories`, `aiExposurePenalty`, `finalScore`, and `riskKey` as props, and manages its own internal what-if state — it does not override `calculateResults` for the rest of the page, and there's no separate "What-If Mode" banner or explicit "Your score: X → What-If score: Y" comparison. Instead, the panel shows the live projected score/risk band plus a narrative coaching sentence describing what's driving the change.
+**Why:** A self-contained, always-in-place panel keeps the rest of the results page (Career Playbook, What Protects Your Job, etc.) anchored to the user's real score while still making "what if" exploration interactive — avoids the risk of the whole page silently switching to hypothetical numbers and confusing the user about which score is real.
 **Files:** `src/pages/Results.jsx`
 **Time:** 45 minutes
 **Dependencies:** E1
 
 ---
 
-### E3 · Style WhatIfPanel and What-If state in `index.css`
-**What:** CSS for the What-If panel container, the segmented button controls, the "What-If Mode" banner, and the score comparison display. Match the existing design system (CSS variables, spacing, radius tokens).
-**Why:** The feature is only valuable if it's clear and easy to use. The UI needs to communicate "this is hypothetical" without being confusing.
+### E3 · Style WhatIfPanel in `index.css` ✓ DONE
+**What:** ~47 `.whatif-*` selectors covering the panel container, category adjustment rows, +/− stepper buttons, the projected-score display (color-coded by projected risk tier), and the coaching sentence. Matches the app's existing design tokens (CSS variables, spacing, radius).
+**Why:** The feature is only valuable if it's clear and easy to use, and needs to visually distinguish "projected" from "real" without a jarring full-page mode switch.
 **Files:** `src/index.css`
 **Time:** 35 minutes
 **Dependencies:** E1, E2
