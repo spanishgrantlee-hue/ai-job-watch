@@ -315,17 +315,17 @@
 
 ---
 
-### H1 · Add `loading="lazy"` to images
-**What:** Add `loading="lazy"` to every `<img>` tag in `Home.jsx` that is below the fold (the hero image is above the fold and should use `loading="eager"` or no attribute).
-**Why:** The hero image is already loaded eagerly. Below-fold images delay LCP and Total Blocking Time if loaded upfront. This is a one-attribute change that improves Lighthouse Performance score.
-**Files:** `src/pages/Home.jsx`
+### H1 · Add `loading="lazy"` to images — NOT YET IMPLEMENTED
+**What:** `Home.jsx` has zero `<img>` tags — the page is built entirely from text, emoji icons, and CSS-driven sections (hero, features, risk-bands, CTA), so this task as originally scoped doesn't apply to that file. The only `<img>` tag anywhere in the app is `About.jsx:35` (`heroPhoto`, a founder photo), and it currently has no `loading` attribute at all — neither `lazy` nor `eager`.
+**Why:** Lazy-loading below-fold images reduces initial page weight and improves LCP/Total Blocking Time. There's no image on `Home.jsx` to apply this to; `About.jsx`'s founder photo is the actual candidate if it renders below the fold.
+**Files:** `src/pages/About.jsx` (actual candidate); `src/pages/Home.jsx` has no images to change
 **Time:** 10 minutes
 **Dependencies:** None
 
 ---
 
-### H2 · Add preconnect hints for GA4 and fonts
-**What:** Add `<link rel="preconnect" href="https://www.googletagmanager.com">` and `<link rel="dns-prefetch" href="https://www.google-analytics.com">` to `<head>` in `index.html`.
+### H2 · Add preconnect hints for GA4 — NOT YET IMPLEMENTED
+**What:** `index.html` has no `<link rel="preconnect">` or `dns-prefetch` hints at all. The "fonts" half of the original task doesn't apply to the current build — the app uses a system font stack (`'Segoe UI', system-ui, -apple-system, sans-serif`, `index.css:62`), not Google Fonts or any externally hosted font, so there's no font origin to preconnect to. Only a GA4 preconnect (`googletagmanager.com`) remains relevant.
 **Why:** GA4 loads a script from `googletagmanager.com` that currently incurs a DNS + TLS handshake cost on every page load. Preconnect eliminates that overhead and improves Time to Interactive by ~100–300ms on cold connections.
 **Files:** `index.html`
 **Time:** 5 minutes
@@ -333,8 +333,8 @@
 
 ---
 
-### H3 · Run Lighthouse audit and fix issues
-**What:** Run `npm run build && npm run preview` locally, open Chrome DevTools → Lighthouse, run against all four pages, document scores, and fix anything scoring below 90 in Performance, Accessibility, Best Practices, and SEO.
+### H3 · Run Lighthouse audit and fix issues — NOT YET IMPLEMENTED
+**What:** No Lighthouse report, config, or audit notes exist anywhere in the repo — this task has not been run. Once it is: run `npm run build && npm run preview` locally, open Chrome DevTools → Lighthouse, run against all four pages, document scores, and fix anything scoring below 90 in Performance, Accessibility, Best Practices, and SEO.
 **Why:** Lighthouse is the single source of truth for production readiness. This task is intentionally open-ended — the specific fixes depend on what the audit reveals. Known likely issues: missing `alt` tags, color contrast ratios on the dark hero, render-blocking resources.
 **Files:** Any file flagged by the audit — likely `src/index.css`, `src/pages/Home.jsx`, `index.html`
 **Time:** 60 minutes
