@@ -253,11 +253,11 @@
 
 ---
 
-### F1 · Verify and improve progress display in `Assessment.jsx`
-**What:** The progress bar already shows "Section X of Y — Title" and "X% complete". Verify the percentage feels accurate (currently `currentSection / TOTAL_SECTIONS` — entering section 1 shows 14%, which may feel off). Consider changing the formula to `(currentSection - 1) / TOTAL_SECTIONS` so it starts at 0% and reaches 100% on the final section.
-**Why:** A progress bar that starts at 14% on question 1 creates a misleading sense of how much is left. Starting at 0% is more honest. This is a one-line change but matters for first impressions.
-**Files:** `src/pages/Assessment.jsx`
-**Time:** 10 minutes
+### F1 · Progress display — Issue moot, redesigned
+**What:** The original concern doesn't apply to the current code. There is no percentage-based progress calculation anywhere in `Assessment.jsx` — grepping every use of `TOTAL_SECTIONS` confirms it. The progress bar was redesigned at some undocumented point into a segmented indicator: one visual segment per section (`done` / `active` / `upcoming`), plus a per-section "N/M answered" count (e.g., "3/5 answered"), not a continuous `currentSection / TOTAL_SECTIONS` percentage. The "misleading 14% on question 1" scenario this task worried about structurally cannot happen with this design, since no number claims a percentage of the whole assessment is complete.
+**Why:** Recorded here so a future reader doesn't re-derive a percentage-formula fix for a display that no longer shows a percentage at all.
+**Files:** None — no code change required
+**Time:** N/A
 **Dependencies:** None
 
 ---
