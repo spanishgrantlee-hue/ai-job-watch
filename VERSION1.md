@@ -284,8 +284,8 @@
 
 ---
 
-### G1 · Animate the score number counting up
-**What:** When the Results page mounts, animate the score number from 0 to `finalScore` over ~800ms using `requestAnimationFrame` and a `useEffect` hook. Store the animated value in a `displayScore` state variable and render that instead of the raw `finalScore`.
+### G1 · Animate the score number counting up ✓ DONE
+**What:** `Results.jsx`'s mount `useEffect` runs a `requestAnimationFrame` loop that animates `displayScore` from 0 to the real `finalScore` over 900ms using a cubic ease-out curve (`1 - (1-t)^3`). The score hero renders `{displayScore}` in place of the raw value.
 **Why:** Counting-up animations on score reveals are one of the most effective attention-holding techniques for assessment results. They create anticipation, make the number feel earned, and increase time-on-page.
 **Files:** `src/pages/Results.jsx`
 **Time:** 30 minutes
@@ -293,8 +293,8 @@
 
 ---
 
-### G2 · Animate the score range bar marker
-**What:** Add a CSS transition to the `.score-marker` element (`transition: left 0.8s ease-out`). On mount, initialize `markerPct` to 0 and update it to the real value in a `useEffect` with a `requestAnimationFrame` or short `setTimeout` to trigger the transition after the initial render paint.
+### G2 · Animate the score range bar marker — NOT YET IMPLEMENTED
+**What:** `ScoreRangeBar` (`Results.jsx:190-209`) computes `markerPct` synchronously from the final `finalScore` prop and renders `.score-marker` at its resting position immediately on mount. There is no animation state, no `useEffect`, no `requestAnimationFrame`/`setTimeout`, and `.score-marker` in `index.css` has no `transition` property — the marker appears instantly rather than sliding into place. The task as originally scoped (animate `markerPct` from 0, add a `left` transition) has not been done.
 **Why:** The marker sliding into position on the risk bar reinforces where the user sits and provides a satisfying visual moment that makes the result feel significant.
 **Files:** `src/pages/Results.jsx`, `src/index.css`
 **Time:** 20 minutes
@@ -302,8 +302,8 @@
 
 ---
 
-### G3 · Stagger-reveal category breakdown cards
-**What:** Add CSS `@keyframes` animation (`fadeInUp` — opacity 0→1, translateY 16px→0) and apply it to each `.category-row` with an incrementing `animation-delay` (0ms, 80ms, 160ms, etc.) using inline styles or CSS `nth-child` selectors.
+### G3 · Stagger-reveal category breakdown cards — NOT YET IMPLEMENTED
+**What:** `.category-row` (`index.css:1150`) has no `@keyframes`, no `animation` property, and no per-row `animation-delay` — cards render instantly with no reveal effect. The only `@keyframes` block in `index.css` (`whatif-enter`) belongs to the Group E What-If panel, not this feature. The `fadeInUp` stagger described below has not been built.
 **Why:** The category breakdown is information-dense. Staggering the appearance directs the user's eye down the list sequentially rather than presenting everything at once, which feels overwhelming on first load.
 **Files:** `src/index.css`, minor change to `src/pages/Results.jsx` (add delay via inline style)
 **Time:** 25 minutes
