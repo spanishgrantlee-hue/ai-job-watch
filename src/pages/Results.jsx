@@ -481,10 +481,10 @@ export default function Results() {
           </div>
 
           <div className="category-breakdown">
-            {rankedCategories.map(cat => {
+            {rankedCategories.map((cat, i) => {
               const fillClass = cat.score >= 4 ? 'fill--strong' : cat.score >= 3 ? 'fill--mid' : 'fill--weak';
               return (
-                <div className="category-row" key={cat.key}>
+                <div className="category-row" key={cat.key} style={{ animationDelay: `${i * 80}ms` }}>
                   <div className="category-row-top">
                     <span className="category-row-label">{cat.label}</span>
                     <span className="category-row-score">{cat.score}<span className="category-row-max">/5</span></span>
