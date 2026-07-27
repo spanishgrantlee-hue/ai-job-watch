@@ -32,7 +32,7 @@ export default function About() {
       {/* Personal story */}
       <div className="about-story">
         <div className="story-photo-wrap">
-          <img src={heroPhoto} alt="Site founder" className="story-photo" />
+          <img src={heroPhoto} alt="Site founder" className="story-photo" loading="lazy" />
         </div>
         <div className="story-content">
           <h2>Why I built this</h2>
