@@ -39,12 +39,14 @@ export default function App() {
     <AnswerContext.Provider value={{ answers, setAnswers }}>
       <BrowserRouter>
         <Navbar />
-        <Routes>
-          <Route path="/"           element={<Home />} />
-          <Route path="/assessment" element={<Assessment />} />
-          <Route path="/results"    element={<Results />} />
-          <Route path="/about"      element={<About />} />
-        </Routes>
+        <main>
+          <Routes>
+            <Route path="/"           element={<Home />} />
+            <Route path="/assessment" element={<Assessment />} />
+            <Route path="/results"    element={<Results />} />
+            <Route path="/about"      element={<About />} />
+          </Routes>
+        </main>
       </BrowserRouter>
     </AnswerContext.Provider>
   );
