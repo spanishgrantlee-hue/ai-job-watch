@@ -44,7 +44,7 @@
   --clr-hero:          #0A2540;
   --clr-text:          #1A1A2E;
   --clr-text-mid:      #52647A;
-  --clr-text-light:    #8898AA;
+  --clr-text-light:    #5D6D82;
   --clr-bg:            #F0F4F9;
   --clr-white:         #FFFFFF;
   --clr-border:        #DDE3EE;
@@ -863,7 +863,7 @@ input, select, textarea, button { font-family: inherit; }
 .results-score-denom {
   font-size: 1.4rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.5);
   margin-bottom: 12px;
 }
 
@@ -977,7 +977,7 @@ input, select, textarea, button { font-family: inherit; }
 
 .score-range-legend em {
   font-style: normal;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.5);
   font-size: 0.68rem;
 }
 
