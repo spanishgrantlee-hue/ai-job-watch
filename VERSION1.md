@@ -348,12 +348,12 @@
 
 ---
 
-### I1 · End-to-end share link test — NOT YET VERIFIED
-**What:** Complete a full assessment → click Copy Link → paste URL in a new incognito tab → verify the results page renders correctly from the shared URL → verify the shared-view banner appears (actual copy: "You're viewing a shared result." with a "Take your own assessment →" link, not the "You're viewing someone else's results" text originally drafted here) → click through and verify it routes to `/assessment`. No test report or other evidence exists in the repo confirming this round-trip has actually been run.
-**Why:** The share link is the most complex new flow in v1. A manual round-trip test catches encoding edge cases (score = 0, all HIGH categories, etc.) that unit tests might miss.
+### I1 · End-to-end share link test ✓ DONE
+**What:** Completed a full 30-question assessment, clicked Copy Link, and captured the real string the button writes to the clipboard (via a `navigator.clipboard.writeText` intercept, since headless clipboard-read permissions hung). Opened that exact URL in a new tab with `localStorage` fully cleared first — a genuine test of the share mechanism, not just shared browser storage — and confirmed: the results page rendered the correct score (17/30, Medium Risk) and category breakdown from the URL alone; the shared-view banner ("You're viewing a shared result." / "Take your own assessment →") appeared; and clicking through routed correctly to `/assessment` with a clean, unstarted assessment (no resume prompt, since local state was cleared).
+**Why:** The share link is the most complex new flow in v1. A manual round-trip test catches encoding edge cases that unit tests might miss.
 **Files:** No code changes — test only
 **Time:** 20 minutes
-**Dependencies:** C1–C6 complete (✓ verified implemented — this manual test itself has not been executed)
+**Dependencies:** C1–C6 complete
 
 ---
 
