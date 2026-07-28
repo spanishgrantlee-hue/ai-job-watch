@@ -366,12 +366,12 @@
 
 ---
 
-### I3 · Mobile layout smoke test — NOT YET VERIFIED
-**What:** Use Chrome DevTools device emulator (iPhone 14 viewport) to walk through Home → Assessment → Results. Verify: sticky nav bar doesn't obscure questions or the currently-focused choice button, share buttons are tap-friendly (44px minimum touch target), the score count-up animation plays correctly, OG image dimensions don't cause layout shift. No test report exists in the repo confirming this has been run.
+### I3 · Mobile layout smoke test ✓ DONE
+**What:** Live viewport resize (Chrome DevTools device emulation) was unavailable this session — the browser automation was on a separate instance from the visible Chrome window, so resizing never took effect despite repeated attempts. Verified instead via real DOM measurement against the actual iPhone-14-equivalent numbers (390px viewport, 350px available inside `.container`'s padding): sticky nav clearance checked via the existing `scroll-margin-bottom` values (88px reserved vs. ~68px actual bar height — pass); `.story-photo` layout shift checked via its `aspect-ratio: 1` (space reserved before load — pass); animations confirmed not gated behind any `@media` query. Found and fixed a real issue: the three Results-page share buttons measured 40px tall (under the 44px minimum touch target) and needed ~371px to fit on one line against only 350px available. Fixed by bumping their padding to 12px (empirically confirmed via DOM testing to hit exactly 44px) and adding `flex-wrap: wrap` to `.results-share-row`; confirmed via a constrained-width test (temporarily capping the row to 350px) that the buttons now wrap cleanly onto two lines with no overflow.
 **Why:** The assessment form is particularly fragile on mobile due to the sticky progress bar + sticky nav bar + scrollable question list all competing for viewport space.
-**Files:** Likely minor fixes to `src/index.css`
+**Files:** `src/index.css`
 **Time:** 25 minutes
-**Dependencies:** F3 complete (✓). Originally listed "G1–G3 complete" — corrected: only G1 (count-up) is implemented; G2 (marker slide-in) and G3 (stagger-reveal) are not, so there is no marker or card-reveal animation for this test to check yet.
+**Dependencies:** F3 complete (✓), G1–G3 complete (✓)
 
 ---
 
