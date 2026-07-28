@@ -293,8 +293,8 @@
 
 ---
 
-### G2 · Animate the score range bar marker — NOT YET IMPLEMENTED
-**What:** `ScoreRangeBar` (`Results.jsx:190-209`) computes `markerPct` synchronously from the final `finalScore` prop and renders `.score-marker` at its resting position immediately on mount. There is no animation state, no `useEffect`, no `requestAnimationFrame`/`setTimeout`, and `.score-marker` in `index.css` has no `transition` property — the marker appears instantly rather than sliding into place. The task as originally scoped (animate `markerPct` from 0, add a `left` transition) has not been done.
+### G2 · Animate the score range bar marker ✓ DONE
+**What:** `ScoreRangeBar` now holds `markerPct` as local state initialized to 0, updated to its real target value one `requestAnimationFrame` after mount, paired with a `transition: left 0.8s ease-out` on `.score-marker`. The marker slides into its resting position instead of snapping there instantly.
 **Why:** The marker sliding into position on the risk bar reinforces where the user sits and provides a satisfying visual moment that makes the result feel significant.
 **Files:** `src/pages/Results.jsx`, `src/index.css`
 **Time:** 20 minutes
@@ -302,10 +302,10 @@
 
 ---
 
-### G3 · Stagger-reveal category breakdown cards — NOT YET IMPLEMENTED
-**What:** `.category-row` (`index.css:1150`) has no `@keyframes`, no `animation` property, and no per-row `animation-delay` — cards render instantly with no reveal effect. The only `@keyframes` block in `index.css` (`whatif-enter`) belongs to the Group E What-If panel, not this feature. The `fadeInUp` stagger described below has not been built.
+### G3 · Stagger-reveal category breakdown cards ✓ DONE
+**What:** Added a `fadeInUp` `@keyframes` (opacity 0→1, `translateY(16px)`→0) and applied it to `.category-row` via `animation: fadeInUp 0.4s ease-out both`. Each mapped category row gets an inline `animationDelay` staggered 80ms apart (`i * 80ms`), so the breakdown cards reveal top-to-bottom instead of appearing all at once.
 **Why:** The category breakdown is information-dense. Staggering the appearance directs the user's eye down the list sequentially rather than presenting everything at once, which feels overwhelming on first load.
-**Files:** `src/index.css`, minor change to `src/pages/Results.jsx` (add delay via inline style)
+**Files:** `src/index.css`, `src/pages/Results.jsx`
 **Time:** 25 minutes
 **Dependencies:** None
 
@@ -315,17 +315,17 @@
 
 ---
 
-### H1 · Add `loading="lazy"` to images — NOT YET IMPLEMENTED
-**What:** `Home.jsx` has zero `<img>` tags — the page is built entirely from text, emoji icons, and CSS-driven sections (hero, features, risk-bands, CTA), so this task as originally scoped doesn't apply to that file. The only `<img>` tag anywhere in the app is `About.jsx:35` (`heroPhoto`, a founder photo), and it currently has no `loading` attribute at all — neither `lazy` nor `eager`.
-**Why:** Lazy-loading below-fold images reduces initial page weight and improves LCP/Total Blocking Time. There's no image on `Home.jsx` to apply this to; `About.jsx`'s founder photo is the actual candidate if it renders below the fold.
-**Files:** `src/pages/About.jsx` (actual candidate); `src/pages/Home.jsx` has no images to change
+### H1 · Add `loading="lazy"` to images ✓ DONE
+**What:** `Home.jsx` has no images at all, so this task didn't apply to that file as originally scoped. Added `loading="lazy"` to the app's one real `<img>` — the founder photo in `About.jsx` — since it renders below the page's text hero.
+**Why:** Lazy-loading below-fold images reduces initial page weight and improves LCP/Total Blocking Time.
+**Files:** `src/pages/About.jsx`
 **Time:** 10 minutes
 **Dependencies:** None
 
 ---
 
-### H2 · Add preconnect hints for GA4 — NOT YET IMPLEMENTED
-**What:** `index.html` has no `<link rel="preconnect">` or `dns-prefetch` hints at all. The "fonts" half of the original task doesn't apply to the current build — the app uses a system font stack (`'Segoe UI', system-ui, -apple-system, sans-serif`, `index.css:62`), not Google Fonts or any externally hosted font, so there's no font origin to preconnect to. Only a GA4 preconnect (`googletagmanager.com`) remains relevant.
+### H2 · Add preconnect hint for GA4 ✓ DONE
+**What:** Added `<link rel="preconnect" href="https://www.googletagmanager.com">` to `index.html`'s `<head>`, right before the GA4 script tag. The "fonts" half of the original task didn't apply — the app uses a system font stack (`index.css:62`), not Google Fonts or any externally hosted font, so there was no font origin to preconnect to.
 **Why:** GA4 loads a script from `googletagmanager.com` that currently incurs a DNS + TLS handshake cost on every page load. Preconnect eliminates that overhead and improves Time to Interactive by ~100–300ms on cold connections.
 **Files:** `index.html`
 **Time:** 5 minutes
@@ -333,12 +333,14 @@
 
 ---
 
-### H3 · Run Lighthouse audit and fix issues — NOT YET IMPLEMENTED
-**What:** No Lighthouse report, config, or audit notes exist anywhere in the repo — this task has not been run. Once it is: run `npm run build && npm run preview` locally, open Chrome DevTools → Lighthouse, run against all four pages, document scores, and fix anything scoring below 90 in Performance, Accessibility, Best Practices, and SEO.
-**Why:** Lighthouse is the single source of truth for production readiness. This task is intentionally open-ended — the specific fixes depend on what the audit reveals. Known likely issues: missing `alt` tags, color contrast ratios on the dark hero, render-blocking resources.
-**Files:** Any file flagged by the audit — likely `src/index.css`, `src/pages/Home.jsx`, `index.html`
+### H3 · Run Lighthouse audit and fix issues ✓ DONE
+**What:** Ran Lighthouse (CLI, headless Chrome) against all four pages, using a real populated Results page generated via the app's own share-encoding logic. All four pages scored 90+ in every category (Performance, Accessibility, Best Practices, SEO) even before any fixes. Fixed the `landmark-one-main` failure (added a `<main>` wrapper, see F-group note) and the shared-token color-contrast failures (`--clr-text-light` and two dark-hero `rgba` values), re-verified via a second Lighthouse pass on all four pages after each fix.
+**Why:** Lighthouse is the single source of truth for production readiness.
+**Files:** `src/App.jsx`, `src/index.css` (fixes applied across separate commits)
 **Time:** 60 minutes
-**Dependencies:** All prior groups completed (so the audit reflects the full v1 state)
+**Dependencies:** All prior groups completed
+
+**Known, deliberately deferred (not blockers — no page scores below 90):** a few remaining `color-contrast` failures were scoped out of the H3 fix to avoid touching colors used elsewhere in the app — risk-tier colors (`--success`/`--warning`/`--danger`) used as text directly on their own light-tint backgrounds (`.band-label` on Home, `.threshold-score`/`.threshold-label` on About), and `.playbook-score-denom`'s `opacity: 0.7`. Revisit if a future pass wants a fully clean audit rather than 90+.
 
 ---
 
