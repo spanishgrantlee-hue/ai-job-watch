@@ -384,12 +384,12 @@
 
 ---
 
-### I5 · Commit and push Version 1 — NOT YET DONE
-**What:** No single consolidated "Version 1 release" commit has been made. Work has instead been committed and pushed incrementally — one commit per checklist group or fix — throughout this audit, rather than as one final release checkpoint.
-**Why:** Creates a clean git checkpoint for v1. If v2 work introduces regressions, we have a known-good v1 state to diff against.
-**Files:** All modified files
+### I5 · Version 1 release checkpoint ✓ DONE
+**What:** Work was committed and pushed incrementally throughout — one commit per checklist group or fix — rather than as a single final commit, so there was nothing left to stage by this point. Instead, created an annotated git tag `v1.0.0` at `84f9343` (pushed to `origin`, verified the remote's dereferenced commit matches exactly) with a message summarizing the full Version 1 scope across Groups A–I, the deliberately deferred color-contrast items, and the paused/stashed ScoreGauge work explicitly marked out of scope for this release.
+**Why:** Creates a clean checkpoint for v1. If v2 work introduces regressions, `v1.0.0` is the known-good state to diff against.
+**Files:** `VERSION1.md` only (the tag itself is not a file change)
 **Time:** 10 minutes
-**Dependencies:** I1–I4 passing — not yet met: I1 and I3 are unverified, I4 is verified, I2 is verified.
+**Dependencies:** I1–I4 passing — all met (I1 ✓, I2 ✓, I3 ✓, I4 ✓).
 
 ---
 
