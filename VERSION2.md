@@ -22,6 +22,7 @@ AI Job Watch exists to help everyday workers understand how AI is changing their
 - **Protect the current career before suggesting a change.** Career-change content (Similar Careers) always comes last, always framed as "in case," never as the default recommendation.
 - **One clear question per screen**, and every screen ends more informed *and* more in control than it began.
 - **Personalization is additive, never required.** Every embedded question must have a sensible default if skipped.
+- **The lunch-break test.** Every individual recommendation, in every content category, must be something a person could read on a break and realistically act on today, this week, or this month. No advice that depends on an external event happening first (a compliment arriving, a problem breaking, an opportunity appearing) — rewrite it into something the person initiates themselves. If a recommendation only helps a hypothetical version of the reader, it doesn't pass. Established while finalizing Workplace Moves (J6); applies to all future categories, not just that one.
 
 ## What V2 explicitly is not
 
@@ -88,11 +89,21 @@ No UI in this group — pure data, reviewable and testable independent of any co
 
 ---
 
-### J6 · Extend the Workplace Moves (Tips) dataset per category
-**What:** V1's `RESOURCES.tips` is keyed only by risk tier (HIGH/MEDIUM/LOW), two tips each. Extend this — or create a parallel dataset — with category-specific, situational tips (manager-framed vs. union-framed based on the personalization answer), matching the "This Week's Moves" rename.
-**Why:** Current tips are broad-strokes; Screen 8 needs tighter, more specific advice tied to the user's actual weak/strong categories, not just their overall tier.
+### J6 · Extend the Workplace Moves (Tips) dataset per category — CONTENT FINALIZED
+**What:** V1's `RESOURCES.tips` is keyed only by risk tier (HIGH/MEDIUM/LOW), two tips each. Replaced with a category-keyed dataset — two moves per category, manager-framed by default with a union-framed variant where it genuinely applies (not forced on every category) — matching the confirmed "Workplace Moves" rename. Every entry passes the lunch-break test: no advice conditional on an external event happening first; each one is self-initiated and names a concrete timeframe (today/this week/this month).
+
+**Finalized content, ready to port into the data file:**
+
+- **Accountability:** *(1)* "This week, ask your supervisor if you can own one small process start to finish — restocking, scheduling, a specific type of customer issue, whatever's realistic. Owning one thing completely matters more than helping with ten things partway." *(Union variant: "If you're in a union role, check with your rep first — new responsibility can sometimes affect job classification or pay grade.")* *(2)* "This week, pick one recurring annoyance or inefficiency in your day-to-day work, and bring your supervisor not just the problem but one specific idea to fix it."
+- **Trust & Relationships:** *(1)* "This week, tell your manager directly about one piece of positive feedback you've gotten recently from a coworker, client, or vendor — even something small and informal. Don't wait for a review to bring it up." *(2)* "This week, check in with one coworker, client, or vendor you deal with regularly about something other than work — just once. Real trust is built in the moments that aren't about the task."
+- **Human Judgment:** *(1)* "Starting today, keep a running one-line note every time you make a judgment call at work — what you decided and why. In a few months, that's real, written proof of the judgment you use every day." *(2)* "This week, think back over the last month and pick one good call you made that wasn't obvious from the outside. Mention it to your supervisor in one sentence — no big deal, just so it's on the record."
+- **Problem Solving:** *(1)* "This week, ask your supervisor directly: 'Is there anything that keeps coming up that nobody's found a good fix for?' Then take a shot at it." *(2)* "This week, think of one thing you've figured out how to do better or faster than the official way, and write it down in a sentence or two. That's the start of a track record."
+- **Physical Presence:** *(1)* "This week, ask your supervisor about cross-training on one specific piece of equipment or task outside your normal role." *(2)* "This week, ask your supervisor if there's a hands-on project or task coming up that needs an extra set of hands, and volunteer before they finish asking."
+- **Licensing & Credentials:** *(1)* "This month, look up the one most common license or certification in your field and find out exactly what it requires. You don't have to start it — just know what's involved." *(2)* "If you're already working toward a license or certification, mention it to your supervisor this month — it's the kind of thing that gets remembered when responsibilities, or promotions, come up."
+
+**Why:** Current V1 tips are broad-strokes; Workplace Moves needs tighter, more specific advice tied to the user's actual weak/strong categories, not just their overall tier. This is also where the lunch-break test (see Design Principles) was established as a standard for all future content.
 **Files:** `src/utils/roadmap/workplaceMoves.js` *(new)*, references `src/pages/Results.jsx`'s existing `RESOURCES` for continuity
-**Time:** 45 minutes
+**Time:** 45 minutes *(content authoring complete; remaining time is porting into the data file)*
 **Dependencies:** None
 
 ---
