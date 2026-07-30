@@ -90,11 +90,21 @@ No UI in this group — pure data, reviewable and testable independent of any co
 
 ---
 
-### J5 · Author the Recommended Tools dataset
-**What:** For each category, 1–2 concrete AI-tool use-cases framed as "use AI to do your current job better" (per the Screen 7 design intent) — not generic software recommendations. Each entry: the tool/technique, a one-sentence how-to, and the one-line reasoning tying it back to the category.
-**Why:** New content. This is the "AI stops being the threat and becomes something you use" reframe — arguably one of the highest-leverage sections in the whole report, per the design-phase discussion.
+### J5 · Author the Recommended Tools dataset — CONTENT FINALIZED
+**What:** For each category, one AI-tool use-case framed as "use AI to do your current job better" (per the Screen 7 design intent) — not generic software recommendations. Deliberately does *not* use J4's milestone structure (this week/this month/ongoing) — Tools is meant to be zero-ramp-up and immediate, in contrast to Learning Plan's paced structure. Each entry: what to use, why it matters, a learning-time estimate (minutes, not weeks — that's the point), and one this-week action. Names a real, genuinely free option (ChatGPT's free tier) rather than staying vague, with a note that a workplace-provided equivalent (Copilot, Gemini) works the same way.
+
+**Finalized content, ready to port into the data file:**
+
+- **Accountability.** *Why:* turns a gut call into something documented and defensible — visible accountability is protected accountability. Learning time: ~10 min. This week: next time you make a decision worth explaining, describe it and ask for help writing a clear one-paragraph explanation you could hand your manager.
+- **Trust & Relationships.** *Why:* saves time on the writing itself so your actual energy goes into the relationship, not wordsmithing. Learning time: ~10 min. This week: after your next client or vendor call, ask it to help draft a short, friendly follow-up, then personalize it before sending.
+- **Human Judgment.** *Why:* you still make the call, but seeing your own reasoning laid out sharpens it and gives you language to explain your judgment later. Learning time: ~10 min. This week: next time you're weighing a real decision, ask it to lay out the pros and cons as you already see them, then decide for yourself.
+- **Problem Solving.** *Why:* treat it like a coworker who's seen a lot of problems, not an answer key — it widens your options fast on something genuinely new. Learning time: ~10–15 min. This week: next time you hit something you haven't seen before, describe it and ask for three different ways people typically approach it.
+- **Physical Presence.** *Why:* you did the real work — this just gets the paperwork done faster, without eating into time you'd rather spend on the actual task. Learning time: ~10 min. This week: after your next hands-on task or incident, describe what happened in a few bullet points and ask for help turning it into a clean, submittable report.
+- **Licensing & Credentials.** *Why:* a free, always-available study partner for exam prep, on your schedule, not a class schedule. Learning time: ~10 min. This week: ask it to quiz you with 5 practice questions on a topic from the certification you're considering or already pursuing.
+
+**Why:** New content. This is the "AI stops being the threat and becomes something you use" reframe — arguably one of the highest-leverage sections in the whole report, per the design-phase discussion. Now meets the same lunch-break standard as J4 and J6: clear purpose, realistic learning time, one immediate action, all reinforcing the current role.
 **Files:** `src/utils/roadmap/tools.js` *(new)*
-**Time:** 60 minutes
+**Time:** 60 minutes *(content authoring complete; remaining time is porting into the data file)*
 **Dependencies:** None
 
 ---
