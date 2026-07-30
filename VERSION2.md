@@ -71,11 +71,21 @@ No UI in this group — pure data, reviewable and testable independent of any co
 
 ---
 
-### J4 · Author the Learning Plan resource library
-**What:** For each of the 6 categories, 2–4 learning resources (course, video, article), each tagged with: estimated time commitment, cost (free/paid), and format (reading/video/hands-on) — so the personalization engine (Group O) can filter by the user's stated time/budget/learning-style.
-**Why:** This is new authoring, not a port — nothing like it exists in V1. Directly serves "Personalized Learning Plan."
+### J4 · Author the Learning Plan resource library — CONTENT FINALIZED
+**What:** For each of the 6 categories, one clear skill (not a flat resource list) broken into a this-week / this-month / ongoing milestone structure — mirroring the same near/mid/long cadence the Protection Plan already uses (30/90/365-day), so the Learning Plan feels like one coherent system rather than its own bespoke shape. Each skill opens with an explicit "why this makes you harder to replace" line, and the "this week" step is always something doable with zero setup. Cost/format tags carry through so Screen 6's embedded personalization questions (time budget, cost preference — see Group M) can filter appropriately.
+
+**Finalized content, ready to port into the data file:**
+
+- **Accountability — Basic project planning.** *Why:* visible, documented ownership is hard to quietly automate away. This week: watch one free intro video on project-management basics (~1 hr). This month: write a one-page plan (what/when/who) for something you're already doing. Ongoing (free, ~4–6 hrs): finish the full free course.
+- **Trust & Relationships — Active listening.** *Why:* software can respond to people, it can't build an actual track record with them. This week: watch one free short video on active-listening techniques (~20–30 min). This month: practice reflecting back what someone said before responding, in three real conversations. Ongoing (free via library-card LinkedIn Learning, ~2–3 hrs): a short course on building professional relationships.
+- **Human Judgment — Structured decision-making.** *Why:* explaining *how* you make a good call makes your judgment visible, not just felt. This week: watch one free video on a simple decision-making framework (~20 min). This month: use it on paper for one real decision you're facing. Ongoing (free, ~3–5 hrs): a full course on critical thinking/decision-making.
+- **Problem Solving — Structured problem-solving.** *Why:* AI handles familiar patterns; a repeatable process for genuinely new problems is what sets you apart. This week: watch a free intro video on design thinking or root-cause analysis (~30 min). This month: apply the framework to one real, messy problem and write down the steps. Ongoing (free, ~4 hrs): a free design-thinking intro course.
+- **Physical Presence — Broader hands-on certification.** *Why:* the wider your certified hands-on range, the harder it is for one tool or machine to replace your whole role. This week: look up one free OSHA outreach safety module for your industry (~1 hr). This month: complete it, and ask about cross-training on a related task (see Workplace Moves). Ongoing (low-cost, ~1 day, in person): Red Cross First Aid/CPR certification.
+- **Licensing & Credentials — Mapping your field's credential path.** *Why:* a formal license/certification is one of the few protections regulation makes structurally hard to automate away. This week: look up your state licensing board or field's certifying body and find the exact requirements for the closest credential. This month: request free practice materials and take one practice test. Ongoing (free/self-paced via IBM SkillsBuild; timeframe varies): start the actual coursework.
+
+**Why:** New authoring, not a port — nothing like it exists in V1. Directly serves "Personalized Learning Plan," and every entry now passes the lunch-break test the same way Workplace Moves (J6) does.
 **Files:** `src/utils/roadmap/learningResources.js` *(new)*
-**Time:** 90 minutes
+**Time:** 90 minutes *(content authoring complete; remaining time is porting into the data file)*
 **Dependencies:** None
 
 ---
