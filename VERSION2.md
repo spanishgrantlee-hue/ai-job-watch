@@ -44,29 +44,59 @@ No UI in this group — pure data, reviewable and testable independent of any co
 
 ---
 
-### J1 · Port the Automation Timeline dataset
-**What:** Move the timeline copy already drafted (HIGH: 1–3 years, MEDIUM: 3–7 years, LOW: 7+ years, each with the revised Screen 4 wording and the "this is a general estimate" disclaimer) into a new data file, keyed by `riskKey`.
-**Why:** Already written and reviewed during the design phase — this is a port, not new authoring.
+### J1 · Automation Timeline dataset — CONTENT FINALIZED
+**What:** For each `riskKey` (HIGH/MEDIUM/LOW), a one-line timeline estimate (1–3 / 3–7 / 7+ years) plus a shared "this is a general estimate" disclaimer, written to pair with Screen 4's "Tasks Most Likely to Change." Framed to inform, not alarm — no fixed dates, no countdown language.
+
+**Finalized content, ready to port into the data file:**
+
+- **HIGH:** "Roles like yours often start seeing noticeable change within 1–3 years — not full replacement, but a shift in which tasks a person does versus a tool. That's sooner than roles in the other tiers, but it's not a countdown to a fixed date — the categories in this report are exactly where you can start building protection now."
+- **MEDIUM:** "Roles like yours typically see this kind of shift over a longer window — usually 3–7 years — which gives you real time to build the protections that matter most before they're needed."
+- **LOW:** "Roles like yours tend to hold up well for 7+ years before facing this kind of pressure. That's not a guarantee forever, but it's a real head start."
+- **Shared disclaimer (all three):** "This is a general estimate based on patterns across similar roles, not a prediction about your specific job. Some roles change faster, some slower — use it to plan, not to worry."
+
+**Why:** First-pass content authored directly in this document — the original design-phase draft referenced here couldn't be located, so this replaces it rather than porting it. Not a recommendation (nothing to act on), so the lunch-break test's actionability criterion doesn't apply; checked instead for fear-based framing, clarity, and consistency with the rest of Group J. All three tiers avoid exaggeration and end on a forward-looking note rather than a bare countdown.
 **Files:** `src/utils/roadmap/timeline.js` *(new)*
-**Time:** 15 minutes
+**Time:** 15 minutes *(content drafted above; remaining time is porting into the data file)*
 **Dependencies:** None
 
 ---
 
-### J2 · Port the Certifications-per-category dataset
-**What:** Move the certifications content drafted during the (paused) ScoreGauge work — 2–3 certifications per category with a one-line "why" each — into a new data file, keyed by category. Apply the Learning-Plan/Certifications division-of-labor rule: this dataset is for formal, credential-granting resources only.
-**Why:** Already drafted and reviewed; this closes out the stashed work rather than re-authoring it.
+### J2 · Certifications-per-category dataset — CONTENT FINALIZED
+**What:** For each of the 6 categories, formal, credential-granting certifications with a one-line "why" and a this-week lookup action each. Applies the Learning-Plan/Certifications division-of-labor rule: this dataset is credentials only — free skill-building content is J4/Learning Plan's job.
+
+**Finalized content, ready to port into the data file:**
+
+- **Accountability:** Google Project Management Certificate (Coursera, financial aid available) — *why:* a recognized credential for the ownership you're already building. **This week:** look up the enrollment cost and financial-aid option.
+- **Trust & Relationships:** HubSpot Academy Customer Service Fundamentals (free) — *why:* a formal credential for relationship skills that usually go unrecognized on paper. **This week:** create a free account and check the syllabus. Notary Public commission — *why:* a low-cost, state-issued credential that is itself a formal trust designation. **This week:** look up your state's notary requirements and fee.
+- **Human Judgment:** ASQ Root Cause Analysis Certification (self-paced, low-cost) — *why:* a formal credential for identifying the real cause behind a problem, not just its symptoms. **This week:** look up the certification requirements and cost. Train-the-Trainer credential — *why:* formal recognition that your judgment is trusted enough to teach others. **This week:** ask your employer or local community college if they offer one.
+- **Problem Solving:** Lean Six Sigma Green Belt (often free/low-cost via community college or edX) — *why:* a formal credential for structured problem-solving. **This week:** search "[your field] Six Sigma Green Belt free" and bookmark one option.
+- **Physical Presence:** OSHA 30-Hour (General Industry or Construction) — *why:* the broadest recognized hands-on safety credential. Equipment-specific operator certification (forklift, aerial lift, etc.) — *why:* narrow, fast, and often employer-reimbursed. **This week:** ask your supervisor which operator certifications your workplace will pay for.
+- **Licensing & Credentials:** Your field's primary state or national license/exam — *why:* the credential with the most legal weight in your field. **This week:** look up the exact requirements (same first step as Workplace Moves for this category).
+
+**Why:** First-pass content authored directly in this document — the original design-phase draft couldn't be located. The initial brief (name + why, no action) would have failed the lunch-break test, since "get a certification" isn't a today/this-week action on its own — added a lookup first step to every entry, matching how J6 rewrote its own tips. Also replaced a duplicate OSHA 30-Hour cert originally drafted under both Human Judgment and Physical Presence with a distinct credential for Human Judgment, so the two categories don't recommend the same resource.
 **Files:** `src/utils/roadmap/certifications.js` *(new)*
-**Time:** 20 minutes
+**Time:** 20 minutes *(content drafted above; remaining time is porting into the data file)*
 **Dependencies:** None
 
 ---
 
-### J3 · Port the Similar Careers dataset, with the new framing
-**What:** Move the "Careers That Often Emphasize Your Strongest Skills" content (3–5 roles per category, one-line reason each) into a new data file, keyed by category. Include the disclaimer text and the strengthened Screen 10 opening line ("This isn't instead of everything you just built...") as part of the same module, not scattered in a component.
-**Why:** Already drafted; keeps the "not personalized career advice" disclaimer co-located with the content it governs.
+### J3 · Similar Careers dataset, with the new framing — CONTENT FINALIZED
+**What:** For each category, roles that people with that strength often transition into, with a one-line, purely descriptive reason each — awareness content, not a recommendation. Includes the disclaimer and the Screen 10 opening line. Deliberately carries no this-week action: per the design principles, career-change content always comes last and is framed as "in case," never as something to act on now — adding an action here would misrepresent it as a recommendation.
+
+**Finalized content, ready to port into the data file:**
+
+- **Accountability:** Operations Supervisor, Project Coordinator, Shift Lead, Facilities Manager — each built around owning a process or outcome start to finish, the same instinct behind this category.
+- **Trust & Relationships:** Client Relationship Manager, Patient Care Coordinator, Account Manager, Community Liaison — each centered on being the person others rely on directly.
+- **Human Judgment:** Quality Assurance Inspector, Claims Adjuster, Dispatcher, Mediator — each requires making a real judgment call as the core of the job.
+- **Problem Solving:** Field Service Technician, Maintenance Technician, Process Improvement Coordinator, Logistics Coordinator — each solves problems that don't come with a standard fix.
+- **Physical Presence:** Electrician, HVAC Technician, Home Health Aide, Equipment Operator — each requires being physically present to do the work at all.
+- **Licensing & Credentials:** Licensed Practical Nurse, Certified Welding Inspector, Real Estate Agent, Insurance Agent — each requires a formal license just to practice.
+- **Disclaimer:** "These aren't personalized career recommendations — just roles where people with strengths like yours often do well."
+- **Screen 10 opener:** "This isn't instead of everything you just built here — it's only useful if a change is ever something you're considering."
+
+**Why:** First-pass content authored directly in this document — the original design-phase draft couldn't be located. Ran the lunch-break check for fear-based framing, clarity, and consistency only, not actionability, which doesn't apply to awareness content by design — reworded role reasons to be purely descriptive ("requires being physically present," "solves problems that don't come with a standard fix") rather than comparative or safety-framed ("safer," "more secure"), so nothing here reads as encouragement to leave a current role.
 **Files:** `src/utils/roadmap/similarCareers.js` *(new)*
-**Time:** 20 minutes
+**Time:** 20 minutes *(content drafted above; remaining time is porting into the data file)*
 **Dependencies:** None
 
 ---
