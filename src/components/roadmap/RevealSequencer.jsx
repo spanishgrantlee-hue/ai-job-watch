@@ -11,8 +11,8 @@ import { PACING } from './pacing.js';
 //               class so timing lives in one stylesheet, not copy-pasted per screen
 // - act:        1 | 2 | 3 — which act this screen belongs to (used by K2's
 //               ambient progress bar, not by this component directly)
-// - background: 'hero' | 'light' | 'light-distinct' — visual section tone
-//               (used by K3, not by this component directly)
+// - background: 'hero' | 'light' | 'light-distinct' — visual section tone,
+//               mapped to a reveal-bg-* class independent of act grouping
 
 export default function RevealSequencer({ screens, onComplete }) {
   const [index, setIndex] = useState(0);
@@ -40,8 +40,14 @@ export default function RevealSequencer({ screens, onComplete }) {
   const actPosition = actScreens.findIndex(s => s.id === current.id);
   const actProgressPct = actScreens.length > 0 ? ((actPosition + 1) / actScreens.length) * 100 : 0;
 
+  // Background tone is driven purely by this screen's own config, independent
+  // of its act — this is what lets Screen 11 use the dark-hero tone (a
+  // deliberate bookend with Screen 0-1) even though it's grouped into Act 3
+  // for progress-bar purposes.
+  const backgroundClass = `reveal-bg-${current.background}`;
+
   return (
-    <div className="reveal-sequencer">
+    <div className={`reveal-sequencer ${backgroundClass}`}>
       <div
         className="reveal-progress-track"
         role="progressbar"
