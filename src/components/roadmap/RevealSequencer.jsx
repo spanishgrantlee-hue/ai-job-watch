@@ -33,8 +33,25 @@ export default function RevealSequencer({ screens, onComplete }) {
     ? 'reveal-transition-instant'
     : 'reveal-transition-deliberate';
 
+  // Ambient progress — reflects position within the CURRENT act only, so it
+  // resets (rather than crawling toward 100%) at each act boundary. No visible
+  // count is shown; aria-* attributes below are for screen readers only.
+  const actScreens = screens.filter(s => s.act === current.act);
+  const actPosition = actScreens.findIndex(s => s.id === current.id);
+  const actProgressPct = actScreens.length > 0 ? ((actPosition + 1) / actScreens.length) * 100 : 0;
+
   return (
     <div className="reveal-sequencer">
+      <div
+        className="reveal-progress-track"
+        role="progressbar"
+        aria-valuenow={actPosition + 1}
+        aria-valuemin={1}
+        aria-valuemax={actScreens.length}
+        aria-label="Progress through this part"
+      >
+        <div className="reveal-progress-fill" style={{ width: `${actProgressPct}%` }} />
+      </div>
       <div key={current.id} className={`reveal-screen ${pacingClass}`}>
         <Screen onAdvance={advance} isLast={isLast} />
       </div>
