@@ -1881,6 +1881,30 @@ input, select, textarea, button { font-family: inherit; }
   .reveal-transition-deliberate, .reveal-transition-instant { animation: none; }
 }
 
+/* Phase marker beat (K4) */
+.phase-marker-screen {
+  min-height: calc(100vh - var(--nav-h) - 3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.phase-marker-tap {
+  background: none;
+  border: none;
+  padding: 1rem;
+  cursor: pointer;
+  color: inherit;
+}
+
+.phase-marker-line {
+  font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
