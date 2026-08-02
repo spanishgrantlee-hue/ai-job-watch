@@ -2224,6 +2224,32 @@ input, select, textarea, button { font-family: inherit; }
 
 .protection-plan-cta { display: flex; margin: 2.5rem auto 0; }
 
+/* Tools screen (M3) — Act 2 (light background), reuses playbook-card-title/
+   playbook-card-context/playbook-timeline from M1; only these are new. */
+.tools-screen {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+}
+
+.tools-card {
+  background: var(--clr-white);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px 24px;
+  margin-top: 1.75rem;
+}
+
+.tools-note {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--clr-text-mid);
+  font-style: italic;
+  margin: 1.25rem 0 0;
+}
+
+.tools-cta { display: flex; margin: 2.5rem auto 0; }
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
