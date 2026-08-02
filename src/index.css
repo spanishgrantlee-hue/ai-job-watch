@@ -2250,6 +2250,26 @@ input, select, textarea, button { font-family: inherit; }
 
 .tools-cta { display: flex; margin: 2.5rem auto 0; }
 
+/* Workplace Moves screen (M4) — Act 2 (light background), reuses
+   resources-tip-card/protection-plan-option; only these three are new. */
+.workplace-moves-screen {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+}
+
+.workplace-moves-screen > .protection-plan-option { display: inline-flex; margin: 0.25rem 0 1.75rem; }
+
+.workplace-moves-union-note {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--clr-text-mid);
+  font-style: italic;
+  margin: 0.5rem 0 0;
+}
+
+.workplace-moves-cta { display: flex; margin: 2.5rem auto 0; }
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
