@@ -2301,6 +2301,16 @@ input, select, textarea, button { font-family: inherit; }
 
 .certifications-cta { display: flex; margin: 2.5rem auto 0; }
 
+/* Learning Plan screen (M2) — Act 2 (light background), reuses
+   playbook-card-context/playbook-timeline; only these two are new. */
+.learning-plan-screen {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+}
+
+.learning-plan-cta { display: flex; margin: 2.5rem auto 0; }
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
