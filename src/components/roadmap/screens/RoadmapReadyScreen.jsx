@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { PLAYBOOK, playbookLevel } from '../../../utils/playbook.js';
+import { encodeRoadmapSnapshot } from '../../../utils/share.js';
 
 // ─── Your Roadmap Is Ready (Screen 11, close) ──────────────────────────────────
 // The emotional climax of the Reveal, dark-hero background bookending
@@ -7,14 +9,29 @@ import { PLAYBOOK, playbookLevel } from '../../../utils/playbook.js';
 // N1 opened Act 3 on the strongest category; this closes on the weakest,
 // same thread M1-M5 shared.
 //
-// Save My Roadmap / See the Full Report / Share are symmetric placeholders:
-// Groups O (reference mode) and P (progress tracking) don't exist yet, so none
-// of the three do real work. onSave/onShare are optional no-ops until then;
-// "See the Full Report" calls onAdvance, the natural exit from the last screen.
+// Save My Roadmap (P2) is real: builds a /roadmap?snapshot= link via P1's
+// encodeRoadmapSnapshot and copies it, same UX convention Results.jsx already
+// uses for its Copy Link button. Takes `results` directly (calculateResults()
+// shape) rather than an onSave callback -- this screen now does its own real
+// work from the data it's given, same as every other screen, instead of
+// delegating to a callback nobody has ever supplied.
+//
+// See the Full Report / Share remain as before: onAdvance is the natural exit
+// from the last screen; onShare is still an inert placeholder -- Share isn't
+// part of any Group P task.
 
-export default function RoadmapReadyScreen({ weakestCategory, onSave, onShare, onAdvance }) {
+export default function RoadmapReadyScreen({ weakestCategory, results, onShare, onAdvance }) {
+  const [saved, setSaved] = useState(false);
   const level = playbookLevel(weakestCategory.score);
   const action = PLAYBOOK[weakestCategory.key].days30[level];
+
+  function handleSave() {
+    const encoded = encodeRoadmapSnapshot(results);
+    const url = `${window.location.origin}/roadmap?snapshot=${encoded}`;
+    navigator.clipboard.writeText(url)
+      .then(() => { setSaved(true); setTimeout(() => setSaved(false), 2000); })
+      .catch(() => {});
+  }
 
   return (
     <div className="roadmap-ready-screen">
@@ -30,8 +47,8 @@ export default function RoadmapReadyScreen({ weakestCategory, onSave, onShare, o
       <p className="why-line">Pick it, and start there.</p>
 
       <div className="roadmap-ready-actions">
-        <button type="button" className="btn-ghost-dark" onClick={() => onSave?.()}>
-          Save My Roadmap
+        <button type="button" className="btn-ghost-dark" onClick={handleSave}>
+          {saved ? '✓ Link Copied!' : 'Save My Roadmap'}
         </button>
         <button type="button" className="btn-ghost-dark" onClick={() => onAdvance?.()}>
           See the Full Report

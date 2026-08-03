@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAnswers } from '../App';
 import { calculateResults } from '../utils/scoring';
-import { decodeShareState } from '../utils/share';
+import { decodeShareState, encodeRoadmapSnapshot, decodeRoadmapSnapshot } from '../utils/share';
 import { PLAYBOOK, playbookLevel } from '../utils/playbook';
 import { TIMELINE, TIMELINE_DISCLAIMER } from '../utils/roadmap/timeline.js';
 import { LEARNING_RESOURCES } from '../utils/roadmap/learningResources.js';
@@ -450,9 +450,20 @@ function SimilarCareersSection({ topProtector }) {
   );
 }
 
-function ClosingSection({ weakestCategory, onDownloadPdf }) {
+function ClosingSection({ weakestCategory, results, onDownloadPdf }) {
+  const [saved, setSaved] = useState(false);
   const level = playbookLevel(weakestCategory.score);
   const action = PLAYBOOK[weakestCategory.key].days30[level];
+
+  // Same real save logic as RoadmapReadyScreen.jsx (P2) -- builds a
+  // /roadmap?snapshot= link via P1's encodeRoadmapSnapshot and copies it.
+  function handleSave() {
+    const encoded = encodeRoadmapSnapshot(results);
+    const url = `${window.location.origin}/roadmap?snapshot=${encoded}`;
+    navigator.clipboard.writeText(url)
+      .then(() => { setSaved(true); setTimeout(() => setSaved(false), 2000); })
+      .catch(() => {});
+  }
 
   return (
     <section className="results-hero career-roadmap-close">
@@ -467,7 +478,9 @@ function ClosingSection({ weakestCategory, onDownloadPdf }) {
         <p className="why-line">Pick it, and start there.</p>
 
         <div className="roadmap-ready-actions">
-          <button type="button" className="btn-ghost-dark">Save My Roadmap</button>
+          <button type="button" className="btn-ghost-dark" onClick={handleSave}>
+            {saved ? '✓ Link Copied!' : 'Save My Roadmap'}
+          </button>
           <button type="button" className="btn-ghost-dark" onClick={onDownloadPdf}>Download PDF</button>
           <button type="button" className="btn-ghost-dark">Share</button>
         </div>
@@ -484,9 +497,19 @@ export default function CareerRoadmap() {
   const shareParam = searchParams.get('share');
   const sharedData = shareParam ? decodeShareState(shareParam) : null;
   const isSharedView = sharedData !== null;
+
+  // Saved-roadmap links (P2) use a distinct ?snapshot= param and decoder from
+  // one-time ?share= links -- decodeShareState can technically also decode a
+  // snapshot string (it ignores the extra timestamp field), which would make
+  // a saved link silently indistinguishable from a plain share if it reused
+  // ?share=. Keeping them separate avoids that ambiguity.
+  const snapshotParam = searchParams.get('snapshot');
+  const snapshotData = snapshotParam ? decodeRoadmapSnapshot(snapshotParam) : null;
+  const isSnapshotView = snapshotData !== null;
+
   const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
 
-  if (!isSharedView && !hasAnswers) {
+  if (!isSharedView && !isSnapshotView && !hasAnswers) {
     return (
       <div className="results-page">
         <div className="results-empty-page">
@@ -500,13 +523,21 @@ export default function CareerRoadmap() {
     );
   }
 
-  const results = isSharedView ? sharedData : calculateResults(answers);
+  const results = isSnapshotView ? snapshotData : (isSharedView ? sharedData : calculateResults(answers));
   const { finalScore, riskKey, riskLabel, rankedCategories, automationRisks, topProtectors } = results;
   const weakestCategory = rankedCategories[rankedCategories.length - 1];
   const topProtector = topProtectors[0] ?? rankedCategories[0];
 
   return (
     <div className="results-page career-roadmap-page">
+      {isSnapshotView && (
+        <div className="results-shared-banner">
+          <div className="container">
+            <span>Viewing a roadmap saved on {new Date(results.savedAt).toLocaleDateString()}</span>
+            <Link to="/assessment" className="results-shared-banner-cta">Take your own assessment &rarr;</Link>
+          </div>
+        </div>
+      )}
       <ScoreSection finalScore={finalScore} riskKey={riskKey} riskLabel={riskLabel} />
       <WhySection topProtector={topProtector} />
       <StrengthsSection rankedCategories={rankedCategories} />
@@ -517,7 +548,7 @@ export default function CareerRoadmap() {
       <WorkplaceMovesSection weakestCategory={weakestCategory} />
       <CertificationsSection weakestCategory={weakestCategory} />
       <SimilarCareersSection topProtector={topProtector} />
-      <ClosingSection weakestCategory={weakestCategory} onDownloadPdf={() => window.print()} />
+      <ClosingSection weakestCategory={weakestCategory} results={results} onDownloadPdf={() => window.print()} />
     </div>
   );
 }
