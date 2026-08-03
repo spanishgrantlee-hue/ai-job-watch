@@ -2311,6 +2311,39 @@ input, select, textarea, button { font-family: inherit; }
 
 .learning-plan-cta { display: flex; margin: 2.5rem auto 0; }
 
+/* Similar Careers screen (N1) — Act 3 (light-distinct background from
+   RevealSequencer's wrapper), reuses .protector-tag for role chips. */
+.similar-careers-screen {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+}
+
+.similar-careers-opener {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--clr-text);
+  margin: 0 0 2rem;
+}
+
+.similar-careers-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.similar-careers-disclaimer {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--clr-text-mid);
+  font-style: italic;
+  margin: 1.75rem 0 0;
+}
+
+.similar-careers-cta { display: flex; margin: 2.5rem auto 0; }
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
