@@ -2344,6 +2344,36 @@ input, select, textarea, button { font-family: inherit; }
 
 .similar-careers-cta { display: flex; margin: 2.5rem auto 0; }
 
+/* Roadmap Ready screen (N2) — dark-hero bookend, reuses why-line and
+   tasks-changing-timeline; only these three are new. */
+.roadmap-ready-screen {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 3rem 2rem 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+}
+
+.roadmap-ready-action-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin: 0.5rem 0 -0.5rem;
+}
+
+.roadmap-ready-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
