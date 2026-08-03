@@ -2374,6 +2374,36 @@ input, select, textarea, button { font-family: inherit; }
   margin-top: 0.5rem;
 }
 
+/* Career Roadmap reference page (Group O) — light-appropriate quick-list for
+   the Strengths section (L4's own version was built dark-hero-only, so it
+   isn't reusable here). Everything else on this page reuses existing
+   Results.jsx/screen-component CSS as-is. */
+.strength-quicklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.strength-quicklist-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--clr-border);
+  font-size: 0.9rem;
+  color: var(--clr-text);
+}
+
+.strength-quicklist-rank {
+  font-weight: 700;
+  color: var(--clr-text-light);
+  width: 1.75rem;
+  flex-shrink: 0;
+}
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
@@ -2437,4 +2467,26 @@ input, select, textarea, button { font-family: inherit; }
   .cta-section { padding: 4rem 1.25rem; }
   .band { padding: 1.5rem; }
   .feature-card { padding: 1.35rem; }
+}
+
+/* =========================================================
+   PRINT (O2 — Download PDF, Career Roadmap reference page)
+   ========================================================= */
+
+@media print {
+  .navbar { display: none; }
+
+  .career-roadmap-page button,
+  .career-roadmap-page .protection-plan-question { display: none; }
+
+  /* Force backgrounds to print as shown on screen (dark sections stay dark,
+     so their white text stays legible) rather than the browser default of
+     printing white backgrounds only, which would make white-on-white text
+     invisible. */
+  .career-roadmap-page * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .career-roadmap-page { padding-top: 0; }
 }
