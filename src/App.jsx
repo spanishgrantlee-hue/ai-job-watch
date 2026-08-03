@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Assessment from './pages/Assessment';
 import Results from './pages/Results';
 import CareerRoadmap from './pages/CareerRoadmap';
+import RoadmapCheckIn from './pages/RoadmapCheckIn';
 import About from './pages/About';
 import './index.css';
 
@@ -46,6 +47,7 @@ export default function App() {
             <Route path="/assessment" element={<Assessment />} />
             <Route path="/results"    element={<Results />} />
             <Route path="/roadmap"    element={<CareerRoadmap />} />
+            <Route path="/check-in"   element={<RoadmapCheckIn />} />
             <Route path="/about"      element={<About />} />
           </Routes>
         </main>

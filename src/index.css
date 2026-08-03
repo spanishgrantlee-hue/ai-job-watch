@@ -2404,6 +2404,46 @@ input, select, textarea, button { font-family: inherit; }
   flex-shrink: 0;
 }
 
+/* Roadmap Check-In (P3) — dark-hero before/after comparison; the question
+   form itself reuses Assessment.jsx's existing question-block/choice-btn
+   classes as-is. */
+.checkin-comparison {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 0.5rem 0 2rem;
+}
+
+.checkin-comparison-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.checkin-comparison-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+
+.checkin-comparison-score {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.checkin-comparison-arrow {
+  font-size: 1.75rem;
+  color: rgba(255,255,255,0.4);
+}
+
+.checkin-submit { display: flex; margin: 20px auto 0; }
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
