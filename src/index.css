@@ -2270,6 +2270,37 @@ input, select, textarea, button { font-family: inherit; }
 
 .workplace-moves-cta { display: flex; margin: 2.5rem auto 0; }
 
+/* Certifications screen (M5) — Act 2's last screen (light background),
+   reuses playbook-card-title/playbook-card-context/playbook-timeline. */
+.certifications-screen {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+}
+
+.certifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1.75rem;
+}
+
+.certifications-card {
+  background: var(--clr-white);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px 24px;
+}
+
+.certifications-closing {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--clr-text-mid);
+  margin: 2rem 0 0;
+}
+
+.certifications-cta { display: flex; margin: 2.5rem auto 0; }
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
