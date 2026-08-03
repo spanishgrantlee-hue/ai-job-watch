@@ -145,3 +145,92 @@ export function generateTextSummary({ finalScore, riskLabel, rankedCategories, a
 
   return lines.join('\n');
 }
+
+/**
+ * Encodes a calculateResults() object plus a timestamp into a compact,
+ * URL-safe Base64 string — a "roadmap snapshot" for later progress-tracking
+ * re-check-ins (Group P), as opposed to encodeShareState's one-time share
+ * link. Deliberately a separate function rather than a change to
+ * encodeShareState: keeps the existing share-link format (and every caller
+ * that already depends on it) completely unchanged.
+ *
+ * Scope note: this captures score/result data only (finalScore, riskKey,
+ * categories, aiExposurePenalty, automationRisks) plus when it was saved —
+ * never personalization answers like hoursBudget or the union toggle, which
+ * are transient UI preferences, not part of what a before/after comparison
+ * needs to track.
+ *
+ * Payload shape (before encoding):
+ *   { s: finalScore, r: 'H'|'M'|'L', c: [6 category scores], e: aiExposurePenalty, a: bitmask, t: savedAt }
+ *
+ * @param {object} results - return value of calculateResults()
+ * @param {number} [savedAt] - Unix ms timestamp; defaults to now
+ * @returns {string} URL-safe Base64 string, safe to use as a query-param value
+ */
+export function encodeRoadmapSnapshot({ finalScore, riskKey, categories, aiExposurePenalty, automationRisks }, savedAt = Date.now()) {
+  const c = CAT_ORDER.map(k => categories[k]);
+
+  const a = automationRisks.reduce((mask, risk) => {
+    const idx = SIGNAL_KEYS.indexOf(risk.key);
+    return idx >= 0 ? mask | (1 << idx) : mask;
+  }, 0);
+
+  const payload = JSON.stringify({ s: finalScore, r: riskKey[0], c, e: aiExposurePenalty, a, t: savedAt });
+
+  return btoa(payload).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+/**
+ * Decodes a snapshot produced by encodeRoadmapSnapshot() back into the full
+ * results object (same shape as decodeShareState), plus savedAt.
+ *
+ * Returns null if the string is missing, malformed, or fails validation —
+ * callers must handle null gracefully.
+ *
+ * @param {string|null} encoded
+ * @returns {object|null}
+ */
+export function decodeRoadmapSnapshot(encoded) {
+  if (!encoded) return null;
+  try {
+    const b64    = encoded.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = b64 + '='.repeat((4 - b64.length % 4) % 4);
+    const p      = JSON.parse(atob(padded));
+
+    if (
+      typeof p.s !== 'number' || p.s < 0 || p.s > 30 ||
+      !RISK_CHAR[p.r] ||
+      !Array.isArray(p.c) || p.c.length !== 6 || p.c.some(v => typeof v !== 'number') ||
+      typeof p.e !== 'number' || p.e < 0 || p.e > 5 ||
+      typeof p.a !== 'number' || p.a < 0 || p.a > 31 ||
+      typeof p.t !== 'number' || p.t <= 0
+    ) return null;
+
+    const riskKey    = RISK_CHAR[p.r];
+    const categories = Object.fromEntries(CAT_ORDER.map((k, i) => [k, p.c[i]]));
+
+    const rankedCategories = CAT_ORDER
+      .map(key => ({ key, score: categories[key], ...CATEGORY_META[key] }))
+      .sort((a, b) => b.score - a.score);
+
+    const automationRisks = AUTOMATION_SIGNALS
+      .filter((_, i) => p.a & (1 << i))
+      .map(({ key, label, description }) => ({ key, label, description }));
+
+    return {
+      finalScore:       p.s,
+      riskKey,
+      riskLabel:        RISK_THRESHOLDS[riskKey].label,
+      riskColor:        RISK_THRESHOLDS[riskKey].color,
+      categories,
+      rankedCategories,
+      aiExposurePenalty: p.e,
+      summary:          RISK_SUMMARIES[riskKey],
+      automationRisks,
+      topProtectors:    rankedCategories.filter(c => c.score >= 3).slice(0, 3),
+      savedAt:          p.t,
+    };
+  } catch {
+    return null;
+  }
+}
