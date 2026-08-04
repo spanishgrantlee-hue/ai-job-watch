@@ -12,6 +12,13 @@ import { PLAYBOOK, playbookLevel } from '../../../utils/playbook.js';
 // -- this component doesn't know or care how the answer is stored; that's
 // decided by whatever assembles the full screen sequence later. Continue is
 // never gated on answering it: personalization here is additive, not required.
+//
+// Checklist (P5): each of the 6 timeline items (2 categories x 3 timeframes)
+// can be marked complete. Keyed "categoryKey:timeframe" to stay meaningful
+// even if the weakest categories change later (e.g. after a check-in).
+// initialChecklist/onChecklistChange follow the same "accept state + notify,
+// don't own persistence" pattern as onAnswerHours -- the checklist itself is
+// stored in the saved-roadmap snapshot (share.js), not owned by this screen.
 
 const HOURS_OPTIONS = [
   { key: 'low',  label: 'A few minutes a week' },
@@ -19,7 +26,13 @@ const HOURS_OPTIONS = [
   { key: 'high', label: '5+ hours a week' },
 ];
 
-function PlanCard({ category, rank }) {
+const TIMELINE_ITEMS = [
+  { key: 'days30', label: 'This Week' },
+  { key: 'days90', label: 'Next Few Months' },
+  { key: 'year1',  label: 'Long-Term' },
+];
+
+function PlanCard({ category, rank, checklist, onToggleItem }) {
   const level = playbookLevel(category.score);
   const data = PLAYBOOK[category.key];
   if (!data) return null;
@@ -38,30 +51,44 @@ function PlanCard({ category, rank }) {
       <h3 className="playbook-card-title">{category.label}</h3>
       <p className="playbook-card-context">{data.context[level]}</p>
       <div className="playbook-timeline">
-        <div className="playbook-item">
-          <span className="playbook-item-label">This Week</span>
-          <p className="playbook-item-text">{data.days30[level]}</p>
-        </div>
-        <div className="playbook-item">
-          <span className="playbook-item-label">Next Few Months</span>
-          <p className="playbook-item-text">{data.days90[level]}</p>
-        </div>
-        <div className="playbook-item">
-          <span className="playbook-item-label">Long-Term</span>
-          <p className="playbook-item-text">{data.year1[level]}</p>
-        </div>
+        {TIMELINE_ITEMS.map(({ key: timeframe, label }) => {
+          const checklistKey = `${category.key}:${timeframe}`;
+          const complete = !!checklist[checklistKey];
+          return (
+            <div className={`playbook-item${complete ? ' playbook-item--complete' : ''}`} key={timeframe}>
+              <label className="playbook-item-checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={complete}
+                  onChange={() => onToggleItem(category.key, timeframe)}
+                  aria-label={`Mark "${label}" complete for ${category.label}`}
+                />
+                <span className="playbook-item-label">{label}</span>
+              </label>
+              <p className="playbook-item-text">{data[timeframe][level]}</p>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-export default function ProtectionPlanScreen({ rankedCategories, onAnswerHours, onAdvance }) {
+export default function ProtectionPlanScreen({ rankedCategories, onAnswerHours, initialChecklist = {}, onChecklistChange, onAdvance }) {
   const [selectedHours, setSelectedHours] = useState(null);
+  const [checklist, setChecklist] = useState(initialChecklist);
   const weakest = [...rankedCategories].reverse().slice(0, 2);
 
   function handleSelectHours(key) {
     setSelectedHours(key);
     onAnswerHours?.(key);
+  }
+
+  function handleToggleItem(categoryKey, timeframe) {
+    const checklistKey = `${categoryKey}:${timeframe}`;
+    const next = { ...checklist, [checklistKey]: !checklist[checklistKey] };
+    setChecklist(next);
+    onChecklistChange?.(next);
   }
 
   return (
@@ -74,7 +101,7 @@ export default function ProtectionPlanScreen({ rankedCategories, onAnswerHours, 
 
       <div className="playbook-grid">
         {weakest.map((cat, idx) => (
-          <PlanCard key={cat.key} category={cat} rank={idx + 1} />
+          <PlanCard key={cat.key} category={cat} rank={idx + 1} checklist={checklist} onToggleItem={handleToggleItem} />
         ))}
       </div>
 

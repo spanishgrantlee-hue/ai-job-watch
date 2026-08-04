@@ -22,6 +22,11 @@ export const CAT_ORDER = [
 // Must match AUTOMATION_SIGNALS key order in scoring.js.
 const SIGNAL_KEYS = ['routine', 'dataEntry', 'aiAlreadyHere', 'remoteInfo', 'replaceability'];
 
+// Fixed order — never reorder; decodeRoadmapSnapshot's checklist bitmask
+// relies on CAT_ORDER x TIMEFRAME_ORDER position (see P5). Matches
+// PLAYBOOK's own days30/days90/year1 field names in playbook.js.
+const TIMEFRAME_ORDER = ['days30', 'days90', 'year1'];
+
 /**
  * Encodes a calculateResults() object into a compact, URL-safe Base64 string.
  *
@@ -161,13 +166,20 @@ export function generateTextSummary({ finalScore, riskLabel, rankedCategories, a
  * needs to track.
  *
  * Payload shape (before encoding):
- *   { s: finalScore, r: 'H'|'M'|'L', c: [6 category scores], e: aiExposurePenalty, a: bitmask, t: savedAt }
+ *   { s: finalScore, r: 'H'|'M'|'L', c: [6 category scores], e: aiExposurePenalty, a: bitmask, t: savedAt, k: checklistBitmask }
+ *
+ * checklist (P5) is optional and defaults to nothing checked — Protection
+ * Plan action items, keyed "categoryKey:timeframe" (e.g. "accountability:days30"),
+ * packed as an 18-bit mask (6 categories x 3 timeframes) so old snapshot
+ * links generated before P5 still decode correctly (missing k = all
+ * unchecked, see decodeRoadmapSnapshot).
  *
  * @param {object} results - return value of calculateResults()
  * @param {number} [savedAt] - Unix ms timestamp; defaults to now
+ * @param {object} [checklist] - { "categoryKey:timeframe": boolean }
  * @returns {string} URL-safe Base64 string, safe to use as a query-param value
  */
-export function encodeRoadmapSnapshot({ finalScore, riskKey, categories, aiExposurePenalty, automationRisks }, savedAt = Date.now()) {
+export function encodeRoadmapSnapshot({ finalScore, riskKey, categories, aiExposurePenalty, automationRisks }, savedAt = Date.now(), checklist = {}) {
   const c = CAT_ORDER.map(k => categories[k]);
 
   const a = automationRisks.reduce((mask, risk) => {
@@ -175,7 +187,14 @@ export function encodeRoadmapSnapshot({ finalScore, riskKey, categories, aiExpos
     return idx >= 0 ? mask | (1 << idx) : mask;
   }, 0);
 
-  const payload = JSON.stringify({ s: finalScore, r: riskKey[0], c, e: aiExposurePenalty, a, t: savedAt });
+  let k = 0;
+  CAT_ORDER.forEach((catKey, ci) => {
+    TIMEFRAME_ORDER.forEach((timeframe, ti) => {
+      if (checklist[`${catKey}:${timeframe}`]) k |= (1 << (ci * TIMEFRAME_ORDER.length + ti));
+    });
+  });
+
+  const payload = JSON.stringify({ s: finalScore, r: riskKey[0], c, e: aiExposurePenalty, a, t: savedAt, k });
 
   return btoa(payload).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
@@ -197,13 +216,17 @@ export function decodeRoadmapSnapshot(encoded) {
     const padded = b64 + '='.repeat((4 - b64.length % 4) % 4);
     const p      = JSON.parse(atob(padded));
 
+    // p.k (checklist bitmask) is intentionally NOT required: snapshot links
+    // generated before P5 have no k field at all, and must keep decoding
+    // successfully with checklist defaulting to nothing checked (see below).
     if (
       typeof p.s !== 'number' || p.s < 0 || p.s > 30 ||
       !RISK_CHAR[p.r] ||
       !Array.isArray(p.c) || p.c.length !== 6 || p.c.some(v => typeof v !== 'number') ||
       typeof p.e !== 'number' || p.e < 0 || p.e > 5 ||
       typeof p.a !== 'number' || p.a < 0 || p.a > 31 ||
-      typeof p.t !== 'number' || p.t <= 0
+      typeof p.t !== 'number' || p.t <= 0 ||
+      (p.k !== undefined && (typeof p.k !== 'number' || p.k < 0 || p.k > 262143)) // 2^18 - 1
     ) return null;
 
     const riskKey    = RISK_CHAR[p.r];
@@ -217,6 +240,14 @@ export function decodeRoadmapSnapshot(encoded) {
       .filter((_, i) => p.a & (1 << i))
       .map(({ key, label, description }) => ({ key, label, description }));
 
+    const k = typeof p.k === 'number' ? p.k : 0;
+    const checklist = {};
+    CAT_ORDER.forEach((catKey, ci) => {
+      TIMEFRAME_ORDER.forEach((timeframe, ti) => {
+        checklist[`${catKey}:${timeframe}`] = !!(k & (1 << (ci * TIMEFRAME_ORDER.length + ti)));
+      });
+    });
+
     return {
       finalScore:       p.s,
       riskKey,
@@ -229,6 +260,7 @@ export function decodeRoadmapSnapshot(encoded) {
       automationRisks,
       topProtectors:    rankedCategories.filter(c => c.score >= 3).slice(0, 3),
       savedAt:          p.t,
+      checklist,
     };
   } catch {
     return null;

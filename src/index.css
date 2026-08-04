@@ -2463,6 +2463,25 @@ input, select, textarea, button { font-family: inherit; }
   margin: 4px 0 0;
 }
 
+/* Protection Plan checklist (P5) — additions to the existing .playbook-item
+   family only; the base rules themselves are untouched. */
+.playbook-item-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.playbook-item-checkbox-row input[type="checkbox"] { cursor: pointer; }
+
+.playbook-item--complete .playbook-item-text {
+  text-decoration: line-through;
+  color: var(--clr-text-light);
+}
+
+.playbook-item--complete .playbook-item-label { opacity: 0.6; }
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
