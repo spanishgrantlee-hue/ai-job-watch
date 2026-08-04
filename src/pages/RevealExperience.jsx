@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useAnswers } from '../App';
@@ -36,10 +36,25 @@ import RoadmapReadyScreen from '../components/roadmap/screens/RoadmapReadyScreen
 // Every other screen defaults to DELIBERATE -- a judgment call, not a
 // previously-decided requirement, since pacing was never assigned to them.
 //
-// hoursBudget and the Protection Plan checklist (P5) are the two pieces of
-// state that must persist ACROSS screens (Protection Plan sets hoursBudget,
-// Learning Plan reads it) -- owned here, same as CareerRoadmap.jsx already
-// owns them for its own rendering.
+// Each screen's wrapper is individually memoized (useCallback) with only the
+// dependencies it actually needs. This matters specifically for
+// protectionPlan: it deliberately excludes hoursBudget/checklist, because
+// Protection Plan is the WRITER of that state via stable setState setters,
+// never a reader of the live value while it's the active screen. Including
+// them as dependencies would recreate this closure on every one of
+// Protection Plan's own interactions, which would hand RevealSequencer a new
+// component reference for the currently-displayed screen -- React remounts
+// it, wiping its local state (this is a real bug Q1 found and this fix
+// addresses). learningPlan's wrapper DOES depend on hoursBudget, which is
+// correct: Learning Plan needs the fresh value, and the user is never
+// looking at it while Protection Plan updates that state, so recreating its
+// closure there is invisible/harmless.
+//
+// initialChecklist is a constant {} rather than threading the checklist
+// state back in: nothing currently seeds it from anywhere real (no snapshot
+// restore flow reaches /reveal), and checklist isn't yet wired into the
+// actual save call in RoadmapReadyScreen.jsx either -- a separate, documented
+// gap (see Q1 verification notes), not addressed by this fix.
 
 const SCORED_IDS = ['Q6','Q7','Q8','Q9','Q10','Q11','Q12','Q13','Q14','Q15','Q16','Q17','Q18','Q19','Q20','Q21','Q22','Q23','Q24','Q25','Q28'];
 
@@ -47,9 +62,36 @@ export default function RevealExperience() {
   const { answers } = useAnswers();
   const navigate = useNavigate();
   const [hoursBudget, setHoursBudget] = useState(null);
-  const [checklist, setChecklist] = useState({});
+  const [, setChecklist] = useState({});
 
   const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
+
+  const results = useMemo(() => (hasAnswers ? calculateResults(answers) : null), [answers, hasAnswers]);
+  const rankedCategories = useMemo(() => results?.rankedCategories ?? [], [results]);
+  const weakestCategory = rankedCategories[rankedCategories.length - 1];
+  const topProtector = results?.topProtectors?.[0] ?? rankedCategories[0];
+
+  const welcomeComponent = useCallback((props) => <WelcomeScreen {...props} />, []);
+  const scoreComponent = useCallback((props) => <ScoreScreen {...props} finalScore={results?.finalScore} riskKey={results?.riskKey} riskLabel={results?.riskLabel} />, [results]);
+  const whyComponent = useCallback((props) => <WhyScreen {...props} topProtector={topProtector} />, [topProtector]);
+  const strengthsComponent = useCallback((props) => <StrengthsScreen {...props} rankedCategories={rankedCategories} />, [rankedCategories]);
+  const tasksChangingComponent = useCallback((props) => <TasksChangingScreen {...props} weakestCategory={weakestCategory} automationRisks={results?.automationRisks} riskKey={results?.riskKey} />, [weakestCategory, results]);
+  const protectionPlanComponent = useCallback((props) => (
+    <ProtectionPlanScreen
+      {...props}
+      rankedCategories={rankedCategories}
+      onAnswerHours={setHoursBudget}
+      initialChecklist={{}}
+      onChecklistChange={setChecklist}
+    />
+  ), [rankedCategories]);
+  const phaseMarkerComponent = useCallback((props) => <PhaseMarkerScreen {...props} />, []);
+  const learningPlanComponent = useCallback((props) => <LearningPlanScreen {...props} weakestCategory={weakestCategory} hoursBudget={hoursBudget ?? 'mid'} />, [weakestCategory, hoursBudget]);
+  const toolsComponent = useCallback((props) => <ToolsScreen {...props} weakestCategory={weakestCategory} />, [weakestCategory]);
+  const workplaceMovesComponent = useCallback((props) => <WorkplaceMovesScreen {...props} weakestCategory={weakestCategory} />, [weakestCategory]);
+  const certificationsComponent = useCallback((props) => <CertificationsScreen {...props} weakestCategory={weakestCategory} />, [weakestCategory]);
+  const similarCareersComponent = useCallback((props) => <SimilarCareersScreen {...props} topProtector={topProtector} />, [topProtector]);
+  const roadmapReadyComponent = useCallback((props) => <RoadmapReadyScreen {...props} weakestCategory={weakestCategory} results={results} />, [weakestCategory, results]);
 
   if (!hasAnswers) {
     return (
@@ -65,46 +107,20 @@ export default function RevealExperience() {
     );
   }
 
-  const results = calculateResults(answers);
-  const { finalScore, riskKey, riskLabel, rankedCategories, automationRisks, topProtectors } = results;
-  const weakestCategory = rankedCategories[rankedCategories.length - 1];
-  const topProtector = topProtectors[0] ?? rankedCategories[0];
-
   const screens = [
-    { id: 'welcome', act: 1, background: 'hero', pacing: PACING.DELIBERATE,
-      component: (props) => <WelcomeScreen {...props} /> },
-    { id: 'score', act: 1, background: 'hero', pacing: PACING.DELIBERATE,
-      component: (props) => <ScoreScreen {...props} finalScore={finalScore} riskKey={riskKey} riskLabel={riskLabel} /> },
-    { id: 'why', act: 1, background: 'hero', pacing: PACING.INSTANT,
-      component: (props) => <WhyScreen {...props} topProtector={topProtector} /> },
-    { id: 'strengths', act: 1, background: 'hero', pacing: PACING.DELIBERATE,
-      component: (props) => <StrengthsScreen {...props} rankedCategories={rankedCategories} /> },
-    { id: 'tasksChanging', act: 1, background: 'hero', pacing: PACING.DELIBERATE,
-      component: (props) => <TasksChangingScreen {...props} weakestCategory={weakestCategory} automationRisks={automationRisks} riskKey={riskKey} /> },
-    { id: 'protectionPlan', act: 2, background: 'light', pacing: PACING.DELIBERATE,
-      component: (props) => (
-        <ProtectionPlanScreen
-          {...props}
-          rankedCategories={rankedCategories}
-          onAnswerHours={setHoursBudget}
-          initialChecklist={checklist}
-          onChecklistChange={setChecklist}
-        />
-      ) },
-    { id: 'phaseMarker', act: 2, background: 'light', pacing: PACING.INSTANT,
-      component: (props) => <PhaseMarkerScreen {...props} /> },
-    { id: 'learningPlan', act: 2, background: 'light', pacing: PACING.DELIBERATE,
-      component: (props) => <LearningPlanScreen {...props} weakestCategory={weakestCategory} hoursBudget={hoursBudget ?? 'mid'} /> },
-    { id: 'tools', act: 2, background: 'light', pacing: PACING.DELIBERATE,
-      component: (props) => <ToolsScreen {...props} weakestCategory={weakestCategory} /> },
-    { id: 'workplaceMoves', act: 2, background: 'light', pacing: PACING.DELIBERATE,
-      component: (props) => <WorkplaceMovesScreen {...props} weakestCategory={weakestCategory} /> },
-    { id: 'certifications', act: 2, background: 'light', pacing: PACING.DELIBERATE,
-      component: (props) => <CertificationsScreen {...props} weakestCategory={weakestCategory} /> },
-    { id: 'similarCareers', act: 3, background: 'light-distinct', pacing: PACING.DELIBERATE,
-      component: (props) => <SimilarCareersScreen {...props} topProtector={topProtector} /> },
-    { id: 'roadmapReady', act: 3, background: 'hero', pacing: PACING.DELIBERATE,
-      component: (props) => <RoadmapReadyScreen {...props} weakestCategory={weakestCategory} results={results} /> },
+    { id: 'welcome', act: 1, background: 'hero', pacing: PACING.DELIBERATE, component: welcomeComponent },
+    { id: 'score', act: 1, background: 'hero', pacing: PACING.DELIBERATE, component: scoreComponent },
+    { id: 'why', act: 1, background: 'hero', pacing: PACING.INSTANT, component: whyComponent },
+    { id: 'strengths', act: 1, background: 'hero', pacing: PACING.DELIBERATE, component: strengthsComponent },
+    { id: 'tasksChanging', act: 1, background: 'hero', pacing: PACING.DELIBERATE, component: tasksChangingComponent },
+    { id: 'protectionPlan', act: 2, background: 'light', pacing: PACING.DELIBERATE, component: protectionPlanComponent },
+    { id: 'phaseMarker', act: 2, background: 'light', pacing: PACING.INSTANT, component: phaseMarkerComponent },
+    { id: 'learningPlan', act: 2, background: 'light', pacing: PACING.DELIBERATE, component: learningPlanComponent },
+    { id: 'tools', act: 2, background: 'light', pacing: PACING.DELIBERATE, component: toolsComponent },
+    { id: 'workplaceMoves', act: 2, background: 'light', pacing: PACING.DELIBERATE, component: workplaceMovesComponent },
+    { id: 'certifications', act: 2, background: 'light', pacing: PACING.DELIBERATE, component: certificationsComponent },
+    { id: 'similarCareers', act: 3, background: 'light-distinct', pacing: PACING.DELIBERATE, component: similarCareersComponent },
+    { id: 'roadmapReady', act: 3, background: 'hero', pacing: PACING.DELIBERATE, component: roadmapReadyComponent },
   ];
 
   return <RevealSequencer screens={screens} onComplete={() => navigate('/roadmap')} />;
