@@ -2444,6 +2444,25 @@ input, select, textarea, button { font-family: inherit; }
 
 .checkin-submit { display: flex; margin: 20px auto 0; }
 
+/* Live Progress View comparison banner (P4) — reuses .results-shared-banner
+   as the container; these are just its two-line content layout. */
+.compare-progress-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.compare-progress-now { font-weight: 700; color: #fff; }
+
+.compare-progress-summary {
+  width: 100%;
+  text-align: center;
+  margin: 4px 0 0;
+}
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */

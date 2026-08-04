@@ -507,9 +507,19 @@ export default function CareerRoadmap() {
   const snapshotData = snapshotParam ? decodeRoadmapSnapshot(snapshotParam) : null;
   const isSnapshotView = snapshotData !== null;
 
-  const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
+  // Live Progress View (P4) — a distinct ?compare= param and mode, never
+  // reusing or altering ?snapshot='s meaning. decodeRoadmapSnapshot is only
+  // ever called on compareParam when isSnapshotView/isSharedView are both
+  // false, so ?snapshot= and ?share= always take absolute precedence: a
+  // snapshot link's behavior is untouched by this feature's existence.
+  const compareParam = searchParams.get('compare');
+  const compareData = (!isSnapshotView && !isSharedView && compareParam) ? decodeRoadmapSnapshot(compareParam) : null;
+  const isCompareView = compareData !== null;
 
-  if (!isSharedView && !isSnapshotView && !hasAnswers) {
+  const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
+  const liveResults = hasAnswers ? calculateResults(answers) : null;
+
+  if (!isSharedView && !isSnapshotView && !isCompareView && !hasAnswers) {
     return (
       <div className="results-page">
         <div className="results-empty-page">
@@ -523,10 +533,20 @@ export default function CareerRoadmap() {
     );
   }
 
-  const results = isSnapshotView ? snapshotData : (isSharedView ? sharedData : calculateResults(answers));
+  const results =
+    isSnapshotView ? snapshotData
+    : isSharedView ? sharedData
+    : isCompareView ? (liveResults ?? compareData)
+    : liveResults;
   const { finalScore, riskKey, riskLabel, rankedCategories, automationRisks, topProtectors } = results;
   const weakestCategory = rankedCategories[rankedCategories.length - 1];
   const topProtector = topProtectors[0] ?? rankedCategories[0];
+
+  const compareDelta = (isCompareView && liveResults) ? liveResults.finalScore - compareData.finalScore : null;
+  const compareDeltaText = compareDelta === null ? null
+    : compareDelta > 0 ? `Your score moved up ${compareDelta} point${compareDelta === 1 ? '' : 's'} since you saved this roadmap.`
+    : compareDelta < 0 ? `Your score moved down ${Math.abs(compareDelta)} point${Math.abs(compareDelta) === 1 ? '' : 's'} since you saved this roadmap.`
+    : "Your score hasn't changed since you saved this roadmap.";
 
   return (
     <div className="results-page career-roadmap-page">
@@ -535,6 +555,28 @@ export default function CareerRoadmap() {
           <div className="container">
             <span>Viewing a roadmap saved on {new Date(results.savedAt).toLocaleDateString()}</span>
             <Link to="/assessment" className="results-shared-banner-cta">Take your own assessment &rarr;</Link>
+            {hasAnswers && (
+              <Link to={`/roadmap?compare=${snapshotParam}`} className="results-shared-banner-cta">See My Progress Since This Save &rarr;</Link>
+            )}
+          </div>
+        </div>
+      )}
+      {isCompareView && liveResults && (
+        <div className="results-shared-banner">
+          <div className="container">
+            <div className="compare-progress-banner">
+              <span>Comparing to your roadmap saved on {new Date(compareData.savedAt).toLocaleDateString()}: {compareData.finalScore}/30</span>
+              <span className="compare-progress-now">Now: {liveResults.finalScore}/30 ({compareDelta >= 0 ? '+' : ''}{compareDelta})</span>
+            </div>
+            <p className="compare-progress-summary">{compareDeltaText}</p>
+          </div>
+        </div>
+      )}
+      {isCompareView && !liveResults && (
+        <div className="results-shared-banner">
+          <div className="container">
+            <span>We can&rsquo;t compare &mdash; no current assessment found on this device. Here&rsquo;s the roadmap as it was saved on {new Date(compareData.savedAt).toLocaleDateString()}.</span>
+            <Link to="/assessment" className="results-shared-banner-cta">Take the Assessment &rarr;</Link>
           </div>
         </div>
       )}
