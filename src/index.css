@@ -2555,7 +2555,8 @@ input, select, textarea, button { font-family: inherit; }
   .navbar { display: none; }
 
   .career-roadmap-page button,
-  .career-roadmap-page .protection-plan-question { display: none; }
+  .career-roadmap-page .protection-plan-question,
+  .career-roadmap-page .results-shared-banner { display: none; }
 
   /* Force backgrounds to print as shown on screen (dark sections stay dark,
      so their white text stays legible) rather than the browser default of

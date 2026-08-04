@@ -584,7 +584,7 @@ export default function CareerRoadmap() {
       <WhySection topProtector={topProtector} />
       <StrengthsSection rankedCategories={rankedCategories} />
       <TasksChangingSection weakestCategory={weakestCategory} automationRisks={automationRisks} riskKey={riskKey} />
-      <ProtectionPlanSection rankedCategories={rankedCategories} hoursBudget={hoursBudget ?? 'mid'} onSelectHours={setHoursBudget} />
+      <ProtectionPlanSection rankedCategories={rankedCategories} hoursBudget={hoursBudget} onSelectHours={setHoursBudget} />
       <LearningPlanSection weakestCategory={weakestCategory} hoursBudget={hoursBudget ?? 'mid'} />
       <ToolsSection weakestCategory={weakestCategory} />
       <WorkplaceMovesSection weakestCategory={weakestCategory} />
