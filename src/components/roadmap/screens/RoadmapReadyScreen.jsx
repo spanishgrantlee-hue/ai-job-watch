@@ -20,13 +20,13 @@ import { encodeRoadmapSnapshot } from '../../../utils/share.js';
 // from the last screen; onShare is still an inert placeholder -- Share isn't
 // part of any Group P task.
 
-export default function RoadmapReadyScreen({ weakestCategory, results, onShare, onAdvance }) {
+export default function RoadmapReadyScreen({ weakestCategory, results, checklist, onShare, onAdvance }) {
   const [saved, setSaved] = useState(false);
   const level = playbookLevel(weakestCategory.score);
   const action = PLAYBOOK[weakestCategory.key].days30[level];
 
   function handleSave() {
-    const encoded = encodeRoadmapSnapshot(results);
+    const encoded = encodeRoadmapSnapshot(results, undefined, checklist);
     const url = `${window.location.origin}/roadmap?snapshot=${encoded}`;
     navigator.clipboard.writeText(url)
       .then(() => { setSaved(true); setTimeout(() => setSaved(false), 2000); })

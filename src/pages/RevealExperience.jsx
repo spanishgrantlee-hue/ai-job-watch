@@ -50,11 +50,15 @@ import RoadmapReadyScreen from '../components/roadmap/screens/RoadmapReadyScreen
 // looking at it while Protection Plan updates that state, so recreating its
 // closure there is invisible/harmless.
 //
-// initialChecklist is a constant {} rather than threading the checklist
-// state back in: nothing currently seeds it from anywhere real (no snapshot
-// restore flow reaches /reveal), and checklist isn't yet wired into the
-// actual save call in RoadmapReadyScreen.jsx either -- a separate, documented
-// gap (see Q1 verification notes), not addressed by this fix.
+// initialChecklist passed to ProtectionPlanScreen is still a constant {}:
+// nothing currently seeds it from anywhere real (no snapshot restore flow
+// reaches /reveal). checklist itself IS now kept (not discarded) and threaded
+// into roadmapReadyComponent, which passes it on to RoadmapReadyScreen's
+// handleSave -- closing the save-time gap Q1 documented and Q3 confirmed
+// live. roadmapReadyComponent safely depends on checklist (unlike
+// protectionPlanComponent above) for the same reason learningPlanComponent
+// safely depends on hoursBudget: the user is never looking at the closing
+// screen while Protection Plan is writing this state.
 
 const SCORED_IDS = ['Q6','Q7','Q8','Q9','Q10','Q11','Q12','Q13','Q14','Q15','Q16','Q17','Q18','Q19','Q20','Q21','Q22','Q23','Q24','Q25','Q28'];
 
@@ -62,7 +66,7 @@ export default function RevealExperience() {
   const { answers } = useAnswers();
   const navigate = useNavigate();
   const [hoursBudget, setHoursBudget] = useState(null);
-  const [, setChecklist] = useState({});
+  const [checklist, setChecklist] = useState({});
 
   const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
 
@@ -91,7 +95,7 @@ export default function RevealExperience() {
   const workplaceMovesComponent = useCallback((props) => <WorkplaceMovesScreen {...props} weakestCategory={weakestCategory} />, [weakestCategory]);
   const certificationsComponent = useCallback((props) => <CertificationsScreen {...props} weakestCategory={weakestCategory} />, [weakestCategory]);
   const similarCareersComponent = useCallback((props) => <SimilarCareersScreen {...props} topProtector={topProtector} />, [topProtector]);
-  const roadmapReadyComponent = useCallback((props) => <RoadmapReadyScreen {...props} weakestCategory={weakestCategory} results={results} />, [weakestCategory, results]);
+  const roadmapReadyComponent = useCallback((props) => <RoadmapReadyScreen {...props} weakestCategory={weakestCategory} results={results} checklist={checklist} />, [weakestCategory, results, checklist]);
 
   if (!hasAnswers) {
     return (

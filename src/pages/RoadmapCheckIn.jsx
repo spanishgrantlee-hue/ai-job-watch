@@ -59,8 +59,9 @@ export default function RoadmapCheckIn() {
     setDraftAnswers(prev => ({ ...prev, [questionId]: index }));
   }
 
+  const snapshotParam = searchParams.get('snapshot');
+
   function handleSubmit() {
-    const snapshotParam = searchParams.get('snapshot');
     const snapshotData = snapshotParam ? decodeRoadmapSnapshot(snapshotParam) : null;
     const before = snapshotData ?? calculateResults(answers);
 
@@ -96,7 +97,7 @@ export default function RoadmapCheckIn() {
               </div>
             </div>
             <p className="why-line">{deltaText}</p>
-            <Link to="/roadmap" className="btn-ghost-dark">See Your Full Roadmap</Link>
+            <Link to={snapshotParam ? `/roadmap?compare=${snapshotParam}` : '/roadmap'} className="btn-ghost-dark">See Your Full Roadmap</Link>
           </div>
         </section>
       </div>
