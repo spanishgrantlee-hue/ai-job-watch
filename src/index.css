@@ -1938,7 +1938,7 @@ input, select, textarea, button { font-family: inherit; }
   text-align: center;
 }
 
-.score-screen-cta { margin-top: 2rem; }
+.score-screen-cta { margin-top: 2rem; min-height: 44px; }
 
 /* Why screen (L3) */
 .why-screen {
@@ -1961,7 +1961,7 @@ input, select, textarea, button { font-family: inherit; }
   margin: 0;
 }
 
-.why-screen-cta { margin-top: 0.75rem; }
+.why-screen-cta { margin-top: 0.75rem; min-height: 44px; }
 
 /* Strengths screen (L4) — dark-hero, content-heavier than L1-L3 so it
    flows top-down and scrolls naturally rather than forcing 100vh centering. */
@@ -2073,7 +2073,7 @@ input, select, textarea, button { font-family: inherit; }
   margin: 0 0 2rem;
 }
 
-.strengths-cta { display: flex; margin: 0 auto; }
+.strengths-cta { display: flex; margin: 0 auto; min-height: 44px; }
 
 /* Tasks Changing + Timeline screen (L5) — dark-hero, same content-heavy
    top-down flow as L4's Strengths screen. */
@@ -2170,7 +2170,7 @@ input, select, textarea, button { font-family: inherit; }
   margin: 0 0 2rem;
 }
 
-.tasks-changing-cta { display: flex; margin: 0 auto; }
+.tasks-changing-cta { display: flex; margin: 0 auto; min-height: 44px; }
 
 /* Protection Plan screen (M1) — Act 2's first screen (light background), so
    it reuses the existing .playbook-card/.results-section-title/.section-label
@@ -2222,7 +2222,17 @@ input, select, textarea, button { font-family: inherit; }
   color: var(--clr-primary);
 }
 
-.protection-plan-cta { display: flex; margin: 2.5rem auto 0; }
+.protection-plan-cta { display: flex; margin: 2.5rem auto 0; min-height: 44px; }
+
+/* .protection-plan-option is shared with Reference mode (CareerRoadmap.jsx) --
+   scoped to .reveal-screen only so this Q4b mobile tap-target fix stays
+   limited to Reveal, matching the milestone's boundary. */
+.reveal-screen .protection-plan-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
 
 /* Tools screen (M3) — Act 2 (light background), reuses playbook-card-title/
    playbook-card-context/playbook-timeline from M1; only these are new. */
@@ -2248,7 +2258,7 @@ input, select, textarea, button { font-family: inherit; }
   margin: 1.25rem 0 0;
 }
 
-.tools-cta { display: flex; margin: 2.5rem auto 0; }
+.tools-cta { display: flex; margin: 2.5rem auto 0; min-height: 44px; }
 
 /* Workplace Moves screen (M4) — Act 2 (light background), reuses
    resources-tip-card/protection-plan-option; only these three are new. */
@@ -2268,7 +2278,7 @@ input, select, textarea, button { font-family: inherit; }
   margin: 0.5rem 0 0;
 }
 
-.workplace-moves-cta { display: flex; margin: 2.5rem auto 0; }
+.workplace-moves-cta { display: flex; margin: 2.5rem auto 0; min-height: 44px; }
 
 /* Certifications screen (M5) — Act 2's last screen (light background),
    reuses playbook-card-title/playbook-card-context/playbook-timeline. */
@@ -2299,7 +2309,7 @@ input, select, textarea, button { font-family: inherit; }
   margin: 2rem 0 0;
 }
 
-.certifications-cta { display: flex; margin: 2.5rem auto 0; }
+.certifications-cta { display: flex; margin: 2.5rem auto 0; min-height: 44px; }
 
 /* Learning Plan screen (M2) — Act 2 (light background), reuses
    playbook-card-context/playbook-timeline; only these two are new. */
@@ -2309,7 +2319,7 @@ input, select, textarea, button { font-family: inherit; }
   padding: 3rem 1.25rem 4rem;
 }
 
-.learning-plan-cta { display: flex; margin: 2.5rem auto 0; }
+.learning-plan-cta { display: flex; margin: 2.5rem auto 0; min-height: 44px; }
 
 /* Similar Careers screen (N1) — Act 3 (light-distinct background from
    RevealSequencer's wrapper), reuses .protector-tag for role chips. */
@@ -2342,7 +2352,7 @@ input, select, textarea, button { font-family: inherit; }
   margin: 1.75rem 0 0;
 }
 
-.similar-careers-cta { display: flex; margin: 2.5rem auto 0; }
+.similar-careers-cta { display: flex; margin: 2.5rem auto 0; min-height: 44px; }
 
 /* Roadmap Ready screen (N2) — dark-hero bookend, reuses why-line and
    tasks-changing-timeline; only these three are new. */
@@ -2373,6 +2383,11 @@ input, select, textarea, button { font-family: inherit; }
   gap: 0.75rem;
   margin-top: 0.5rem;
 }
+
+/* .roadmap-ready-actions is shared with Reference mode's ClosingSection
+   (CareerRoadmap.jsx) -- scoped to .reveal-screen only so this Q4b mobile
+   tap-target fix stays limited to Reveal, matching the milestone's boundary. */
+.reveal-screen .roadmap-ready-actions button { min-height: 44px; }
 
 /* Career Roadmap reference page (Group O) — light-appropriate quick-list for
    the Strengths section (L4's own version was built dark-hero-only, so it
@@ -2471,6 +2486,7 @@ input, select, textarea, button { font-family: inherit; }
   gap: 8px;
   cursor: pointer;
   align-self: flex-start;
+  min-height: 44px;
 }
 
 .playbook-item-checkbox-row input[type="checkbox"] { cursor: pointer; }
