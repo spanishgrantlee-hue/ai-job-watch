@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PACING } from './pacing.js';
 
 // ─── Reveal Sequencer ───────────────────────────────────────────────────────────
@@ -19,6 +19,15 @@ export default function RevealSequencer({ screens, onComplete }) {
 
   const current = screens[index];
   const isLast = index === screens.length - 1;
+
+  // Screens swap under the same container with no route change, so nothing
+  // resets scroll position on its own. On screens short enough to fit the
+  // viewport this is invisible; on the 5 (of 13) screens taller than a phone
+  // viewport, reaching the advance button requires scrolling, and that
+  // offset otherwise carries unchanged into the next, unrelated screen.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [current.id]);
 
   function advance() {
     if (isLast) {
