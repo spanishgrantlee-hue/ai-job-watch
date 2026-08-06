@@ -215,7 +215,7 @@ function TasksChangingSection({ weakestCategory, automationRisks, riskKey }) {
   );
 }
 
-function ProtectionPlanSection({ rankedCategories, hoursBudget, onSelectHours }) {
+function ProtectionPlanSection({ rankedCategories, hoursBudget, onSelectHours, checklist, onToggleItem }) {
   const weakest = [...rankedCategories].reverse().slice(0, 2);
 
   return (
@@ -246,18 +246,28 @@ function ProtectionPlanSection({ rankedCategories, hoursBudget, onSelectHours })
                 <h3 className="playbook-card-title">{category.label}</h3>
                 <p className="playbook-card-context">{data.context[level]}</p>
                 <div className="playbook-timeline">
-                  <div className="playbook-item">
-                    <span className="playbook-item-label">This Week</span>
-                    <p className="playbook-item-text">{data.days30[level]}</p>
-                  </div>
-                  <div className="playbook-item">
-                    <span className="playbook-item-label">Next Few Months</span>
-                    <p className="playbook-item-text">{data.days90[level]}</p>
-                  </div>
-                  <div className="playbook-item">
-                    <span className="playbook-item-label">Long-Term</span>
-                    <p className="playbook-item-text">{data.year1[level]}</p>
-                  </div>
+                  {[
+                    { timeframe: 'days30', label: 'This Week' },
+                    { timeframe: 'days90', label: 'Next Few Months' },
+                    { timeframe: 'year1',  label: 'Long-Term' },
+                  ].map(({ timeframe, label }) => {
+                    const checklistKey = `${category.key}:${timeframe}`;
+                    const complete = !!checklist[checklistKey];
+                    return (
+                      <div className={`playbook-item${complete ? ' playbook-item--complete' : ''}`} key={timeframe}>
+                        <label className="playbook-item-checkbox-row">
+                          <input
+                            type="checkbox"
+                            checked={complete}
+                            onChange={() => onToggleItem(category.key, timeframe)}
+                            aria-label={`Mark "${label}" complete for ${category.label}`}
+                          />
+                          <span className="playbook-item-label">{label}</span>
+                        </label>
+                        <p className="playbook-item-text">{data[timeframe][level]}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
@@ -450,15 +460,17 @@ function SimilarCareersSection({ topProtector }) {
   );
 }
 
-function ClosingSection({ weakestCategory, results, onDownloadPdf }) {
+function ClosingSection({ weakestCategory, results, checklist, onDownloadPdf }) {
   const [saved, setSaved] = useState(false);
   const level = playbookLevel(weakestCategory.score);
   const action = PLAYBOOK[weakestCategory.key].days30[level];
 
   // Same real save logic as RoadmapReadyScreen.jsx (P2) -- builds a
   // /roadmap?snapshot= link via P1's encodeRoadmapSnapshot and copies it.
+  // checklist (new) is passed the same way RoadmapReadyScreen.jsx's own
+  // handleSave already does, closing the gap Q3 documented for Reference mode.
   function handleSave() {
-    const encoded = encodeRoadmapSnapshot(results);
+    const encoded = encodeRoadmapSnapshot(results, undefined, checklist);
     const url = `${window.location.origin}/roadmap?snapshot=${encoded}`;
     navigator.clipboard.writeText(url)
       .then(() => { setSaved(true); setTimeout(() => setSaved(false), 2000); })
@@ -515,6 +527,20 @@ export default function CareerRoadmap() {
   const compareParam = searchParams.get('compare');
   const compareData = (!isSnapshotView && !isSharedView && compareParam) ? decodeRoadmapSnapshot(compareParam) : null;
   const isCompareView = compareData !== null;
+
+  // Protection Plan checklist -- seeded from whichever snapshot is already
+  // being decoded (snapshotData for a saved-link view, compareData as a
+  // starting point for the live-vs-saved compare view), so a returning user
+  // sees their previously-checked items restored. Neither ?share= links
+  // (decodeShareState, no checklist field) nor a fresh live view have
+  // anything to seed from, so both correctly default to {} -- same "additive,
+  // sensible default if skipped" pattern hoursBudget already uses.
+  const [checklist, setChecklist] = useState(() => (snapshotData ?? compareData)?.checklist ?? {});
+
+  function handleToggleChecklistItem(categoryKey, timeframe) {
+    const checklistKey = `${categoryKey}:${timeframe}`;
+    setChecklist(prev => ({ ...prev, [checklistKey]: !prev[checklistKey] }));
+  }
 
   const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
   const liveResults = hasAnswers ? calculateResults(answers) : null;
@@ -584,13 +610,13 @@ export default function CareerRoadmap() {
       <WhySection topProtector={topProtector} />
       <StrengthsSection rankedCategories={rankedCategories} />
       <TasksChangingSection weakestCategory={weakestCategory} automationRisks={automationRisks} riskKey={riskKey} />
-      <ProtectionPlanSection rankedCategories={rankedCategories} hoursBudget={hoursBudget} onSelectHours={setHoursBudget} />
+      <ProtectionPlanSection rankedCategories={rankedCategories} hoursBudget={hoursBudget} onSelectHours={setHoursBudget} checklist={checklist} onToggleItem={handleToggleChecklistItem} />
       <LearningPlanSection weakestCategory={weakestCategory} hoursBudget={hoursBudget ?? 'mid'} />
       <ToolsSection weakestCategory={weakestCategory} />
       <WorkplaceMovesSection weakestCategory={weakestCategory} />
       <CertificationsSection weakestCategory={weakestCategory} />
       <SimilarCareersSection topProtector={topProtector} />
-      <ClosingSection weakestCategory={weakestCategory} results={results} onDownloadPdf={() => window.print()} />
+      <ClosingSection weakestCategory={weakestCategory} results={results} checklist={checklist} onDownloadPdf={() => window.print()} />
     </div>
   );
 }
