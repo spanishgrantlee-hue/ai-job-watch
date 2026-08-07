@@ -216,6 +216,47 @@ function ScoreRangeBar({ score }) {
   );
 }
 
+// Rescaled 0–100 view of the same finalScore, shown as a colored arc gauge.
+// No new scoring logic — purely a second visualization of the existing number.
+function ScoreGauge({ score, riskClass }) {
+  const risk100 = Math.round((score / 30) * 100);
+  const R = 80;
+  const CIRC = 2 * Math.PI * R;
+  const HALF = CIRC / 2;
+  const targetOffset = HALF - (HALF * risk100) / 100;
+
+  const [offset, setOffset] = useState(HALF);
+  useEffect(() => {
+    const frameId = requestAnimationFrame(() => setOffset(targetOffset));
+    return () => cancelAnimationFrame(frameId);
+  }, [targetOffset]);
+
+  return (
+    <div className="score-gauge-wrap">
+      <svg viewBox="0 0 200 120" className="score-gauge-svg" aria-hidden="true">
+        <circle
+          cx="100" cy="100" r={R}
+          className="score-gauge-track"
+          strokeDasharray={`${HALF} ${CIRC}`}
+          transform="rotate(180 100 100)"
+        />
+        <circle
+          cx="100" cy="100" r={R}
+          className={`score-gauge-fill score-gauge-fill--${riskClass}`}
+          strokeDasharray={`${HALF} ${CIRC}`}
+          strokeDashoffset={offset}
+          transform="rotate(180 100 100)"
+        />
+      </svg>
+      <div className="score-gauge-label">
+        <span className="score-gauge-number">{risk100}</span>
+        <span className="score-gauge-denom">/100</span>
+      </div>
+      <p className="score-gauge-caption">Overall AI Resistance Score (0&ndash;100 scale)</p>
+    </div>
+  );
+}
+
 // ─── Career Playbook card ─────────────────────────────────────────────────────
 function PlaybookCard({ category, rank }) {
   const level = playbookLevel(category.score);
@@ -428,6 +469,7 @@ export default function Results() {
             <p>You scored {finalScore} out of 30 possible points.</p>
             <p>{scoreContextWhy}</p>
           </div>
+          <ScoreGauge score={finalScore} riskClass={riskClass} />
           <div className="results-share-row">
             <button
               type="button"

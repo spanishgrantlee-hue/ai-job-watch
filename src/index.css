@@ -982,6 +982,51 @@ input, select, textarea, button { font-family: inherit; }
   font-size: 0.68rem;
 }
 
+/* Score gauge — rescaled 0-100 arc view of the same score */
+.score-gauge-wrap {
+  position: relative;
+  max-width: 220px;
+  margin: 28px auto 8px;
+}
+
+.score-gauge-svg { width: 100%; height: auto; display: block; }
+
+.score-gauge-track {
+  fill: none;
+  stroke: rgba(255,255,255,0.15);
+  stroke-width: 16;
+  stroke-linecap: round;
+}
+
+.score-gauge-fill {
+  fill: none;
+  stroke-width: 16;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s ease-out;
+}
+
+.score-gauge-fill--low    { stroke: var(--clr-low-border); }
+.score-gauge-fill--medium { stroke: var(--clr-medium-border); }
+.score-gauge-fill--high   { stroke: var(--clr-high-border); }
+
+.score-gauge-label {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  line-height: 1;
+}
+
+.score-gauge-number { font-size: 2.2rem; font-weight: 800; color: #fff; }
+.score-gauge-denom  { font-size: 1rem; font-weight: 500; color: rgba(255,255,255,0.5); margin-left: 2px; }
+
+.score-gauge-caption {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.55);
+  text-align: center;
+  margin-top: 2px;
+}
+
 /* Score context — plain-English interpretation below the range bar */
 .results-score-context {
   max-width: 480px;
