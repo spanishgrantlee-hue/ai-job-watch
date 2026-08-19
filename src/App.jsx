@@ -8,6 +8,7 @@ import CareerRoadmap from './pages/CareerRoadmap';
 import RoadmapCheckIn from './pages/RoadmapCheckIn';
 import RevealExperience from './pages/RevealExperience';
 import About from './pages/About';
+import JobStats from './pages/JobStats';
 import './index.css';
 
 // Shared context — Assessment writes answers, Results reads them
@@ -51,6 +52,7 @@ export default function App() {
             <Route path="/check-in"   element={<RoadmapCheckIn />} />
             <Route path="/reveal"     element={<RevealExperience />} />
             <Route path="/about"      element={<About />} />
+            <Route path="/jobs/:slug" element={<JobStats />} />
           </Routes>
         </main>
       </BrowserRouter>

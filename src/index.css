@@ -2630,3 +2630,57 @@ input, select, textarea, button { font-family: inherit; }
 
   .career-roadmap-page { padding-top: 0; }
 }
+
+/* =========================================================
+   Job Stats page (/jobs/:slug)
+   ========================================================= */
+
+.job-stats-page { max-width: 640px; margin: 0 auto; padding: 3rem 24px 4rem; }
+
+.job-stats-loading { text-align: center; color: var(--text-secondary); padding: 4rem 0; }
+
+.job-stats-empty { text-align: center; padding: 3rem 0; }
+.job-stats-empty h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; }
+.job-stats-empty p { color: var(--text-secondary); margin-bottom: 1.75rem; }
+
+.job-stats-hero { text-align: center; margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+.job-stats-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+.job-stats-hero h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; }
+.job-stats-industry { color: var(--text-secondary); margin-top: 0.4rem; }
+
+.job-stats-section { margin-bottom: 2.5rem; }
+.job-stats-section h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
+
+.job-stats-score-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+.job-stats-score-number { font-size: 3.5rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.03em; }
+.job-stats-score-denom { font-size: 0.95rem; color: var(--text-secondary); }
+.job-stats-meta { text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; }
+
+.job-stats-risk-row { display: flex; gap: 0.75rem; }
+.job-stats-risk-item {
+  flex: 1;
+  text-align: center;
+  padding: 1rem 0.5rem;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.job-stats-risk-item--low    { background: var(--clr-low-bg);    color: var(--clr-low); }
+.job-stats-risk-item--medium { background: var(--clr-medium-bg); color: var(--clr-medium); }
+.job-stats-risk-item--high   { background: var(--clr-high-bg);   color: var(--clr-high); }
+.job-stats-risk-pct { font-size: 1.3rem; font-weight: 800; }
+.job-stats-risk-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+
+.job-stats-cta { text-align: center; padding-top: 1rem; }
+
+@media (max-width: 600px) {
+  .job-stats-risk-row { flex-direction: column; }
+}
