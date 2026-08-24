@@ -49,6 +49,9 @@ export default function Navbar() {
         <Link to="/about" className={pathname === '/about' ? 'nav-link active' : 'nav-link'}>
           About
         </Link>
+        <Link to="/explore" className={pathname === '/explore' ? 'nav-link active' : 'nav-link'}>
+          Explore
+        </Link>
         <Link to="/assessment" className="nav-cta">
           Take the Test
         </Link>
