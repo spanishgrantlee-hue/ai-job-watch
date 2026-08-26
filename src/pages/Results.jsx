@@ -3,6 +3,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAnswers } from '../App';
 import { calculateResults } from '../utils/scoring';
 import { encodeShareState, decodeShareState, generateTextSummary } from '../utils/share';
+import { normalizeJobTitle, slugify } from '../utils/jobTitleMatch';
 import { Helmet } from 'react-helmet-async';
 import WhatIfPanel from '../components/WhatIfPanel';
 import { PLAYBOOK, playbookLevel } from '../utils/playbook';
@@ -329,6 +330,7 @@ export default function Results() {
   const [copiedText, setCopiedText] = useState(false);
   const [showWhatIf, setShowWhatIf] = useState(false);
   const [displayScore, setDisplayScore] = useState(0);
+  const [comparison, setComparison] = useState(null);
 
   const shareParam = searchParams.get('share');
   const sharedData = shareParam ? decodeShareState(shareParam) : null;
@@ -367,6 +369,32 @@ export default function Results() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ answers, finalScore, riskKey, shareUrl }),
     }).catch(() => {});
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Compare-with-others: reuses the already-live /api/job-stats endpoint.
+  // Silently renders nothing if the title doesn't normalize, has no data
+  // yet, or the request fails -- never blocks or degrades the score itself.
+  useEffect(() => {
+    if (isSharedView || !hasAnswers) return;
+    const canonical = normalizeJobTitle(answers.Q1);
+    if (!canonical) return;
+
+    let cancelled = false;
+    fetch(`/api/job-stats?slug=${encodeURIComponent(slugify(canonical))}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body) => {
+        if (cancelled || !body?.available) return;
+        setComparison({
+          canonicalName: body.canonicalName,
+          avgScore: body.avgScore,
+          sampleSize: body.sampleSize,
+        });
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isSharedView && !hasAnswers) {
@@ -470,6 +498,12 @@ export default function Results() {
             <p>{scoreContextWhy}</p>
           </div>
           <ScoreGauge score={finalScore} riskClass={riskClass} />
+          {comparison && (
+            <p className="results-compare">
+              You compare to other <strong>{comparison.canonicalName}</strong> respondents: average score{' '}
+              <strong>{comparison.avgScore}/30</strong> from {comparison.sampleSize} responses.
+            </p>
+          )}
           <div className="results-share-row">
             <button
               type="button"

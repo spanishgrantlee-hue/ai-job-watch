@@ -109,3 +109,19 @@ export function normalizeJobTitle(rawInput) {
 
   return bestScore >= MATCH_THRESHOLD ? bestMatch : null;
 }
+
+/**
+ * Converts a canonical job title into the same slug format used for
+ * job_titles.slug in Neon -- must stay in sync with the local slugify()
+ * copy in netlify/functions/aggregate-job-stats.js. Duplicated rather than
+ * shared so this frontend-safe file never has to import that Blobs-backed
+ * server function.
+ * @param {string} canonicalName
+ * @returns {string}
+ */
+export function slugify(canonicalName) {
+  return canonicalName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}

@@ -2726,3 +2726,13 @@ input, select, textarea, button { font-family: inherit; }
 @media (max-width: 480px) {
   .explore-row { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
 }
+
+/* Results page — compare-with-others section */
+.results-compare {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.9rem;
+  max-width: 420px;
+  margin: 4px auto 0;
+}
+.results-compare strong { color: #fff; }
