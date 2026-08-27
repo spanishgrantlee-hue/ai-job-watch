@@ -2700,6 +2700,22 @@ input, select, textarea, button { font-family: inherit; }
 .explore-empty { text-align: center; color: var(--text-secondary); padding: 2rem 0; }
 .explore-empty p { margin-bottom: 1.5rem; }
 
+.explore-sector-row { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 0.75rem; flex-wrap: wrap; }
+
+.explore-sector-btn {
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+.explore-sector-btn:hover { border-color: var(--border-med); }
+.explore-sector-btn.active { background: var(--text-primary); border-color: var(--text-primary); color: #fff; }
+
 .explore-sort-row { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
 
 .explore-sort-btn {

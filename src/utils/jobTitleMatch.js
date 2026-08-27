@@ -15,6 +15,46 @@ export const CANONICAL_JOB_TITLES = [
   'Social Worker', 'Welder', 'Longshoreman', 'Bus Driver', 'Insurance Agent',
 ];
 
+// Static, maintained-by-us sector categorization for /explore's sector
+// filter -- not derived from user-reported data (job_titles.industry is
+// NULL for every row in production; populating it for real would mean
+// touching aggregate-job-stats.js, already verified live). Every key must
+// be one of CANONICAL_JOB_TITLES.
+export const JOB_TITLE_SECTORS = {
+  'Software Engineer': 'Technology',
+  'Registered Nurse': 'Healthcare',
+  'Truck Driver': 'Transportation & Logistics',
+  'Teacher': 'Education',
+  'Warehouse Associate': 'Transportation & Logistics',
+  'Customer Service Representative': 'Retail & Sales',
+  'Project Manager': 'Business & Management',
+  'Electrician': 'Skilled Trades',
+  'Accountant': 'Business & Finance',
+  'Sales Representative': 'Retail & Sales',
+  'Administrative Assistant': 'Business & Management',
+  'Marketing Manager': 'Business & Management',
+  'Data Analyst': 'Technology',
+  'Mechanic': 'Skilled Trades',
+  'Construction Worker': 'Skilled Trades',
+  'Retail Associate': 'Retail & Sales',
+  'Human Resources Manager': 'Business & Management',
+  'Graphic Designer': 'Creative & Design',
+  'Financial Analyst': 'Business & Finance',
+  'Police Officer': 'Public Service & Safety',
+  'Chef': 'Food Service & Hospitality',
+  'Plumber': 'Skilled Trades',
+  'Real Estate Agent': 'Retail & Sales',
+  'Paralegal': 'Legal',
+  'Dental Hygienist': 'Healthcare',
+  'Physical Therapist': 'Healthcare',
+  'Pharmacist': 'Healthcare',
+  'Social Worker': 'Public Service & Safety',
+  'Welder': 'Skilled Trades',
+  'Longshoreman': 'Transportation & Logistics',
+  'Bus Driver': 'Transportation & Logistics',
+  'Insurance Agent': 'Business & Finance',
+};
+
 // Common abbreviations/aliases mapped directly, bypassing fuzzy matching.
 const ALIASES = {
   'swe': 'Software Engineer',

@@ -2,6 +2,17 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { RISK_THRESHOLDS } from '../utils/scoring';
+import { JOB_TITLE_SECTORS } from '../utils/jobTitleMatch';
+
+const ALL_SECTORS = 'All Sectors';
+const SECTOR_OPTIONS = [ALL_SECTORS, ...new Set(Object.values(JOB_TITLE_SECTORS))].sort(
+  (a, b) => (a === ALL_SECTORS ? -1 : b === ALL_SECTORS ? 1 : a.localeCompare(b))
+);
+
+function filterJobsBySector(jobs, sector) {
+  if (sector === ALL_SECTORS) return jobs;
+  return jobs.filter((job) => JOB_TITLE_SECTORS[job.canonicalName] === sector);
+}
 
 // Same 0-30 scale RISK_THRESHOLDS already applies to an individual score --
 // avg_score is an aggregate on that identical scale, so the bands carry over
@@ -58,7 +69,9 @@ function useJobStatsList() {
 export default function Explore() {
   const { status, jobs } = useJobStatsList();
   const [sortMode, setSortMode] = useState('alpha');
-  const sortedJobs = sortJobs(jobs, sortMode);
+  const [sector, setSector] = useState(ALL_SECTORS);
+  const filteredJobs = filterJobsBySector(jobs, sector);
+  const sortedJobs = sortJobs(filteredJobs, sortMode);
 
   return (
     <div className="page-wrap">
@@ -99,6 +112,18 @@ export default function Explore() {
 
         {status === 'populated' && (
           <>
+            <div className="explore-sector-row" role="group" aria-label="Filter by sector">
+              {SECTOR_OPTIONS.map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  className={`explore-sector-btn${sector === opt ? ' active' : ''}`}
+                  onClick={() => setSector(opt)}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
             <div className="explore-sort-row" role="group" aria-label="Sort jobs">
               {SORT_MODES.map((mode) => (
                 <button
@@ -111,23 +136,29 @@ export default function Explore() {
                 </button>
               ))}
             </div>
-            <div className="explore-list">
-              {sortedJobs.map((job) => (
-                <Link
-                  key={job.slug}
-                  to={`/jobs/${job.slug}`}
-                  className={`explore-row explore-row--${riskClassFor(job.avgScore)}`}
-                >
-                  <div className="explore-row-name">{job.canonicalName}</div>
-                  <div className="explore-row-stats">
-                    <span className="explore-row-score">{job.avgScore} / 30</span>
-                    <span className="explore-row-sample">
-                      {job.sampleSize} {job.sampleSize === 1 ? 'response' : 'responses'}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            {filteredJobs.length === 0 ? (
+              <div className="explore-empty">
+                <p>No job titles in this sector have enough responses yet.</p>
+              </div>
+            ) : (
+              <div className="explore-list">
+                {sortedJobs.map((job) => (
+                  <Link
+                    key={job.slug}
+                    to={`/jobs/${job.slug}`}
+                    className={`explore-row explore-row--${riskClassFor(job.avgScore)}`}
+                  >
+                    <div className="explore-row-name">{job.canonicalName}</div>
+                    <div className="explore-row-stats">
+                      <span className="explore-row-score">{job.avgScore} / 30</span>
+                      <span className="explore-row-sample">
+                        {job.sampleSize} {job.sampleSize === 1 ? 'response' : 'responses'}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>
