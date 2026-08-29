@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useAnswers } from '../App';
 import { calculateResults } from '../utils/scoring';
 import { decodeRoadmapSnapshot } from '../utils/share';
@@ -44,6 +45,11 @@ export default function RoadmapCheckIn() {
   if (!hasAnswers) {
     return (
       <div className="results-page">
+        <Helmet>
+          <title>Roadmap Check-In | AI Job Watch</title>
+          <meta name="description" content="Check in on how your AI Resistance Score has changed since your last assessment." />
+          <meta name="robots" content="noindex,follow" />
+        </Helmet>
         <div className="results-empty-page">
           <div className="container">
             <h1>No Assessment Found</h1>
@@ -82,6 +88,11 @@ export default function RoadmapCheckIn() {
 
     return (
       <div className="results-page">
+        <Helmet>
+          <title>Roadmap Check-In | AI Job Watch</title>
+          <meta name="description" content="Check in on how your AI Resistance Score has changed since your last assessment." />
+          <meta name="robots" content="noindex,follow" />
+        </Helmet>
         <section className="results-hero">
           <div className="container">
             <p className="results-eyebrow">Your Updated Score</p>
@@ -106,6 +117,11 @@ export default function RoadmapCheckIn() {
 
   return (
     <div className="results-page">
+      <Helmet>
+        <title>Roadmap Check-In | AI Job Watch</title>
+        <meta name="description" content="Check in on how your AI Resistance Score has changed since your last assessment." />
+        <meta name="robots" content="noindex,follow" />
+      </Helmet>
       <section className="results-section">
         <div className="container results-container">
           <div className="results-section-hdr">

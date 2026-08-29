@@ -18,6 +18,10 @@ export default function About() {
       <Helmet>
         <title>About AI Job Watch | Methodology &amp; Scoring</title>
         <meta name="description" content="Learn how AI Job Watch scores your job's automation risk across six factors: Accountability, Trust, Judgment, Problem Solving, Physical Presence, and Licensing. No data stored, fully anonymous." />
+        <link rel="canonical" href="https://aijobwatch.org/about" />
+        <meta property="og:url" content="https://aijobwatch.org/about" />
+        <meta property="og:title" content="About AI Job Watch | Methodology &amp; Scoring" />
+        <meta property="og:description" content="Learn how AI Job Watch scores your job's automation risk across six factors: Accountability, Trust, Judgment, Problem Solving, Physical Presence, and Licensing. No data stored, fully anonymous." />
       </Helmet>
     <div className="about-page">
       <div className="about-hero">

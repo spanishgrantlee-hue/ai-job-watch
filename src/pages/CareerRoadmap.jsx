@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useAnswers } from '../App';
 import { calculateResults } from '../utils/scoring';
 import { decodeShareState, encodeRoadmapSnapshot, decodeRoadmapSnapshot } from '../utils/share';
@@ -548,6 +549,11 @@ export default function CareerRoadmap() {
   if (!isSharedView && !isSnapshotView && !isCompareView && !hasAnswers) {
     return (
       <div className="results-page">
+        <Helmet>
+          <title>Career Roadmap | AI Job Watch</title>
+          <meta name="description" content="Your personalized AI career roadmap, based on your AI Job Watch assessment." />
+          <meta name="robots" content="noindex,follow" />
+        </Helmet>
         <div className="results-empty-page">
           <div className="container">
             <h1>No Results Yet</h1>
@@ -576,6 +582,11 @@ export default function CareerRoadmap() {
 
   return (
     <div className="results-page career-roadmap-page">
+      <Helmet>
+        <title>Career Roadmap | AI Job Watch</title>
+        <meta name="description" content="Your personalized AI career roadmap, based on your AI Job Watch assessment." />
+        <meta name="robots" content="noindex,follow" />
+      </Helmet>
       {isSnapshotView && (
         <div className="results-shared-banner">
           <div className="container">

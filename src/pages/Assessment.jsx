@@ -161,6 +161,10 @@ export default function Assessment() {
       <Helmet>
         <title>AI Job Risk Assessment | AI Job Watch</title>
         <meta name="description" content="Take the free AI Job Watch assessment. Answer 30 questions about your role and get an instant AI Resistance Score across six categories — no account required." />
+        <link rel="canonical" href="https://aijobwatch.org/assessment" />
+        <meta property="og:url" content="https://aijobwatch.org/assessment" />
+        <meta property="og:title" content="AI Job Risk Assessment | AI Job Watch" />
+        <meta property="og:description" content="Take the free AI Job Watch assessment. Answer 30 questions about your role and get an instant AI Resistance Score across six categories — no account required." />
       </Helmet>
 
       {showResumePrompt ? (

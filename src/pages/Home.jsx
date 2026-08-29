@@ -17,6 +17,13 @@ const structuredData = {
   featureList: 'AI Resistance Score, Category Breakdown, Automation Risk Assessment, Anonymous with no account required',
 };
 
+const websiteStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'AI Job Watch',
+  url: 'https://aijobwatch.org',
+};
+
 const features = [
   {
     icon: '🧠',
@@ -46,7 +53,12 @@ export default function Home() {
       <Helmet>
         <title>Is Your Job Safe from AI? | AI Job Watch</title>
         <meta name="description" content="Free AI job risk assessment. Answer 30 questions about your role and get a personalized AI Resistance Score — find out exactly how exposed or protected your job is from automation." />
+        <link rel="canonical" href="https://aijobwatch.org/" />
+        <meta property="og:url" content="https://aijobwatch.org/" />
+        <meta property="og:title" content="Is Your Job Safe from AI? | AI Job Watch" />
+        <meta property="og:description" content="Free AI job risk assessment. Answer 30 questions about your role and get a personalized AI Resistance Score — find out exactly how exposed or protected your job is from automation." />
         <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
+        <script type="application/ld+json">{JSON.stringify(websiteStructuredData)}</script>
       </Helmet>
       {/* Dark navy hero */}
       <section className="hero">

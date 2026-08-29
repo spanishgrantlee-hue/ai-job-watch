@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useAnswers } from '../App';
 import { calculateResults } from '../utils/scoring';
 import RevealSequencer from '../components/roadmap/RevealSequencer.jsx';
@@ -100,6 +101,11 @@ export default function RevealExperience() {
   if (!hasAnswers) {
     return (
       <div className="results-page">
+        <Helmet>
+          <title>Your AI Resistance Reveal | AI Job Watch</title>
+          <meta name="description" content="A personalized, screen-by-screen walkthrough of your AI Resistance Score and career protection plan." />
+          <meta name="robots" content="noindex,follow" />
+        </Helmet>
         <div className="results-empty-page">
           <div className="container">
             <h1>No Results Yet</h1>
@@ -127,5 +133,14 @@ export default function RevealExperience() {
     { id: 'roadmapReady', act: 3, background: 'hero', pacing: PACING.DELIBERATE, component: roadmapReadyComponent },
   ];
 
-  return <RevealSequencer screens={screens} onComplete={() => navigate('/roadmap')} />;
+  return (
+    <>
+      <Helmet>
+        <title>Your AI Resistance Reveal | AI Job Watch</title>
+        <meta name="description" content="A personalized, screen-by-screen walkthrough of your AI Resistance Score and career protection plan." />
+        <meta name="robots" content="noindex,follow" />
+      </Helmet>
+      <RevealSequencer screens={screens} onComplete={() => navigate('/roadmap')} />
+    </>
+  );
 }

@@ -113,21 +113,24 @@ export default function JobStats() {
 
 function JobStatsView({ slug }) {
   const { status, data } = useJobStats(slug);
+  const pageTitle =
+    status === 'available' ? `${data.canonicalName} AI Risk Stats | AI Job Watch` : 'Job Stats | AI Job Watch';
+  const pageDesc =
+    status === 'available'
+      ? `See the average AI automation risk score and risk breakdown reported by ${data.sampleSize} anonymous ${data.canonicalName} assessment takers.`
+      : 'Anonymous, aggregated AI automation risk stats by job title.';
+  const pageUrl = `https://aijobwatch.org/jobs/${slug}`;
 
   return (
     <div className="page-wrap">
       <Helmet>
-        <title>
-          {status === 'available' ? `${data.canonicalName} AI Risk Stats | AI Job Watch` : 'Job Stats | AI Job Watch'}
-        </title>
-        <meta
-          name="description"
-          content={
-            status === 'available'
-              ? `See the average AI automation risk score and risk breakdown reported by ${data.sampleSize} anonymous ${data.canonicalName} assessment takers.`
-              : 'Anonymous, aggregated AI automation risk stats by job title.'
-          }
-        />
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDesc} />
+        <link rel="canonical" href={pageUrl} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDesc} />
+        <meta name="robots" content={status === 'available' ? 'index,follow' : 'noindex,follow'} />
       </Helmet>
       <div className="job-stats-page">
         {status === 'loading' && <p className="job-stats-loading">Loading…</p>}

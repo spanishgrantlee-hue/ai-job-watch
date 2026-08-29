@@ -5,16 +5,18 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Primary meta -->
-    <title>Is Your Job Safe from AI? | AI Job Watch</title>
-    <meta name="description" content="Answer 30 questions about your role and get a free AI Resistance Score. See exactly how exposed — or protected — your job is from automation." />
-    <link rel="canonical" href="https://aijobwatch.org/" />
+    <!--
+      Title, meta description, and og:url/og:title/og:description are
+      deliberately NOT set here: react-helmet-async doesn't replace tags it
+      didn't itself render, so a static tag here plus a per-page <Helmet>
+      override produces two conflicting tags in the DOM instead of one
+      correct one. Every route sets its own title/description via Helmet
+      (see src/pages/*.jsx), so this file only carries tags no page
+      overrides, to stay the single source of truth for each.
+    -->
 
     <!-- Open Graph -->
     <meta property="og:type"        content="website" />
-    <meta property="og:url"         content="https://aijobwatch.org/" />
-    <meta property="og:title"       content="Is Your Job Safe from AI? | AI Job Watch" />
-    <meta property="og:description" content="Answer 30 questions about your role and get a free AI Resistance Score. See exactly how exposed — or protected — your job is from automation." />
     <meta property="og:image"       content="https://aijobwatch.org/og-default.png" />
 
     <!-- Twitter Card -->

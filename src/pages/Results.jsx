@@ -460,6 +460,7 @@ export default function Results() {
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDesc} />
+        <meta name="robots" content="noindex,follow" />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDesc} />
         <meta property="og:image" content={ogImage} />
