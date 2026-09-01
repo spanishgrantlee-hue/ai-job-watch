@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { JOB_PAGE_CONTENT } from '../content/jobPageContent';
 
 function formatStatDate(stat_date) {
   // Neon's DATE column may come back as a plain 'YYYY-MM-DD' string or a
@@ -56,15 +57,9 @@ function EmptyState({ title, message }) {
   );
 }
 
-function StatsView({ data }) {
+function StatsBody({ data }) {
   return (
     <>
-      <div className="job-stats-hero">
-        <p className="job-stats-eyebrow">Job Title Automation Risk</p>
-        <h1>{data.canonicalName}</h1>
-        {data.industry && <p className="job-stats-industry">{data.industry}</p>}
-      </div>
-
       <div className="job-stats-section">
         <div className="job-stats-score-row">
           <div className="job-stats-score-number">{data.avgScore}</div>
@@ -93,10 +88,76 @@ function StatsView({ data }) {
           </div>
         </div>
       </div>
+    </>
+  );
+}
+
+function StatsView({ data }) {
+  return (
+    <>
+      <div className="job-stats-hero">
+        <p className="job-stats-eyebrow">Job Title Automation Risk</p>
+        <h1>{data.canonicalName}</h1>
+        {data.industry && <p className="job-stats-industry">{data.industry}</p>}
+      </div>
+
+      <StatsBody data={data} />
 
       <div className="job-stats-cta">
         <Link to="/assessment" className="btn-primary btn-lg">
           See where you stand →
+        </Link>
+      </div>
+    </>
+  );
+}
+
+// Day 4 SEO pilot: renders always-indexable editorial content for a slug
+// with an entry in JOB_PAGE_CONTENT, plus the live stats block (StatsBody)
+// whenever real data has cleared the sample-size gate. Slugs without an
+// entry never reach this component -- see JobStatsView.
+function StaticJobPage({ content, status, data }) {
+  return (
+    <>
+      <div className="job-stats-hero">
+        <p className="job-stats-eyebrow">Job Title Automation Risk</p>
+        <h1>{content.h1}</h1>
+        <p className="job-stats-industry">{content.jobLabel}</p>
+      </div>
+
+      <div className="about-section">
+        {content.intro.map((para) => (
+          <p key={para}>{para}</p>
+        ))}
+      </div>
+
+      <div className="about-section">
+        <h2>How {content.jobLabel} Scores on Each Factor</h2>
+        <div className="category-table">
+          {content.factors.map((f) => (
+            <div key={f.name} className="category-table-row">
+              <div className="cat-table-name">{f.name}</div>
+              <div className="cat-table-desc">{f.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {status === 'available' && <StatsBody data={data} />}
+
+      <div className="about-section">
+        <h2>A Few Common Questions</h2>
+        {content.faqs.map((f) => (
+          <div key={f.q}>
+            <h3>{f.q}</h3>
+            <p>{f.a}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="about-cta">
+        <Link to="/assessment" className="btn-primary btn-lg">
+          Take the Free Assessment →
         </Link>
       </div>
     </>
@@ -113,13 +174,32 @@ export default function JobStats() {
 
 function JobStatsView({ slug }) {
   const { status, data } = useJobStats(slug);
-  const pageTitle =
-    status === 'available' ? `${data.canonicalName} AI Risk Stats | AI Job Watch` : 'Job Stats | AI Job Watch';
-  const pageDesc =
-    status === 'available'
+  const staticContent = JOB_PAGE_CONTENT[slug];
+
+  const pageTitle = staticContent
+    ? staticContent.title
+    : status === 'available'
+      ? `${data.canonicalName} AI Risk Stats | AI Job Watch`
+      : 'Job Stats | AI Job Watch';
+  const pageDesc = staticContent
+    ? staticContent.metaDescription
+    : status === 'available'
       ? `See the average AI automation risk score and risk breakdown reported by ${data.sampleSize} anonymous ${data.canonicalName} assessment takers.`
       : 'Anonymous, aggregated AI automation risk stats by job title.';
   const pageUrl = `https://aijobwatch.org/jobs/${slug}`;
+  // A slug with static editorial content is indexable on its own merits,
+  // regardless of whether live stats have cleared the sample-size gate yet.
+  const robotsContent = (staticContent || status === 'available') ? 'index,follow' : 'noindex,follow';
+
+  const faqStructuredData = staticContent && {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: staticContent.faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
 
   return (
     <div className="page-wrap">
@@ -130,37 +210,46 @@ function JobStatsView({ slug }) {
         <meta property="og:url" content={pageUrl} />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDesc} />
-        <meta name="robots" content={status === 'available' ? 'index,follow' : 'noindex,follow'} />
+        <meta name="robots" content={robotsContent} />
+        {faqStructuredData && (
+          <script type="application/ld+json">{JSON.stringify(faqStructuredData)}</script>
+        )}
       </Helmet>
       <div className="job-stats-page">
-        {status === 'loading' && <p className="job-stats-loading">Loading…</p>}
+        {staticContent ? (
+          <StaticJobPage content={staticContent} status={status} data={data} />
+        ) : (
+          <>
+            {status === 'loading' && <p className="job-stats-loading">Loading…</p>}
 
-        {status === 'not_found' && (
-          <EmptyState
-            title="Job title not found"
-            message="We don't have this job title in our database yet."
-          />
+            {status === 'not_found' && (
+              <EmptyState
+                title="Job title not found"
+                message="We don't have this job title in our database yet."
+              />
+            )}
+
+            {status === 'error' && (
+              <EmptyState
+                title="Something went wrong"
+                message="We couldn't load stats for this job title right now. Please try again in a moment."
+              />
+            )}
+
+            {status === 'unavailable' && (
+              <EmptyState
+                title={data.canonicalName}
+                message={
+                  data.reason === 'no_data_yet'
+                    ? "We haven't collected any assessment data for this job title yet."
+                    : "We don't have enough responses yet to show reliable stats for this job title."
+                }
+              />
+            )}
+
+            {status === 'available' && <StatsView data={data} />}
+          </>
         )}
-
-        {status === 'error' && (
-          <EmptyState
-            title="Something went wrong"
-            message="We couldn't load stats for this job title right now. Please try again in a moment."
-          />
-        )}
-
-        {status === 'unavailable' && (
-          <EmptyState
-            title={data.canonicalName}
-            message={
-              data.reason === 'no_data_yet'
-                ? "We haven't collected any assessment data for this job title yet."
-                : "We don't have enough responses yet to show reliable stats for this job title."
-            }
-          />
-        )}
-
-        {status === 'available' && <StatsView data={data} />}
       </div>
     </div>
   );

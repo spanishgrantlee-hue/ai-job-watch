@@ -104,7 +104,8 @@ export default function WillAiReplaceMyJob() {
               <div className="band-score">Repetitive & rules-based</div>
               <p>
                 Work that's mostly single-task, follows a predictable process, and doesn't require
-                anyone to be personally accountable for the outcome.
+                anyone to be personally accountable for the outcome — see how this plays out for{' '}
+                <Link to="/jobs/customer-service-representative">customer service roles</Link>.
               </p>
             </div>
             <div className="band band-low">
