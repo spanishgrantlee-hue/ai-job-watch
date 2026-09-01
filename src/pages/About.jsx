@@ -31,6 +31,9 @@ export default function About() {
           protected — your job is from AI-driven automation. Built to give workers a clear,
           structured way to think about a question that too many are afraid to ask.
         </p>
+        <p className="about-lead">
+          Wondering whether AI will actually replace your job? <Link to="/will-ai-replace-my-job">Read our breakdown →</Link>
+        </p>
       </div>
 
       {/* Personal story */}

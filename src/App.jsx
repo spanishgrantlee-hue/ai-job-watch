@@ -10,6 +10,7 @@ import RevealExperience from './pages/RevealExperience';
 import About from './pages/About';
 import JobStats from './pages/JobStats';
 import Explore from './pages/Explore';
+import WillAiReplaceMyJob from './pages/WillAiReplaceMyJob';
 import './index.css';
 
 // Shared context — Assessment writes answers, Results reads them
@@ -55,6 +56,7 @@ export default function App() {
             <Route path="/about"      element={<About />} />
             <Route path="/jobs/:slug" element={<JobStats />} />
             <Route path="/explore"    element={<Explore />} />
+            <Route path="/will-ai-replace-my-job" element={<WillAiReplaceMyJob />} />
           </Routes>
         </main>
       </BrowserRouter>
