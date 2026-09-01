@@ -368,7 +368,11 @@ export default function Results() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ answers, finalScore, riskKey, shareUrl }),
-    }).catch(() => {});
+    })
+      .then((res) => {
+        if (!res.ok) console.error('[save-result] request failed', res.status);
+      })
+      .catch((err) => console.error('[save-result] request errored', err));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Compare-with-others: reuses the already-live /api/job-stats endpoint.

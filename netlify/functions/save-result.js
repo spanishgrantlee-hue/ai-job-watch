@@ -22,6 +22,7 @@ export default async (req) => {
     typeof finalScore !== 'number' ||
     !['LOW', 'MEDIUM', 'HIGH'].includes(riskKey)
   ) {
+    console.warn('[save-result] rejected invalid payload', { timestamp: new Date().toISOString() });
     return new Response('Invalid payload', { status: 400 });
   }
 
@@ -33,15 +34,21 @@ export default async (req) => {
   const safeShareUrl = typeof shareUrl === 'string' && shareUrl.length < 1000 ? shareUrl : null;
 
   const id = crypto.randomUUID();
-  const store = getStore('assessment-results');
-  await store.setJSON(id, {
-    id,
-    timestamp: new Date().toISOString(),
-    answers: sanitized,
-    finalScore,
-    riskKey,
-    shareUrl: safeShareUrl,
-  });
+
+  try {
+    const store = getStore('assessment-results');
+    await store.setJSON(id, {
+      id,
+      timestamp: new Date().toISOString(),
+      answers: sanitized,
+      finalScore,
+      riskKey,
+      shareUrl: safeShareUrl,
+    });
+  } catch (err) {
+    console.error('[save-result] blob write failed', { id, riskKey, timestamp: new Date().toISOString(), error: err?.message });
+    return new Response('Internal Server Error', { status: 500 });
+  }
 
   return new Response(JSON.stringify({ ok: true }), {
     status: 200,
