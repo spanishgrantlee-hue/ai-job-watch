@@ -52,11 +52,11 @@ export default function Home() {
     <div className="home">
       <Helmet>
         <title>Is Your Job Safe from AI? | AI Job Watch</title>
-        <meta name="description" content="Free AI job risk assessment. Answer 30 questions about your role and get a personalized AI Resistance Score — find out exactly how exposed or protected your job is from automation." />
+        <meta name="description" content="AI Job Watch gives you a free, personalized AI Resistance Score in 30 questions — see exactly how exposed or protected your job is from automation." />
         <link rel="canonical" href="https://aijobwatch.org/" />
         <meta property="og:url" content="https://aijobwatch.org/" />
         <meta property="og:title" content="Is Your Job Safe from AI? | AI Job Watch" />
-        <meta property="og:description" content="Free AI job risk assessment. Answer 30 questions about your role and get a personalized AI Resistance Score — find out exactly how exposed or protected your job is from automation." />
+        <meta property="og:description" content="AI Job Watch gives you a free, personalized AI Resistance Score in 30 questions — see exactly how exposed or protected your job is from automation." />
         <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
         <script type="application/ld+json">{JSON.stringify(websiteStructuredData)}</script>
       </Helmet>
@@ -69,8 +69,8 @@ export default function Home() {
           <span className="gradient-text">from AI?</span>
         </h1>
         <p className="hero-sub">
-          Answer 30 questions about your role. Get a personalized AI Resistance Score and a clear
-          breakdown of how exposed — or protected — your job really is.
+          AI Job Watch asks 30 questions about your role and gives you a personalized AI
+          Resistance Score — a clear breakdown of how exposed, or protected, your job really is.
         </p>
         <div className="hero-actions">
           <Link to="/assessment" className="btn-primary btn-lg">
