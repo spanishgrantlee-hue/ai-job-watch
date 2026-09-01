@@ -30,6 +30,7 @@ const staticUrls = [
   { loc: '/explore', changefreq: 'weekly', priority: '0.8' },
   { loc: '/about', changefreq: 'yearly', priority: '0.5' },
   { loc: '/will-ai-replace-my-job', changefreq: 'monthly', priority: '0.8' },
+  { loc: '/ai-job-risk-assessment', changefreq: 'monthly', priority: '0.8' },
 ];
 
 const jobUrls = CANONICAL_JOB_TITLES.map((title) => ({

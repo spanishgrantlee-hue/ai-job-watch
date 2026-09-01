@@ -140,6 +140,12 @@ export default function WillAiReplaceMyJob() {
           ))}
         </div>
 
+        <div className="about-section">
+          <p>
+            <Link to="/ai-job-risk-assessment">Learn more about how the AI job risk assessment works →</Link>
+          </p>
+        </div>
+
         <div className="about-cta">
           <Link to="/assessment" className="btn-primary btn-lg">
             Take the Free Assessment →
