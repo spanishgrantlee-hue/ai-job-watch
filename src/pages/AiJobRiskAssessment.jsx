@@ -63,6 +63,10 @@ export default function AiJobRiskAssessment() {
             depends on judgment, trust, accountability, and physical presence — not just what
             it’s called.
           </p>
+          <p>
+            For the bigger picture on how AI is reshaping specific jobs, see{' '}
+            <Link to="/will-ai-replace-my-job">Will AI Replace My Job? →</Link>
+          </p>
         </div>
 
         <div className="about-section">

@@ -153,6 +153,10 @@ function StaticJobPage({ content, status, data }) {
             <p>{f.a}</p>
           </div>
         ))}
+        <p>
+          Want to see how this is calculated for any job?{' '}
+          <Link to="/ai-job-risk-assessment">See how the AI job risk assessment works →</Link>
+        </p>
       </div>
 
       <div className="about-cta">

@@ -132,6 +132,9 @@ export default function Home() {
               <p>Significant automation exposure. Now is the time to plan your next move.</p>
             </div>
           </div>
+          <p className="section-subtitle">
+            Curious what actually determines this? <Link to="/will-ai-replace-my-job">Read our breakdown →</Link>
+          </p>
         </div>
       </section>
 
