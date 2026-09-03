@@ -5,7 +5,69 @@
 [functions]
   directory = "netlify/functions"
 
+# Every rule below must mirror src/App.jsx's <Route> list exactly (one entry
+# per static path, plus a splat for the dynamic /jobs/:slug route). This is
+# what lets the final catch-all report a true 404 for genuinely invalid URLs
+# without breaking direct navigation/refresh on any real route -- a single
+# blanket "/* -> /index.html 200" rule can't tell the two apart. Adding a new
+# top-level route to App.jsx requires adding its matching line here too, or
+# that new route will incorrectly 404 at the edge.
+
+[[redirects]]
+  from = "/jobs/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/assessment"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/results"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/roadmap"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/check-in"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/reveal"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/about"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/explore"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/will-ai-replace-my-job"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ai-job-risk-assessment"
+  to = "/index.html"
+  status = 200
+
+# Fallback for anything else: still serves the SPA shell (so React Router's
+# own "*" route can render a real NotFound page with noindex), but reports
+# a true 404 status -- Netlify's documented pattern for custom 404s on a
+# single-page app.
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200
+  status = 404

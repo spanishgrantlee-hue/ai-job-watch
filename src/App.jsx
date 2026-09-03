@@ -12,6 +12,7 @@ import JobStats from './pages/JobStats';
 import Explore from './pages/Explore';
 import WillAiReplaceMyJob from './pages/WillAiReplaceMyJob';
 import AiJobRiskAssessment from './pages/AiJobRiskAssessment';
+import NotFound from './pages/NotFound';
 import './index.css';
 
 // Shared context — Assessment writes answers, Results reads them
@@ -59,6 +60,7 @@ export default function App() {
             <Route path="/explore"    element={<Explore />} />
             <Route path="/will-ai-replace-my-job" element={<WillAiReplaceMyJob />} />
             <Route path="/ai-job-risk-assessment" element={<AiJobRiskAssessment />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
       </BrowserRouter>
