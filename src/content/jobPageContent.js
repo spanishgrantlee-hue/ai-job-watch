@@ -19,7 +19,7 @@ export const JOB_PAGE_CONTENT = {
     title: 'Will AI Replace Customer Service Jobs? | AI Job Watch',
     h1: 'Will AI Replace Customer Service Jobs?',
     metaDescription:
-      "See how AI is already automating customer service work, the real risk factors behind it, and how Customer Service Representative roles score on AI Job Watch's automation framework.",
+      "See how AI is already automating customer service work and how Customer Service Representative roles score on AI Job Watch's automation risk framework.",
     intro: [
       'Customer service is one of the first roles where AI automation is already visible in the real world, not just theoretical — chatbots and AI assistants are already handling a growing share of routine support conversations.',
       "That doesn't mean every customer service job is at equal risk. What matters is how much of a specific role is repetitive, rules-based ticket handling versus judgment-heavy problem solving, relationship building, and escalations that require a human to be personally accountable for the outcome.",
