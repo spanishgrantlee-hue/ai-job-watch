@@ -33,6 +33,15 @@ const faqStructuredData = {
   })),
 };
 
+const breadcrumbStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://aijobwatch.org/' },
+    { '@type': 'ListItem', position: 2, name: 'AI Job Risk Assessment', item: 'https://aijobwatch.org/ai-job-risk-assessment' },
+  ],
+};
+
 export default function AiJobRiskAssessment() {
   return (
     <div className="page-wrap">
@@ -44,6 +53,7 @@ export default function AiJobRiskAssessment() {
         <meta property="og:title" content="AI Job Risk Assessment | AI Job Watch" />
         <meta property="og:description" content="Take a free AI job risk assessment and get a 0-100 score for how exposed your specific role is to automation, plus a breakdown of exactly why." />
         <script type="application/ld+json">{JSON.stringify(faqStructuredData)}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbStructuredData)}</script>
       </Helmet>
       <div className="about-page">
         <div className="about-hero">

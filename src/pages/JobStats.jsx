@@ -205,6 +205,15 @@ function JobStatsView({ slug }) {
     })),
   };
 
+  const breadcrumbStructuredData = staticContent && {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://aijobwatch.org/' },
+      { '@type': 'ListItem', position: 2, name: staticContent.h1, item: pageUrl },
+    ],
+  };
+
   return (
     <div className="page-wrap">
       <Helmet>
@@ -217,6 +226,9 @@ function JobStatsView({ slug }) {
         <meta name="robots" content={robotsContent} />
         {faqStructuredData && (
           <script type="application/ld+json">{JSON.stringify(faqStructuredData)}</script>
+        )}
+        {breadcrumbStructuredData && (
+          <script type="application/ld+json">{JSON.stringify(breadcrumbStructuredData)}</script>
         )}
       </Helmet>
       <div className="job-stats-page">
