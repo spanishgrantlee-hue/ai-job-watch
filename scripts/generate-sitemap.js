@@ -6,9 +6,11 @@
 // Deliberately reads CANONICAL_JOB_TITLES from src/utils/jobTitleMatch.js
 // (pure logic, no DB/browser dependency) rather than hitting the live
 // /api/job-stats-list endpoint at build time, so the build stays hermetic.
-// Titles that haven't cleared the sample-size gate yet are still listed here
-// but are excluded from indexing via <meta name="robots" content="noindex">
-// on JobStats.jsx, so there's no thin-content risk from listing them.
+// Titles that haven't cleared the sample-size gate yet, and have no static
+// editorial content (see the jobUrls filter below), are excluded from this
+// sitemap entirely -- they're noindex on JobStats.jsx, and Search Console
+// showed a batch of 30+ such near-duplicate URLs was suppressing crawl
+// attention on the rest of the site (Day 13).
 //
 // Run with: node scripts/generate-sitemap.js
 // Output: dist/sitemap.xml
@@ -17,6 +19,7 @@ import { writeFileSync, mkdirSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { CANONICAL_JOB_TITLES, slugify } from '../src/utils/jobTitleMatch.js';
+import { JOB_PAGE_CONTENT } from '../src/content/jobPageContent.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = resolve(__dirname, '../dist');
@@ -33,11 +36,18 @@ const staticUrls = [
   { loc: '/ai-job-risk-assessment', changefreq: 'monthly', priority: '0.8' },
 ];
 
-const jobUrls = CANONICAL_JOB_TITLES.map((title) => ({
-  loc: `/jobs/${slugify(title)}`,
-  changefreq: 'weekly',
-  priority: '0.6',
-}));
+// Only list job slugs that are actually indexable (have static editorial
+// content -- see src/content/jobPageContent.js). The other canonical titles
+// render a noindex empty state until real data clears the sample-size gate,
+// and listing 30+ near-duplicate noindex URLs in the sitemap wastes crawl
+// budget Google could spend on pages that are actually worth indexing.
+const jobUrls = CANONICAL_JOB_TITLES
+  .filter((title) => JOB_PAGE_CONTENT[slugify(title)])
+  .map((title) => ({
+    loc: `/jobs/${slugify(title)}`,
+    changefreq: 'weekly',
+    priority: '0.6',
+  }));
 
 const urls = [...staticUrls, ...jobUrls];
 
