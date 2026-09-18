@@ -22,6 +22,8 @@ export default function About() {
         <meta property="og:url" content="https://aijobwatch.org/about" />
         <meta property="og:title" content="About AI Job Watch | Methodology &amp; Scoring" />
         <meta property="og:description" content="Learn how AI Job Watch scores your job's automation risk across six factors: Accountability, Trust, Judgment, Problem Solving, Physical Presence, and Licensing." />
+        <meta name="twitter:title" content="About AI Job Watch | Methodology &amp; Scoring" />
+        <meta name="twitter:description" content="Learn how AI Job Watch scores your job's automation risk across six factors: Accountability, Trust, Judgment, Problem Solving, Physical Presence, and Licensing." />
       </Helmet>
     <div className="about-page">
       <div className="about-hero">

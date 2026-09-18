@@ -165,6 +165,8 @@ export default function Assessment() {
         <meta property="og:url" content="https://aijobwatch.org/assessment" />
         <meta property="og:title" content="Start Your Free AI Resistance Score | AI Job Watch" />
         <meta property="og:description" content="Take the free AI Job Watch assessment. Answer 30 questions about your role and get an instant AI Resistance Score across six categories — no account required." />
+        <meta name="twitter:title" content="Start Your Free AI Resistance Score | AI Job Watch" />
+        <meta name="twitter:description" content="Take the free AI Job Watch assessment. Answer 30 questions about your role and get an instant AI Resistance Score across six categories — no account required." />
       </Helmet>
 
       {showResumePrompt ? (

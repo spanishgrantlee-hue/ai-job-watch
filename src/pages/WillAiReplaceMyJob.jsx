@@ -54,6 +54,8 @@ export default function WillAiReplaceMyJob() {
         <meta property="og:url" content="https://aijobwatch.org/will-ai-replace-my-job" />
         <meta property="og:title" content="Will AI Replace My Job? | AI Job Watch" />
         <meta property="og:description" content="Will AI replace your job? AI Job Watch breaks down the six factors that actually predict AI risk — not your job title, but how your role is structured." />
+        <meta name="twitter:title" content="Will AI Replace My Job? | AI Job Watch" />
+        <meta name="twitter:description" content="Will AI replace your job? AI Job Watch breaks down the six factors that actually predict AI risk — not your job title, but how your role is structured." />
         <script type="application/ld+json">{JSON.stringify(faqStructuredData)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbStructuredData)}</script>
       </Helmet>

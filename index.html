@@ -6,13 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!--
-      Title, meta description, and og:url/og:title/og:description are
-      deliberately NOT set here: react-helmet-async doesn't replace tags it
-      didn't itself render, so a static tag here plus a per-page <Helmet>
-      override produces two conflicting tags in the DOM instead of one
-      correct one. Every route sets its own title/description via Helmet
-      (see src/pages/*.jsx), so this file only carries tags no page
-      overrides, to stay the single source of truth for each.
+      Title, meta description, og:url/og:title/og:description, and
+      twitter:title/twitter:description are deliberately NOT set here:
+      react-helmet-async doesn't replace tags it didn't itself render, so a
+      static tag here plus a per-page <Helmet> override produces two
+      conflicting tags in the DOM instead of one correct one. Every route
+      sets its own title/description via Helmet (see src/pages/*.jsx), so
+      this file only carries tags no page overrides, to stay the single
+      source of truth for each.
     -->
 
     <!-- Open Graph -->
@@ -21,8 +22,6 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card"        content="summary_large_image" />
-    <meta name="twitter:title"       content="Is Your Job Safe from AI? | AI Job Watch" />
-    <meta name="twitter:description" content="Answer 30 questions about your role and get a free AI Resistance Score. See exactly how exposed — or protected — your job is from automation." />
     <meta name="twitter:image"       content="https://aijobwatch.org/og-default.png" />
 
     <!-- Google Analytics -->

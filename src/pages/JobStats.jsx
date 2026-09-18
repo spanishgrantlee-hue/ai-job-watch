@@ -223,6 +223,8 @@ function JobStatsView({ slug }) {
         <meta property="og:url" content={pageUrl} />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDesc} />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDesc} />
         <meta name="robots" content={robotsContent} />
         {faqStructuredData && (
           <script type="application/ld+json">{JSON.stringify(faqStructuredData)}</script>

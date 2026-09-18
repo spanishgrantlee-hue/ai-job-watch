@@ -65,6 +65,8 @@ export default function Home() {
         <meta property="og:url" content="https://aijobwatch.org/" />
         <meta property="og:title" content="Is Your Job Safe from AI? | AI Job Watch" />
         <meta property="og:description" content="AI Job Watch gives you a free, personalized AI Resistance Score in 30 questions — see exactly how exposed or protected your job is from automation." />
+        <meta name="twitter:title" content="Is Your Job Safe from AI? | AI Job Watch" />
+        <meta name="twitter:description" content="AI Job Watch gives you a free, personalized AI Resistance Score in 30 questions — see exactly how exposed or protected your job is from automation." />
         <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
         <script type="application/ld+json">{JSON.stringify(websiteStructuredData)}</script>
         <script type="application/ld+json">{JSON.stringify(organizationStructuredData)}</script>

@@ -85,6 +85,8 @@ export default function Explore() {
         <meta property="og:url" content="https://aijobwatch.org/explore" />
         <meta property="og:title" content="Explore Job Risk Stats | AI Job Watch" />
         <meta property="og:description" content="Browse anonymous, aggregated AI automation risk stats by job title." />
+        <meta name="twitter:title" content="Explore Job Risk Stats | AI Job Watch" />
+        <meta name="twitter:description" content="Browse anonymous, aggregated AI automation risk stats by job title." />
       </Helmet>
       <div className="explore-page">
         <div className="explore-hero">
