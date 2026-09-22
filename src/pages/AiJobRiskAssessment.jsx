@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 
 const steps = [
   { name: 'Answer a short set of questions',   desc: "About a dozen questions on how your specific role actually works day to day — not your job title." },
-  { name: 'Get a 0-100 AI risk score',          desc: "A single score, built from the same factors researchers use to study automation exposure, not a guess." },
+  { name: 'Get a 0-30 AI Resistance Score',     desc: "A single score, built from the same factors researchers use to study automation exposure, not a guess." },
   { name: 'See exactly what’s driving it', desc: "A breakdown of which factors are pulling your score up or down, so the result isn’t a black box." },
   { name: 'Get a protection plan',              desc: "Concrete next steps tied to your specific gaps, not generic career advice." },
 ];
@@ -47,13 +47,13 @@ export default function AiJobRiskAssessment() {
     <div className="page-wrap">
       <Helmet>
         <title>AI Job Risk Assessment | AI Job Watch</title>
-        <meta name="description" content="Take a free AI job risk assessment and get a 0-100 score for how exposed your specific role is to automation, plus a breakdown of exactly why." />
+        <meta name="description" content="Take a free AI job risk assessment and get a 0-30 AI Resistance Score for how exposed your specific role is to automation, plus a breakdown of exactly why." />
         <link rel="canonical" href="https://aijobwatch.org/ai-job-risk-assessment" />
         <meta property="og:url" content="https://aijobwatch.org/ai-job-risk-assessment" />
         <meta property="og:title" content="AI Job Risk Assessment | AI Job Watch" />
-        <meta property="og:description" content="Take a free AI job risk assessment and get a 0-100 score for how exposed your specific role is to automation, plus a breakdown of exactly why." />
+        <meta property="og:description" content="Take a free AI job risk assessment and get a 0-30 AI Resistance Score for how exposed your specific role is to automation, plus a breakdown of exactly why." />
         <meta name="twitter:title" content="AI Job Risk Assessment | AI Job Watch" />
-        <meta name="twitter:description" content="Take a free AI job risk assessment and get a 0-100 score for how exposed your specific role is to automation, plus a breakdown of exactly why." />
+        <meta name="twitter:description" content="Take a free AI job risk assessment and get a 0-30 AI Resistance Score for how exposed your specific role is to automation, plus a breakdown of exactly why." />
         <script type="application/ld+json">{JSON.stringify(faqStructuredData)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbStructuredData)}</script>
       </Helmet>
