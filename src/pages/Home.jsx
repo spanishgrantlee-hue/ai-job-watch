@@ -146,6 +146,9 @@ export default function Home() {
           <p className="section-subtitle">
             Curious what actually determines this? <Link to="/will-ai-replace-my-job">Read our breakdown →</Link>
           </p>
+          <p className="section-subtitle">
+            Want the full breakdown of how it's scored? <Link to="/ai-job-risk-assessment">See how the AI job risk assessment works →</Link>
+          </p>
         </div>
       </section>
 
