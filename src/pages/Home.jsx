@@ -51,7 +51,7 @@ const features = [
   {
     icon: '🔒',
     title: 'No Account Needed',
-    desc: 'Your answers stay in your browser. No login, no tracking, no data stored.',
+    desc: 'No login, no name or email collected. Your answers are stored anonymously — never linked to your identity — to power aggregate stats.',
   },
 ];
 
