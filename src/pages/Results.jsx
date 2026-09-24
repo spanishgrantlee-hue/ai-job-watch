@@ -7,6 +7,7 @@ import { normalizeJobTitle, slugify } from '../utils/jobTitleMatch';
 import { Helmet } from 'react-helmet-async';
 import WhatIfPanel from '../components/WhatIfPanel';
 import { PLAYBOOK, playbookLevel } from '../utils/playbook';
+import { SIMILAR_CAREERS } from '../utils/roadmap/similarCareers';
 
 // ─── Score label (one word, shown in the hero beneath the number) ─────────────
 const SCORE_LABELS = { LOW: 'Resilient', MEDIUM: 'Developing', HIGH: 'Under Pressure' };
@@ -255,6 +256,71 @@ function ScoreGauge({ score, riskClass }) {
       </div>
       <p className="score-gauge-caption">Overall AI Resistance Score (0&ndash;100 scale)</p>
     </div>
+  );
+}
+
+// ─── Here's What You Should Do Next ──────────────────────────────────────────
+// A compact, three-card synthesis shown right after the score + summary, so
+// the user sees an action plan before scrolling into the detailed breakdown
+// below. Reuses the same category/protector data and copy already computed
+// by calculateResults() and already shown further down the page (Career
+// Playbook, What's Working In Your Favor) -- no new scoring, no new content
+// source. Similar Careers data (previously only used in the Reveal/Roadmap
+// flow) powers the backup-path card.
+function NextMoveSection({ topProtector, weakestCategory }) {
+  const weakestLevel = playbookLevel(weakestCategory.score);
+  const weakestPlaybook = PLAYBOOK[weakestCategory.key];
+
+  // Backup-path suggestions are directional, not a career guarantee, even
+  // without a genuine top protector, so a soft fallback to the single
+  // highest-scoring category is safe here -- unlike the "protect" card,
+  // this one never claims to describe your *current* job's protection.
+  const backupCategory = topProtector ?? weakestCategory;
+  const similarCareers = SIMILAR_CAREERS[backupCategory.key];
+
+  return (
+    <section className="results-section next-move-section">
+      <div className="container results-container">
+        <div className="results-section-hdr">
+          <div className="section-label">Your Next Move</div>
+          <h2 className="results-section-title">Here's What You Should Do Next</h2>
+          <p className="results-section-desc">Three moves based on your specific answers — not generic advice.</p>
+        </div>
+
+        <div className="next-move-grid">
+          <div className="next-move-card">
+            <span className="next-move-card-label">Protect Your Current Job</span>
+            {topProtector ? (
+              <>
+                <h3 className="next-move-card-title">{topProtector.label}</h3>
+                <p className="next-move-card-text">{PROTECTOR_WHY_PLAIN[topProtector.key] ?? topProtector.protectsJobWhy}</p>
+              </>
+            ) : (
+              <p className="next-move-card-text">None of your categories are a strong protection yet — that's a starting point, not a life sentence. See "Increase Your Value" for where to focus first.</p>
+            )}
+          </div>
+
+          <div className="next-move-card">
+            <span className="next-move-card-label">Increase Your Value</span>
+            <h3 className="next-move-card-title">{weakestCategory.label}</h3>
+            <p className="next-move-card-text">{weakestPlaybook ? weakestPlaybook.days30[weakestLevel] : null}</p>
+          </div>
+
+          <div className="next-move-card">
+            <span className="next-move-card-label">Build a Backup Path</span>
+            {similarCareers ? (
+              <>
+                <h3 className="next-move-card-title">{similarCareers.roles.slice(0, 3).join(', ')}</h3>
+                <p className="next-move-card-text">Your {backupCategory.label} strength carries over well to roles like these — {similarCareers.reason}.</p>
+              </>
+            ) : null}
+          </div>
+        </div>
+        {similarCareers && (
+          <p className="next-move-disclaimer">Based on your strength in {backupCategory.label} — a real starting point for a backup plan, not a promise of the perfect fit.</p>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -551,6 +617,11 @@ export default function Results() {
           </div>
         </div>
       </section>
+
+      <NextMoveSection
+        topProtector={topProtectors[0]}
+        weakestCategory={rankedCategories[rankedCategories.length - 1]}
+      />
 
       {/* Category Breakdown */}
       <section className="results-section">
