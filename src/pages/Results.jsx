@@ -267,7 +267,7 @@ function ScoreGauge({ score, riskClass }) {
 // Playbook, What's Working In Your Favor) -- no new scoring, no new content
 // source. Similar Careers data (previously only used in the Reveal/Roadmap
 // flow) powers the backup-path card.
-function NextMoveSection({ topProtector, weakestCategory }) {
+function NextMoveSection({ topProtector, weakestCategory, showRoadmapCta }) {
   const weakestLevel = playbookLevel(weakestCategory.score);
   const weakestPlaybook = PLAYBOOK[weakestCategory.key];
 
@@ -318,6 +318,21 @@ function NextMoveSection({ topProtector, weakestCategory }) {
         </div>
         {similarCareers && (
           <p className="next-move-disclaimer">Based on your strength in {backupCategory.label} — a real starting point for a backup plan, not a promise of the perfect fit.</p>
+        )}
+
+        {/* /roadmap and /reveal read this browser's own answers, so the CTA
+            is hidden on ?share= views, where the score shown isn't theirs. */}
+        {showRoadmapCta && (
+          <div className="next-move-roadmap-cta">
+            <div className="next-move-roadmap-cta-text">
+              <h3 className="next-move-card-title">Want the full step-by-step plan?</h3>
+              <p className="next-move-card-text">Your Career Roadmap turns these three moves into a 30-day, 90-day, and 1-year plan — with a checklist you can save and come back to.</p>
+            </div>
+            <div className="next-move-roadmap-cta-actions">
+              <Link to="/roadmap" className="btn-primary">Build My Full Career Roadmap</Link>
+              <Link to="/reveal" className="next-move-roadmap-cta-alt">Or walk me through it step by step</Link>
+            </div>
+          </div>
         )}
       </div>
     </section>
@@ -621,6 +636,7 @@ export default function Results() {
       <NextMoveSection
         topProtector={topProtectors[0]}
         weakestCategory={rankedCategories[rankedCategories.length - 1]}
+        showRoadmapCta={!isSharedView}
       />
 
       {/* Category Breakdown */}

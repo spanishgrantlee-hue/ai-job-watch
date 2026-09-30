@@ -1245,6 +1245,33 @@ input, select, textarea, button { font-family: inherit; }
   margin-top: 16px;
 }
 
+.next-move-roadmap-cta {
+  margin-top: 24px;
+  padding: 20px 22px;
+  background: var(--clr-primary-light);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.next-move-roadmap-cta-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.next-move-roadmap-cta-alt {
+  display: inline-block;
+  padding: 11px 0; /* 44px tap target */
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--clr-primary);
+}
+@media (min-width: 768px) {
+  .next-move-roadmap-cta { flex-direction: row; align-items: center; justify-content: space-between; }
+  .next-move-roadmap-cta-actions { align-items: flex-end; flex-shrink: 0; }
+}
+
 /* Category breakdown */
 .category-breakdown { display: flex; flex-direction: column; gap: 16px; }
 
