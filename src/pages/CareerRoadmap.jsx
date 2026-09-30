@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useAnswers } from '../App';
 import { calculateResults } from '../utils/scoring';
-import { decodeShareState, encodeRoadmapSnapshot, decodeRoadmapSnapshot } from '../utils/share';
+import { encodeShareState, decodeShareState, encodeRoadmapSnapshot, decodeRoadmapSnapshot } from '../utils/share';
 import { PLAYBOOK, playbookLevel } from '../utils/playbook';
 import { TIMELINE, TIMELINE_DISCLAIMER } from '../utils/roadmap/timeline.js';
 import { LEARNING_RESOURCES } from '../utils/roadmap/learningResources.js';
@@ -463,6 +463,7 @@ function SimilarCareersSection({ topProtector }) {
 
 function ClosingSection({ weakestCategory, results, checklist, onDownloadPdf }) {
   const [saved, setSaved] = useState(false);
+  const [shared, setShared] = useState(false);
   const level = playbookLevel(weakestCategory.score);
   const action = PLAYBOOK[weakestCategory.key].days30[level];
 
@@ -476,6 +477,23 @@ function ClosingSection({ weakestCategory, results, checklist, onDownloadPdf }) 
     navigator.clipboard.writeText(url)
       .then(() => { setSaved(true); setTimeout(() => setSaved(false), 2000); })
       .catch(() => {});
+  }
+
+  // Shares the public /results?share= link (same one Results.jsx's Copy Link
+  // builds), not a /roadmap link: Results has the shared-view banner and
+  // "Take your own" CTA, while this page is written in second person and
+  // offers Save My Roadmap. Native share sheet where available, else copy.
+  // A cancelled share sheet (AbortError) is deliberately not followed by a copy.
+  function handleShare() {
+    const url = `${window.location.origin}/results?share=${encodeShareState(results)}`;
+    if (navigator.share) {
+      navigator.share({ title: `My AI Resistance Score: ${results.finalScore}/30`, url })
+        .catch(() => {});
+    } else {
+      navigator.clipboard.writeText(url)
+        .then(() => { setShared(true); setTimeout(() => setShared(false), 2000); })
+        .catch(() => {});
+    }
   }
 
   return (
@@ -495,7 +513,9 @@ function ClosingSection({ weakestCategory, results, checklist, onDownloadPdf }) 
             {saved ? '✓ Link Copied!' : 'Save My Roadmap'}
           </button>
           <button type="button" className="btn-ghost-dark" onClick={onDownloadPdf}>Download PDF</button>
-          <button type="button" className="btn-ghost-dark">Share</button>
+          <button type="button" className="btn-ghost-dark" onClick={handleShare}>
+            {shared ? '✓ Link Copied!' : 'Share'}
+          </button>
         </div>
       </div>
     </section>
