@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { PLAYBOOK, playbookLevel } from '../../../utils/playbook.js';
-import { encodeRoadmapSnapshot } from '../../../utils/share.js';
+import { encodeShareState, encodeRoadmapSnapshot } from '../../../utils/share.js';
 
 // ─── Your Roadmap Is Ready (Screen 11, close) ──────────────────────────────────
 // The emotional climax of the Reveal, dark-hero background bookending
@@ -16,12 +16,16 @@ import { encodeRoadmapSnapshot } from '../../../utils/share.js';
 // work from the data it's given, same as every other screen, instead of
 // delegating to a callback nobody has ever supplied.
 //
-// See the Full Report / Share remain as before: onAdvance is the natural exit
-// from the last screen; onShare is still an inert placeholder -- Share isn't
-// part of any Group P task.
+// See the Full Report remains as before: onAdvance is the natural exit from
+// the last screen. Share does its own work the same way Save does, mirroring
+// CareerRoadmap.jsx's ClosingSection: it shares the public /results?share=
+// link (Results has the shared-view banner and "Take your own" CTA), via the
+// native share sheet where available, else copies it. A cancelled share
+// sheet (AbortError) is deliberately not followed by a copy.
 
-export default function RoadmapReadyScreen({ weakestCategory, results, checklist, onShare, onAdvance }) {
+export default function RoadmapReadyScreen({ weakestCategory, results, checklist, onAdvance }) {
   const [saved, setSaved] = useState(false);
+  const [shared, setShared] = useState(false);
   const level = playbookLevel(weakestCategory.score);
   const action = PLAYBOOK[weakestCategory.key].days30[level];
 
@@ -31,6 +35,18 @@ export default function RoadmapReadyScreen({ weakestCategory, results, checklist
     navigator.clipboard.writeText(url)
       .then(() => { setSaved(true); setTimeout(() => setSaved(false), 2000); })
       .catch(() => {});
+  }
+
+  function handleShare() {
+    const url = `${window.location.origin}/results?share=${encodeShareState(results)}`;
+    if (navigator.share) {
+      navigator.share({ title: `My AI Resistance Score: ${results.finalScore}/30`, url })
+        .catch(() => {});
+    } else {
+      navigator.clipboard.writeText(url)
+        .then(() => { setShared(true); setTimeout(() => setShared(false), 2000); })
+        .catch(() => {});
+    }
   }
 
   return (
@@ -53,8 +69,8 @@ export default function RoadmapReadyScreen({ weakestCategory, results, checklist
         <button type="button" className="btn-ghost-dark" onClick={() => onAdvance?.()}>
           See the Full Report
         </button>
-        <button type="button" className="btn-ghost-dark" onClick={() => onShare?.()}>
-          Share
+        <button type="button" className="btn-ghost-dark" onClick={handleShare}>
+          {shared ? '✓ Link Copied!' : 'Share'}
         </button>
       </div>
     </div>
