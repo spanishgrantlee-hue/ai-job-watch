@@ -2515,6 +2515,15 @@ input, select, textarea, button { font-family: inherit; }
    tap-target fix stays limited to Reveal, matching the milestone's boundary. */
 .reveal-screen .roadmap-ready-actions button { min-height: 44px; }
 
+/* Below 480px the three Reveal close buttons wrap unevenly, and Share's
+   temporary "✓ Link Copied!" label is wide enough to re-wrap the row onto a
+   third line for 2s. Stacking them full-width keeps the layout fixed. Scoped
+   to .reveal-screen like the rule above, so /roadmap's ClosingSection keeps
+   its own layout. */
+@media (max-width: 480px) {
+  .reveal-screen .roadmap-ready-actions { flex-direction: column; align-self: stretch; }
+}
+
 /* Career Roadmap reference page (Group O) — light-appropriate quick-list for
    the Strengths section (L4's own version was built dark-hero-only, so it
    isn't reusable here). Everything else on this page reuses existing
