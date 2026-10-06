@@ -319,7 +319,7 @@ function QuestionBlock({ question, number, answer, hasError, onChange }) {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [answer, question.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [answer, question.id]);
 
   function handleChoiceKeyDown(e, i) {
     const last = question.choices.length - 1;
