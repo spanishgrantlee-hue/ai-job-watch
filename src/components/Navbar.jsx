@@ -3,16 +3,17 @@ import { Link, useLocation } from 'react-router-dom';
 
 export default function Navbar() {
   const { pathname } = useLocation();
-  const [open, setOpen] = useState(false);
-
-  // Close mobile menu on route change
-  useEffect(() => { setOpen(false); }, [pathname]);
+  // The mobile menu remembers which page it was opened on and only counts as
+  // open there, so any route change closes it in the same render -- no
+  // close-on-navigate effect, and no frame of the open menu on the new page.
+  const [openedOn, setOpenedOn] = useState(null);
+  const open = openedOn === pathname;
 
   // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e) => {
-      if (!e.target.closest('.navbar')) setOpen(false);
+      if (!e.target.closest('.navbar')) setOpenedOn(null);
     };
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
@@ -27,7 +28,7 @@ export default function Navbar() {
 
       <button
         className="hamburger"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => setOpenedOn(open ? null : pathname)}
         aria-label="Toggle navigation menu"
         aria-expanded={open}
       >
