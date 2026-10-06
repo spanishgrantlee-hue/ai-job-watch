@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { useAnswers } from '../App';
+import { useAnswers } from '../AnswerContext';
 import { sections, getQuestionsForSection } from '../utils/questions';
 
 const TOTAL_SECTIONS = sections.length;

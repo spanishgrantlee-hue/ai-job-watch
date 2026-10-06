@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { useAnswers } from '../App';
+import { useAnswers } from '../AnswerContext';
 import { calculateResults } from '../utils/scoring';
 import RevealSequencer from '../components/roadmap/RevealSequencer.jsx';
 import { PACING } from '../components/roadmap/pacing.js';

@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { useAnswers } from '../App';
+import { useAnswers } from '../AnswerContext';
 import { calculateResults } from '../utils/scoring';
 import { encodeShareState, decodeShareState, generateTextSummary } from '../utils/share';
 import { normalizeJobTitle, slugify } from '../utils/jobTitleMatch';

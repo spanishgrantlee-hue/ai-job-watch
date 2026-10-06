@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AnswerContext } from './AnswerContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Assessment from './pages/Assessment';
@@ -14,10 +15,6 @@ import WillAiReplaceMyJob from './pages/WillAiReplaceMyJob';
 import AiJobRiskAssessment from './pages/AiJobRiskAssessment';
 import NotFound from './pages/NotFound';
 import './index.css';
-
-// Shared context — Assessment writes answers, Results reads them
-export const AnswerContext = createContext(null);
-export function useAnswers() { return useContext(AnswerContext); }
 
 // localStorage key for in-progress assessment answers, so a refresh or
 // closed tab doesn't lose the user's progress.
