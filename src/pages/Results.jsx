@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet-async';
 import WhatIfPanel from '../components/WhatIfPanel';
 import { PLAYBOOK, playbookLevel } from '../utils/playbook';
 import { SIMILAR_CAREERS } from '../utils/roadmap/similarCareers';
+import { loadChecklist, clearChecklist, countProgress } from '../utils/roadmapProgress';
 
 // ─── Score label (one word, shown in the hero beneath the number) ─────────────
 const SCORE_LABELS = { LOW: 'Resilient', MEDIUM: 'Developing', HIGH: 'Under Pressure' };
@@ -267,7 +268,7 @@ function ScoreGauge({ score, riskClass }) {
 // Playbook, What's Working In Your Favor) -- no new scoring, no new content
 // source. Similar Careers data (previously only used in the Reveal/Roadmap
 // flow) powers the backup-path card.
-function NextMoveSection({ topProtector, weakestCategory, showRoadmapCta }) {
+function NextMoveSection({ topProtector, weakestCategory, showRoadmapCta, roadmapProgress }) {
   const weakestLevel = playbookLevel(weakestCategory.score);
   const weakestPlaybook = PLAYBOOK[weakestCategory.key];
 
@@ -321,15 +322,26 @@ function NextMoveSection({ topProtector, weakestCategory, showRoadmapCta }) {
         )}
 
         {/* /roadmap and /reveal read this browser's own answers, so the CTA
-            is hidden on ?share= views, where the score shown isn't theirs. */}
+            is hidden on ?share= views, where the score shown isn't theirs.
+            Once the user has ticked Protection Plan steps on /roadmap, it
+            switches to showing that progress (roadmapProgress.js). */}
         {showRoadmapCta && (
           <div className="next-move-roadmap-cta">
             <div className="next-move-roadmap-cta-text">
-              <h3 className="next-move-card-title">Want the full step-by-step plan?</h3>
-              <p className="next-move-card-text">Your Career Roadmap turns these three moves into a 30-day, 90-day, and 1-year plan — with a checklist you can save and come back to.</p>
+              {roadmapProgress?.done > 0 ? (
+                <>
+                  <h3 className="next-move-card-title">You&rsquo;ve completed {roadmapProgress.done} of {roadmapProgress.total} steps in your Career Roadmap</h3>
+                  <p className="next-move-card-text">Pick up where you left off &mdash; your progress is saved in this browser.</p>
+                </>
+              ) : (
+                <>
+                  <h3 className="next-move-card-title">Want the full step-by-step plan?</h3>
+                  <p className="next-move-card-text">Your Career Roadmap turns these three moves into a 30-day, 90-day, and 1-year plan — with a checklist you can save and come back to.</p>
+                </>
+              )}
             </div>
             <div className="next-move-roadmap-cta-actions">
-              <Link to="/roadmap" className="btn-primary">Build My Full Career Roadmap</Link>
+              <Link to="/roadmap" className="btn-primary">{roadmapProgress?.done > 0 ? 'Continue My Career Roadmap' : 'Build My Full Career Roadmap'}</Link>
               <Link to="/reveal" className="next-move-roadmap-cta-alt">Or walk me through it step by step</Link>
             </div>
           </div>
@@ -412,6 +424,8 @@ export default function Results() {
   const [showWhatIf, setShowWhatIf] = useState(false);
   const [displayScore, setDisplayScore] = useState(0);
   const [comparison, setComparison] = useState(null);
+  // Read once: Results re-renders every frame of the score count-up.
+  const [savedChecklist] = useState(loadChecklist);
 
   const shareParam = searchParams.get('share');
   const sharedData = shareParam ? decodeShareState(shareParam) : null;
@@ -535,6 +549,7 @@ export default function Results() {
   }
 
   function handleRetake() {
+    clearChecklist(); // a new assessment (maybe a different role) starts with a fresh plan
     setAnswers({});
     navigate('/assessment');
   }
@@ -637,6 +652,7 @@ export default function Results() {
         topProtector={topProtectors[0]}
         weakestCategory={rankedCategories[rankedCategories.length - 1]}
         showRoadmapCta={!isSharedView}
+        roadmapProgress={isSharedView ? null : countProgress(savedChecklist, rankedCategories)}
       />
 
       {/* Category Breakdown */}

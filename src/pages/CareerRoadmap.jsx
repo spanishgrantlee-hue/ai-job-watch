@@ -11,6 +11,7 @@ import { TOOLS, TOOLS_NOTE } from '../utils/roadmap/tools.js';
 import { WORKPLACE_MOVES } from '../utils/roadmap/workplaceMoves.js';
 import { CERTIFICATIONS } from '../utils/roadmap/certifications.js';
 import { SIMILAR_CAREERS, SIMILAR_CAREERS_DISCLAIMER, SIMILAR_CAREERS_INTRO } from '../utils/roadmap/similarCareers.js';
+import { loadChecklist, saveChecklist, protectionPlanCategories } from '../utils/roadmapProgress.js';
 
 // ─── Career Roadmap — Reference Mode (Group O) ─────────────────────────────────
 // The same content as Reveal Screens 1-11 (Screen 0/Welcome and the K4 phase-
@@ -217,7 +218,7 @@ function TasksChangingSection({ weakestCategory, automationRisks, riskKey }) {
 }
 
 function ProtectionPlanSection({ rankedCategories, hoursBudget, onSelectHours, checklist, onToggleItem }) {
-  const weakest = [...rankedCategories].reverse().slice(0, 2);
+  const weakest = protectionPlanCategories(rankedCategories);
 
   return (
     <section className="results-section">
@@ -552,11 +553,23 @@ export default function CareerRoadmap() {
   // Protection Plan checklist -- seeded from whichever snapshot is already
   // being decoded (snapshotData for a saved-link view, compareData as a
   // starting point for the live-vs-saved compare view), so a returning user
-  // sees their previously-checked items restored. Neither ?share= links
-  // (decodeShareState, no checklist field) nor a fresh live view have
-  // anything to seed from, so both correctly default to {} -- same "additive,
-  // sensible default if skipped" pattern hoursBudget already uses.
-  const [checklist, setChecklist] = useState(() => (snapshotData ?? compareData)?.checklist ?? {});
+  // sees their previously-checked items restored. ?share= links
+  // (decodeShareState, no checklist field) have nothing to seed from and
+  // default to {}. The plain live view seeds from this browser's saved
+  // progress (roadmapProgress.js) instead of starting empty every visit.
+  const isLiveView = !isSharedView && !isSnapshotView && !isCompareView;
+  const [checklist, setChecklist] = useState(() =>
+    isLiveView ? loadChecklist() : (snapshotData ?? compareData)?.checklist ?? {}
+  );
+
+  // Persist live-view progress. Gated on how the checklist was SEEDED, not
+  // just the current view: this page stays mounted when only the query
+  // string changes, so a checklist seeded from a ?snapshot= link must never
+  // be written into the user's own saved progress.
+  const [seededFromSaved] = useState(isLiveView);
+  useEffect(() => {
+    if (seededFromSaved && isLiveView) saveChecklist(checklist);
+  }, [checklist, seededFromSaved, isLiveView]);
 
   function handleToggleChecklistItem(categoryKey, timeframe) {
     const checklistKey = `${categoryKey}:${timeframe}`;
