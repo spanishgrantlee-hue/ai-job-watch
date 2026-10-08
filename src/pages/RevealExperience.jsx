@@ -6,7 +6,7 @@ import { useAnswers } from '../AnswerContext';
 import { calculateResults } from '../utils/scoring';
 import RevealSequencer from '../components/roadmap/RevealSequencer.jsx';
 import { PACING } from '../components/roadmap/pacing.js';
-import { loadChecklist, saveChecklist } from '../utils/roadmapProgress.js';
+import { loadChecklist, saveChecklist, loadHours, saveHours } from '../utils/roadmapProgress.js';
 
 import WelcomeScreen from '../components/roadmap/screens/WelcomeScreen.jsx';
 import ScoreScreen from '../components/roadmap/screens/ScoreScreen.jsx';
@@ -60,7 +60,9 @@ import RoadmapReadyScreen from '../components/roadmap/screens/RoadmapReadyScreen
 // protectionPlanComponent's deps never recreates it -- the remount bug above
 // can't return. /reveal reads no URL params (no ?share=/?snapshot=/?compare=),
 // so only the user's own progress is ever loaded or saved here. Retake and
-// Start Over already clear that same saved progress.
+// Start Over already clear that same saved progress. The hours-per-week
+// choice follows the same pattern (initialHours read once, saved through the
+// stable handleHoursChange), so Learning Plan and /roadmap remember it too.
 //
 // checklist itself IS kept (not discarded) and threaded
 // into roadmapReadyComponent, which passes it on to RoadmapReadyScreen's
@@ -75,7 +77,12 @@ const SCORED_IDS = ['Q6','Q7','Q8','Q9','Q10','Q11','Q12','Q13','Q14','Q15','Q16
 export default function RevealExperience() {
   const { answers } = useAnswers();
   const navigate = useNavigate();
-  const [hoursBudget, setHoursBudget] = useState(null);
+  const [initialHours] = useState(loadHours);
+  const [hoursBudget, setHoursBudget] = useState(initialHours);
+  const handleHoursChange = useCallback((key) => {
+    setHoursBudget(key);
+    saveHours(key);
+  }, []);
   const [initialChecklist] = useState(loadChecklist);
   const [checklist, setChecklist] = useState(initialChecklist);
   const handleChecklistChange = useCallback((next) => {
@@ -99,11 +106,12 @@ export default function RevealExperience() {
     <ProtectionPlanScreen
       {...props}
       rankedCategories={rankedCategories}
-      onAnswerHours={setHoursBudget}
+      onAnswerHours={handleHoursChange}
+      initialHours={initialHours}
       initialChecklist={initialChecklist}
       onChecklistChange={handleChecklistChange}
     />
-  ), [rankedCategories, initialChecklist, handleChecklistChange]);
+  ), [rankedCategories, initialHours, handleHoursChange, initialChecklist, handleChecklistChange]);
   const phaseMarkerComponent = useCallback((props) => <PhaseMarkerScreen {...props} />, []);
   const learningPlanComponent = useCallback((props) => <LearningPlanScreen {...props} weakestCategory={weakestCategory} hoursBudget={hoursBudget ?? 'mid'} />, [weakestCategory, hoursBudget]);
   const toolsComponent = useCallback((props) => <ToolsScreen {...props} weakestCategory={weakestCategory} />, [weakestCategory]);

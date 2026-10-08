@@ -8,7 +8,7 @@ import { Helmet } from 'react-helmet-async';
 import WhatIfPanel from '../components/WhatIfPanel';
 import { PLAYBOOK, playbookLevel } from '../utils/playbook';
 import { SIMILAR_CAREERS } from '../utils/roadmap/similarCareers';
-import { loadChecklist, clearChecklist, countProgress } from '../utils/roadmapProgress';
+import { loadChecklist, clearRoadmapProgress, countProgress } from '../utils/roadmapProgress';
 
 // ─── Score label (one word, shown in the hero beneath the number) ─────────────
 const SCORE_LABELS = { LOW: 'Resilient', MEDIUM: 'Developing', HIGH: 'Under Pressure' };
@@ -549,7 +549,7 @@ export default function Results() {
   }
 
   function handleRetake() {
-    clearChecklist(); // a new assessment (maybe a different role) starts with a fresh plan
+    clearRoadmapProgress(); // a new assessment (maybe a different role) starts with a fresh plan
     setAnswers({});
     navigate('/assessment');
   }

@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useAnswers } from '../AnswerContext';
 import { sections, getQuestionsForSection } from '../utils/questions';
-import { clearChecklist } from '../utils/roadmapProgress';
+import { clearRoadmapProgress } from '../utils/roadmapProgress';
 
 const TOTAL_SECTIONS = sections.length;
 
@@ -126,7 +126,7 @@ export default function Assessment() {
     } catch {
       // localStorage unavailable — safe to ignore
     }
-    clearChecklist(); // starting over also starts a fresh Career Roadmap checklist
+    clearRoadmapProgress(); // starting over also starts a fresh Career Roadmap checklist
     setAnswers({});
     setCurrentSection(1);
     setShowResumePrompt(false);

@@ -11,7 +11,7 @@ import { TOOLS, TOOLS_NOTE } from '../utils/roadmap/tools.js';
 import { WORKPLACE_MOVES } from '../utils/roadmap/workplaceMoves.js';
 import { CERTIFICATIONS } from '../utils/roadmap/certifications.js';
 import { SIMILAR_CAREERS, SIMILAR_CAREERS_DISCLAIMER, SIMILAR_CAREERS_INTRO } from '../utils/roadmap/similarCareers.js';
-import { loadChecklist, saveChecklist, protectionPlanCategories } from '../utils/roadmapProgress.js';
+import { loadChecklist, saveChecklist, loadHours, saveHours, protectionPlanCategories } from '../utils/roadmapProgress.js';
 
 // ─── Career Roadmap — Reference Mode (Group O) ─────────────────────────────────
 // The same content as Reveal Screens 1-11 (Screen 0/Welcome and the K4 phase-
@@ -526,7 +526,6 @@ function ClosingSection({ weakestCategory, results, checklist, onDownloadPdf }) 
 export default function CareerRoadmap() {
   const { answers } = useAnswers();
   const [searchParams] = useSearchParams();
-  const [hoursBudget, setHoursBudget] = useState(null);
 
   const shareParam = searchParams.get('share');
   const sharedData = shareParam ? decodeShareState(shareParam) : null;
@@ -574,6 +573,15 @@ export default function CareerRoadmap() {
   function handleToggleChecklistItem(categoryKey, timeframe) {
     const checklistKey = `${categoryKey}:${timeframe}`;
     setChecklist(prev => ({ ...prev, [checklistKey]: !prev[checklistKey] }));
+  }
+
+  // Hours-per-week choice -- same rules as the checklist: the live view
+  // restores and saves it; link views (which never carry it) start unset and
+  // never save, using the same seeding guard.
+  const [hoursBudget, setHoursBudget] = useState(() => (isLiveView ? loadHours() : null));
+  function handleSelectHours(key) {
+    setHoursBudget(key);
+    if (seededFromSaved && isLiveView) saveHours(key);
   }
 
   const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
@@ -654,7 +662,7 @@ export default function CareerRoadmap() {
       <WhySection topProtector={topProtector} />
       <StrengthsSection rankedCategories={rankedCategories} />
       <TasksChangingSection weakestCategory={weakestCategory} automationRisks={automationRisks} riskKey={riskKey} />
-      <ProtectionPlanSection rankedCategories={rankedCategories} hoursBudget={hoursBudget} onSelectHours={setHoursBudget} checklist={checklist} onToggleItem={handleToggleChecklistItem} />
+      <ProtectionPlanSection rankedCategories={rankedCategories} hoursBudget={hoursBudget} onSelectHours={handleSelectHours} checklist={checklist} onToggleItem={handleToggleChecklistItem} />
       <LearningPlanSection weakestCategory={weakestCategory} hoursBudget={hoursBudget ?? 'mid'} />
       <ToolsSection weakestCategory={weakestCategory} />
       <WorkplaceMovesSection weakestCategory={weakestCategory} />

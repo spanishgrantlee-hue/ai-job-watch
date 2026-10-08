@@ -74,8 +74,8 @@ function PlanCard({ category, rank, checklist, onToggleItem }) {
   );
 }
 
-export default function ProtectionPlanScreen({ rankedCategories, onAnswerHours, initialChecklist = {}, onChecklistChange, onAdvance }) {
-  const [selectedHours, setSelectedHours] = useState(null);
+export default function ProtectionPlanScreen({ rankedCategories, onAnswerHours, initialHours = null, initialChecklist = {}, onChecklistChange, onAdvance }) {
+  const [selectedHours, setSelectedHours] = useState(initialHours);
   const [checklist, setChecklist] = useState(initialChecklist);
   const weakest = [...rankedCategories].reverse().slice(0, 2);
 
