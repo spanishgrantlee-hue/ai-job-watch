@@ -6,6 +6,7 @@ import { useAnswers } from '../AnswerContext';
 import { calculateResults } from '../utils/scoring';
 import RevealSequencer from '../components/roadmap/RevealSequencer.jsx';
 import { PACING } from '../components/roadmap/pacing.js';
+import { loadChecklist, saveChecklist } from '../utils/roadmapProgress.js';
 
 import WelcomeScreen from '../components/roadmap/screens/WelcomeScreen.jsx';
 import ScoreScreen from '../components/roadmap/screens/ScoreScreen.jsx';
@@ -51,9 +52,17 @@ import RoadmapReadyScreen from '../components/roadmap/screens/RoadmapReadyScreen
 // looking at it while Protection Plan updates that state, so recreating its
 // closure there is invisible/harmless.
 //
-// initialChecklist passed to ProtectionPlanScreen is still a constant {}:
-// nothing currently seeds it from anywhere real (no snapshot restore flow
-// reaches /reveal). checklist itself IS now kept (not discarded) and threaded
+// The checklist is the same 6 Protection Plan steps /roadmap shows, in the
+// same "categoryKey:timeframe" format, so it shares /roadmap's saved progress
+// (roadmapProgress.js): initialChecklist is read from it once at mount, and
+// every tick is saved back through handleChecklistChange. Both are stable
+// references (read once; a callback with no deps), so adding them to
+// protectionPlanComponent's deps never recreates it -- the remount bug above
+// can't return. /reveal reads no URL params (no ?share=/?snapshot=/?compare=),
+// so only the user's own progress is ever loaded or saved here. Retake and
+// Start Over already clear that same saved progress.
+//
+// checklist itself IS kept (not discarded) and threaded
 // into roadmapReadyComponent, which passes it on to RoadmapReadyScreen's
 // handleSave -- closing the save-time gap Q1 documented and Q3 confirmed
 // live. roadmapReadyComponent safely depends on checklist (unlike
@@ -67,7 +76,12 @@ export default function RevealExperience() {
   const { answers } = useAnswers();
   const navigate = useNavigate();
   const [hoursBudget, setHoursBudget] = useState(null);
-  const [checklist, setChecklist] = useState({});
+  const [initialChecklist] = useState(loadChecklist);
+  const [checklist, setChecklist] = useState(initialChecklist);
+  const handleChecklistChange = useCallback((next) => {
+    setChecklist(next);
+    saveChecklist(next);
+  }, []);
 
   const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
 
@@ -86,10 +100,10 @@ export default function RevealExperience() {
       {...props}
       rankedCategories={rankedCategories}
       onAnswerHours={setHoursBudget}
-      initialChecklist={{}}
-      onChecklistChange={setChecklist}
+      initialChecklist={initialChecklist}
+      onChecklistChange={handleChecklistChange}
     />
-  ), [rankedCategories]);
+  ), [rankedCategories, initialChecklist, handleChecklistChange]);
   const phaseMarkerComponent = useCallback((props) => <PhaseMarkerScreen {...props} />, []);
   const learningPlanComponent = useCallback((props) => <LearningPlanScreen {...props} weakestCategory={weakestCategory} hoursBudget={hoursBudget ?? 'mid'} />, [weakestCategory, hoursBudget]);
   const toolsComponent = useCallback((props) => <ToolsScreen {...props} weakestCategory={weakestCategory} />, [weakestCategory]);
