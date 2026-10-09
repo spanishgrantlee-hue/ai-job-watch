@@ -110,6 +110,12 @@ export default function About() {
           information. Your responses are anonymous, but your input helps us learn and build a
           better site to help more people.
         </p>
+        <p>
+          Your Career Roadmap checklist and hours-per-week choice are saved only in your browser —
+          they aren't sent to us with your answers, and clearing your browser data (or choosing
+          Retake or Start Over) removes them. If you use Save My Roadmap, your checked steps are
+          included in the link it creates.
+        </p>
       </div>
 
       <div className="about-section">
