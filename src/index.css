@@ -1254,6 +1254,7 @@ input, select, textarea, button { font-family: inherit; }
   flex-direction: column;
   gap: 16px;
 }
+.next-move-roadmap-cta-text .next-move-card-text + .next-move-card-text { margin-top: 6px; }
 .next-move-roadmap-cta-actions {
   display: flex;
   flex-direction: column;
@@ -2309,6 +2310,9 @@ input, select, textarea, button { font-family: inherit; }
 }
 
 .protection-plan-screen .results-section-desc { margin-bottom: 28px; }
+
+/* /roadmap: check-in link under the Protection Plan cards, once a step is ticked */
+.protection-plan-checkin { margin-top: 1.25rem; }
 
 .protection-plan-question {
   margin-top: 2.5rem;

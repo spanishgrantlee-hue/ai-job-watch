@@ -11,7 +11,7 @@ import { TOOLS, TOOLS_NOTE } from '../utils/roadmap/tools.js';
 import { WORKPLACE_MOVES } from '../utils/roadmap/workplaceMoves.js';
 import { CERTIFICATIONS } from '../utils/roadmap/certifications.js';
 import { SIMILAR_CAREERS, SIMILAR_CAREERS_DISCLAIMER, SIMILAR_CAREERS_INTRO } from '../utils/roadmap/similarCareers.js';
-import { loadChecklist, saveChecklist, loadHours, saveHours, protectionPlanCategories } from '../utils/roadmapProgress.js';
+import { loadChecklist, saveChecklist, loadHours, saveHours, protectionPlanCategories, countProgress } from '../utils/roadmapProgress.js';
 
 // ─── Career Roadmap — Reference Mode (Group O) ─────────────────────────────────
 // The same content as Reveal Screens 1-11 (Screen 0/Welcome and the K4 phase-
@@ -217,7 +217,7 @@ function TasksChangingSection({ weakestCategory, automationRisks, riskKey }) {
   );
 }
 
-function ProtectionPlanSection({ rankedCategories, hoursBudget, onSelectHours, checklist, onToggleItem }) {
+function ProtectionPlanSection({ rankedCategories, hoursBudget, onSelectHours, checklist, onToggleItem, showCheckInLink }) {
   const weakest = protectionPlanCategories(rankedCategories);
 
   return (
@@ -275,6 +275,13 @@ function ProtectionPlanSection({ rankedCategories, hoursBudget, onSelectHours, c
             );
           })}
         </div>
+
+        {showCheckInLink && (
+          <p className="results-section-desc protection-plan-checkin">
+            Made changes at work?{' '}
+            <Link to="/check-in" className="next-move-roadmap-cta-alt">Re-check your score in a few quick questions&nbsp;&rarr;</Link>
+          </p>
+        )}
 
         <div className="protection-plan-question">
           <p className="protection-plan-question-text">About how many hours a week could you realistically put toward this?</p>
@@ -662,7 +669,7 @@ export default function CareerRoadmap() {
       <WhySection topProtector={topProtector} />
       <StrengthsSection rankedCategories={rankedCategories} />
       <TasksChangingSection weakestCategory={weakestCategory} automationRisks={automationRisks} riskKey={riskKey} />
-      <ProtectionPlanSection rankedCategories={rankedCategories} hoursBudget={hoursBudget} onSelectHours={handleSelectHours} checklist={checklist} onToggleItem={handleToggleChecklistItem} />
+      <ProtectionPlanSection rankedCategories={rankedCategories} hoursBudget={hoursBudget} onSelectHours={handleSelectHours} checklist={checklist} onToggleItem={handleToggleChecklistItem} showCheckInLink={isLiveView && countProgress(checklist, rankedCategories).done > 0} />
       <LearningPlanSection weakestCategory={weakestCategory} hoursBudget={hoursBudget ?? 'mid'} />
       <ToolsSection weakestCategory={weakestCategory} />
       <WorkplaceMovesSection weakestCategory={weakestCategory} />

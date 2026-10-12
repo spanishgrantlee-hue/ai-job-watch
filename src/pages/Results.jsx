@@ -324,7 +324,8 @@ function NextMoveSection({ topProtector, weakestCategory, showRoadmapCta, roadma
         {/* /roadmap and /reveal read this browser's own answers, so the CTA
             is hidden on ?share= views, where the score shown isn't theirs.
             Once the user has ticked Protection Plan steps on /roadmap, it
-            switches to showing that progress (roadmapProgress.js). */}
+            switches to showing that progress (roadmapProgress.js), plus a
+            link to the existing /check-in re-score. */}
         {showRoadmapCta && (
           <div className="next-move-roadmap-cta">
             <div className="next-move-roadmap-cta-text">
@@ -332,6 +333,10 @@ function NextMoveSection({ topProtector, weakestCategory, showRoadmapCta, roadma
                 <>
                   <h3 className="next-move-card-title">You&rsquo;ve completed {roadmapProgress.done} of {roadmapProgress.total} steps in your Career Roadmap</h3>
                   <p className="next-move-card-text">Pick up where you left off &mdash; your progress is saved in this browser.</p>
+                  <p className="next-move-card-text">
+                    Made changes at work?{' '}
+                    <Link to="/check-in" className="next-move-roadmap-cta-alt">Re-check your score in a few quick questions&nbsp;&rarr;</Link>
+                  </p>
                 </>
               ) : (
                 <>
