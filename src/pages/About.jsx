@@ -106,9 +106,16 @@ export default function About() {
         <p>
           AI Job Watch automatically saves your assessment answers and final score to help us
           understand which jobs and industries are most affected by AI — and to improve this tool
-          over time. We do not collect your name, email, location, or any other personal
-          information. Your responses are anonymous, but your input helps us learn and build a
-          better site to help more people.
+          over time. We don't ask for your name, email, or any contact details. Your responses are
+          anonymous, but your input helps us learn and build a better site to help more people.
+        </p>
+        <p>
+          We also use Google Analytics on every page to understand how the site is used. It sets
+          cookies and records things like the pages you visit, page titles, scrolling, your browser
+          and device, and your approximate location. The site doesn't send your assessment answers
+          to Google Analytics, but page titles and addresses can reflect your results — for
+          example, the results page title shows your score, and share, saved-roadmap, and job-page
+          links include encoded results or a job title in their address.
         </p>
         <p>
           Your Career Roadmap checklist and hours-per-week choice are saved only in your browser —
