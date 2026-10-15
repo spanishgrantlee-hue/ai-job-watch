@@ -5,22 +5,27 @@ import { useAnswers } from '../AnswerContext';
 import { calculateResults } from '../utils/scoring';
 import { decodeRoadmapSnapshot } from '../utils/share';
 import { getQuestion } from '../utils/questions';
+import { protectionPlanCategories, checkInQuestionIds } from '../utils/roadmapProgress';
 
 // ─── Roadmap Check-In (P3) ──────────────────────────────────────────────────────
-// A short 8-question re-check-in instead of the full 30-question assessment.
-// Reuses questions.js's own question/choice objects verbatim (no new
-// questions invented, no changes to that file) and calculateResults()
+// A short re-check-in (10-15 questions) instead of the full 30-question
+// assessment. Reuses questions.js's own question/choice objects verbatim (no
+// new questions invented, no changes to that file) and calculateResults()
 // unmodified -- this only ever merges fresh answers into a COPY of the
 // existing stored answers and recomputes, the same scoring engine every
 // other page already uses.
 //
-// Question choice: covers accountability/judgment/problemSolving/AI-exposure
-// (Q6, Q8, Q13, Q15, Q16, Q17, Q23, Q28) -- factors tied to workplace AI
-// adoption and role-scope changes, which shift on a timescale of months.
-// Deliberately does NOT re-ask anything feeding trust/physicalPresence/
-// licensing, since those are stable traits of a job (relationship demands,
-// physical nature of the work, regulatory requirements) that don't shift in
-// a short re-check-in window.
+// Question choice: a fixed base of BASE_CHECKIN_QUESTION_IDS (accountability/
+// judgment/problemSolving/AI-exposure factors tied to workplace AI adoption
+// and role scope) PLUS every question behind the worker's two Protection Plan
+// categories (roadmapProgress.js checkInQuestionIds). The base set originally
+// skipped trust/physicalPresence/licensing as "stable traits" -- but the
+// Protection Plan tells workers to change exactly those things (earn a
+// credential, build client relationships, take on hands-on work), so a
+// check-in that couldn't see them would show no change for work the plan
+// asked for. The plan and question list are fixed when the page opens, so
+// they don't shift while the worker answers. The result shows the total plus
+// a before/after line for each plan category.
 //
 // Requires the original answers to still be in this browser's localStorage
 // (via AnswerContext) -- there's no raw-answer baseline to merge into
@@ -30,15 +35,37 @@ import { getQuestion } from '../utils/questions';
 // instead of a broken partial-answer computation.
 
 const SCORED_IDS = ['Q6','Q7','Q8','Q9','Q10','Q11','Q12','Q13','Q14','Q15','Q16','Q17','Q18','Q19','Q20','Q21','Q22','Q23','Q24','Q25','Q28'];
-const CHECKIN_QUESTION_IDS = ['Q6', 'Q8', 'Q13', 'Q15', 'Q16', 'Q17', 'Q23', 'Q28'];
+const BASE_CHECKIN_QUESTION_IDS = ['Q6', 'Q8', 'Q13', 'Q15', 'Q16', 'Q17', 'Q23', 'Q28'];
+
+// "Licensing: 2/5 -> 3/5", or an honest note when a category hasn't moved:
+// category scores are rounded averages, so one improved answer doesn't
+// always change the whole-number score.
+function CategoryChange({ label, before, after }) {
+  if (before === after) {
+    return <li><strong>{label}:</strong> still {after}/5. Scores here move in whole steps, so it can take more than one change to show.</li>;
+  }
+  return <li><strong>{label}:</strong> {before}/5 &rarr; {after}/5</li>;
+}
 
 export default function RoadmapCheckIn() {
   const { answers, setAnswers } = useAnswers();
   const [searchParams] = useSearchParams();
   const hasAnswers = SCORED_IDS.some(id => answers[id] !== undefined);
 
+  // The worker's Protection Plan (two weakest categories) and the questions to
+  // re-ask, from their answers as they were when the page opened.
+  const [plan] = useState(() => {
+    if (!hasAnswers) return null;
+    const { rankedCategories } = calculateResults(answers);
+    return {
+      categories: protectionPlanCategories(rankedCategories),
+      questionIds: checkInQuestionIds(rankedCategories, BASE_CHECKIN_QUESTION_IDS),
+    };
+  });
+  const questionIds = plan?.questionIds ?? BASE_CHECKIN_QUESTION_IDS;
+
   const [draftAnswers, setDraftAnswers] = useState(() =>
-    Object.fromEntries(CHECKIN_QUESTION_IDS.map(id => [id, answers[id]]))
+    Object.fromEntries(questionIds.map(id => [id, answers[id]]))
   );
   const [comparison, setComparison] = useState(null);
 
@@ -85,6 +112,8 @@ export default function RoadmapCheckIn() {
       delta > 0 ? `Your score moved up ${delta} point${delta === 1 ? '' : 's'} since your last check.`
       : delta < 0 ? `Your score moved down ${Math.abs(delta)} point${Math.abs(delta) === 1 ? '' : 's'} since your last check.`
       : "Your score hasn't changed since your last check.";
+    const planKeys = plan.categories.map(c => c.key).sort().join();
+    const focusChanged = protectionPlanCategories(after.rankedCategories).map(c => c.key).sort().join() !== planKeys;
 
     return (
       <div className="results-page">
@@ -108,6 +137,14 @@ export default function RoadmapCheckIn() {
               </div>
             </div>
             <p className="why-line">{deltaText}</p>
+            <ul className="checkin-category-changes">
+              {plan.categories.map(c => (
+                <CategoryChange key={c.key} label={c.label} before={before.categories[c.key]} after={after.categories[c.key]} />
+              ))}
+            </ul>
+            {focusChanged && (
+              <p className="checkin-focus-changed">Your focus areas have changed &mdash; your Career Roadmap now shows the new ones.</p>
+            )}
             <Link to={snapshotParam ? `/roadmap?compare=${snapshotParam}` : '/roadmap'} className="btn-ghost-dark">See Your Full Roadmap</Link>
           </div>
         </section>
@@ -128,11 +165,11 @@ export default function RoadmapCheckIn() {
             <div className="section-label">Quick Check-In</div>
             <h1 className="results-section-title">What&rsquo;s changed since you last checked?</h1>
             <p className="results-section-desc">
-              Just {CHECKIN_QUESTION_IDS.length} questions &mdash; the ones most likely to have shifted. Everything else stays the same as your original assessment.
+              {questionIds.length} questions &mdash; the ones most likely to have shifted, plus the ones behind your two focus areas: <strong>{plan.categories[0].label}</strong> and <strong>{plan.categories[1].label}</strong>. Everything else stays the same as your original assessment.
             </p>
           </div>
 
-          {CHECKIN_QUESTION_IDS.map((id, i) => {
+          {questionIds.map((id, i) => {
             const question = getQuestion(id);
             return (
               <div className="question-block" key={id}>

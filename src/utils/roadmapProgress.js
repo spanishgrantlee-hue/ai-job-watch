@@ -12,6 +12,8 @@
 // hours choice is never in a link), so a link someone opens can never
 // overwrite (or be mixed into) their own progress.
 
+import { questions } from './questions.js';
+
 const ROADMAP_CHECKLIST_KEY = 'aijobwatch_roadmap_checklist';
 const ROADMAP_HOURS_KEY = 'aijobwatch_roadmap_hours';
 const HOURS_KEYS = ['low', 'mid', 'high'];
@@ -88,4 +90,31 @@ export function countProgress(checklist, rankedCategories) {
   const keys = protectionPlanCategories(rankedCategories)
     .flatMap(category => TIMEFRAMES.map(timeframe => `${category.key}:${timeframe}`));
   return { done: keys.filter(key => checklist[key]).length, total: keys.length };
+}
+
+// ─── Check-in questions for the Protection Plan ───────────────────────────────
+// The questions that feed a category's score are the ones whose answer
+// choices carry a score for it -- the same `choice.scores[category]` values
+// scoring.js averages (its getScore() reads exactly these). Deriving the list
+// here, instead of copying scoring.js's formulas, keeps one source of truth;
+// they only disagree if a question gains a score key that scoring.js's
+// formula for that category doesn't include.
+export function questionsForCategory(categoryKey) {
+  return questions
+    .filter(q => q.choices?.some(choice => choice.scores && categoryKey in choice.scores))
+    .map(q => q.id);
+}
+
+const questionNumber = (id) => Number(id.slice(1));
+
+// The check-in's base questions plus every question behind the worker's two
+// Protection Plan categories, de-duplicated and in assessment order -- so the
+// steps the plan asks for (a certification, a client relationship, hands-on
+// work...) can actually show up in the re-score.
+export function checkInQuestionIds(rankedCategories, baseIds) {
+  const ids = new Set(baseIds);
+  for (const category of protectionPlanCategories(rankedCategories)) {
+    for (const id of questionsForCategory(category.key)) ids.add(id);
+  }
+  return [...ids].sort((a, b) => questionNumber(a) - questionNumber(b));
 }

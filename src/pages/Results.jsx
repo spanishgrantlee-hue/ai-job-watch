@@ -335,7 +335,7 @@ function NextMoveSection({ topProtector, weakestCategory, showRoadmapCta, roadma
                   <p className="next-move-card-text">Pick up where you left off &mdash; your progress is saved in this browser.</p>
                   <p className="next-move-card-text">
                     Made changes at work?{' '}
-                    <Link to="/check-in" className="next-move-roadmap-cta-alt">Re-check your score in a few quick questions&nbsp;&rarr;</Link>
+                    <Link to="/check-in" className="next-move-roadmap-cta-alt">Re-check your score&nbsp;&rarr;</Link>
                   </p>
                 </>
               ) : (

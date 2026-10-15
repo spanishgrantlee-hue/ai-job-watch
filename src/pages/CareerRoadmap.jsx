@@ -279,7 +279,7 @@ function ProtectionPlanSection({ rankedCategories, hoursBudget, onSelectHours, c
         {showCheckInLink && (
           <p className="results-section-desc protection-plan-checkin">
             Made changes at work?{' '}
-            <Link to="/check-in" className="next-move-roadmap-cta-alt">Re-check your score in a few quick questions&nbsp;&rarr;</Link>
+            <Link to="/check-in" className="next-move-roadmap-cta-alt">Re-check your score&nbsp;&rarr;</Link>
           </p>
         )}
 

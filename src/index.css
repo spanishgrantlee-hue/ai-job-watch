@@ -2599,6 +2599,22 @@ input, select, textarea, button { font-family: inherit; }
 
 .checkin-submit { display: flex; margin: 20px auto 0; }
 
+/* Check-in result: before/after for each Protection Plan category (dark hero) */
+.checkin-category-changes {
+  list-style: none;
+  margin: 1rem auto 1.5rem;
+  padding: 0;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.85);
+}
+.checkin-category-changes strong { color: #fff; }
+.checkin-focus-changed { max-width: 560px; margin: 0 auto 1.5rem; font-size: 0.95rem; line-height: 1.5; color: rgba(255,255,255,0.85); }
+
 /* Live Progress View comparison banner (P4) — reuses .results-shared-banner
    as the container; these are just its two-line content layout. */
 .compare-progress-banner {
