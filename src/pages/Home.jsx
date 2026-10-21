@@ -5,7 +5,7 @@ const structuredData = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
   name: 'AI Job Watch',
-  url: 'https://aijobwatch.org',
+  url: 'https://aijobwatch.org/',
   description: 'Free AI job risk assessment. Answer 30 questions and get a personalized AI Resistance Score showing how exposed or protected your job is from automation.',
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Web Browser',
@@ -21,14 +21,15 @@ const websiteStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'AI Job Watch',
-  url: 'https://aijobwatch.org',
+  alternateName: ['AIJobWatch', 'aijobwatch.org'],
+  url: 'https://aijobwatch.org/',
 };
 
 const organizationStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'AI Job Watch',
-  url: 'https://aijobwatch.org',
+  url: 'https://aijobwatch.org/',
   description: 'Free AI job risk assessment tool that helps workers understand how exposed or protected their job is from AI-driven automation.',
 };
 
@@ -59,13 +60,13 @@ export default function Home() {
   return (
     <div className="home">
       <Helmet>
-        <title>Is Your Job Safe from AI? | AI Job Watch</title>
+        <title>AI Job Watch | Is Your Job Safe from AI?</title>
         <meta name="description" content="AI Job Watch gives you a free, personalized AI Resistance Score in 30 questions — see exactly how exposed or protected your job is from automation." />
         <link rel="canonical" href="https://aijobwatch.org/" />
         <meta property="og:url" content="https://aijobwatch.org/" />
-        <meta property="og:title" content="Is Your Job Safe from AI? | AI Job Watch" />
+        <meta property="og:title" content="AI Job Watch | Is Your Job Safe from AI?" />
         <meta property="og:description" content="AI Job Watch gives you a free, personalized AI Resistance Score in 30 questions — see exactly how exposed or protected your job is from automation." />
-        <meta name="twitter:title" content="Is Your Job Safe from AI? | AI Job Watch" />
+        <meta name="twitter:title" content="AI Job Watch | Is Your Job Safe from AI?" />
         <meta name="twitter:description" content="AI Job Watch gives you a free, personalized AI Resistance Score in 30 questions — see exactly how exposed or protected your job is from automation." />
         <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
         <script type="application/ld+json">{JSON.stringify(websiteStructuredData)}</script>
