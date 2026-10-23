@@ -6,15 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!--
-      Title, meta description, og:url/og:title/og:description, and
-      twitter:title/twitter:description are deliberately NOT set here:
-      react-helmet-async doesn't replace tags it didn't itself render, so a
-      static tag here plus a per-page <Helmet> override produces two
-      conflicting tags in the DOM instead of one correct one. Every route
-      sets its own title/description via Helmet (see src/pages/*.jsx), so
-      this file only carries tags no page overrides, to stay the single
-      source of truth for each.
+      Every route sets its own title, description, canonical, og:url and
+      og:/twitter: title/description via react-helmet-async (see
+      src/pages/*.jsx). With React 19, Helmet adds its OWN tags rather than
+      reusing static ones, so a plain static tag here would leave two
+      conflicting tags in the DOM.
+
+      The data-static-seo tags below are brand-only fallbacks for crawlers
+      and link previews that don't run JavaScript. src/main.jsx removes them
+      before React renders, so once the app runs Helmet's per-page tags are
+      the only ones. Never add canonical or og:url here -- those must be
+      page-specific, and a shared fallback would point every page at one URL.
     -->
+    <title data-static-seo>AI Job Watch</title>
+    <meta data-static-seo name="description" content="AI Job Watch gives you a free, personalized AI Resistance Score — see how exposed or protected your job is from automation." />
+    <meta data-static-seo property="og:title" content="AI Job Watch" />
+    <meta data-static-seo property="og:description" content="AI Job Watch gives you a free, personalized AI Resistance Score — see how exposed or protected your job is from automation." />
+    <meta data-static-seo name="twitter:title" content="AI Job Watch" />
+    <meta data-static-seo name="twitter:description" content="AI Job Watch gives you a free, personalized AI Resistance Score — see how exposed or protected your job is from automation." />
 
     <!-- Open Graph -->
     <meta property="og:type"        content="website" />
@@ -37,6 +46,7 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript><p>AI Job Watch is a free AI job risk assessment. Answer questions about your work to get a personalized AI Resistance Score showing how exposed or protected your job is from automation. Please enable JavaScript to take the assessment.</p></noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
